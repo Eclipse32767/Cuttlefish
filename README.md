@@ -23,3 +23,7 @@ This is a project developed in rust that seeks to provide a feature-complete con
 5. Store data in swaycfg.toml
 
     This is more of a principle so that I don't have to rip apart sway configs to retrieve data, instead storing it in clean toml files that are easier to parse (for starters, there is a crate that can parse them for you)
+
+6. Keep localization data in toml files as well
+
+    This keeps the dependency tree small, reducing build times.

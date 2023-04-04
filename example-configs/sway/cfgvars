@@ -1,0 +1,10 @@
+#AUTO-GENERATED CONFIG, do not edit, any changed will be overwritten
+default_border pixel 5 
+set $pri Mod4
+set $sec Shift
+ 
+set $exit $pri+$sec+e
+set $launch $pri+tab
+set $kill $pri+$sec+c
+set $mini $pri+$sec+z
+set $scratch $pri+z

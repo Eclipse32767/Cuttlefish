@@ -1,0 +1,39 @@
+include cfgvars
+
+bindsym $exit exec swaymsg exit
+bindsym $launch rofi
+bindsym $kill kill
+bindsym $mini move scratchpad
+bindsym $scratch scratchpad show
+
+bindsym $pri+Up focus up
+bindsym $pri+Left focus left
+bindsym $pri+Right focus right
+bindsym $pri+Down focus down
+
+bindsym $pri+$sec+Up move up
+bindsym $pri+$sec+Down move down
+bindsym $pri+$sec+Left move left
+bindsym $pri+$sec+Right move right
+
+bindsym $pri+1 workspace number 1
+bindsym $pri+2 workspace number 2
+bindsym $pri+3 workspace number 3
+bindsym $pri+4 workspace number 4
+bindsym $pri+5 workspace number 5
+bindsym $pri+6 workspace number 6
+bindsym $pri+7 workspace number 7
+bindsym $pri+8 workspace number 8
+bindsym $pri+9 workspace number 9
+bindsym $pri+0 workspace number 10
+
+bindsym $pri+$sec+1 move container to workspace number 1
+bindsym $pri+$sec+2 move container to workspace number 2
+bindsym $pri+$sec+3 move container to workspace number 3
+bindsym $pri+$sec+4 move container to workspace number 4
+bindsym $pri+$sec+5 move container to workspace number 5
+bindsym $pri+$sec+6 move container to workspace number 6
+bindsym $pri+$sec+7 move container to workspace number 7
+bindsym $pri+$sec+8 move container to workspace number 8
+bindsym $pri+$sec+9 move container to workspace number 9
+bindsym $pri+$sec+0 move container to workspace number 10
