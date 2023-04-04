@@ -1,0 +1,15 @@
+[package]
+name = "configurator"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+env_logger = "0.10.0"
+iced = "0.8.0"
+iced_aw = "0.4.1"
+serde = "1.0.159"
+serde_derive = "1.0.159"
+toml = "0.7.3"
+whoami = "1.4.0"
