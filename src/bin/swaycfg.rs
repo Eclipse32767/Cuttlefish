@@ -1,6 +1,6 @@
 use iced::theme::{self, Theme};
 use iced::{Result, Application, Settings, Alignment, Length, executor};
-use iced::widget::{Button, Row, Column, Container, pick_list, text_input, Text, Scrollable};
+use iced::widget::{Button, Row, Column, Container, pick_list, Text, Scrollable};
 use std::process::Command;
 use std::fs::{self, read_to_string};
 use std::env;
@@ -157,7 +157,19 @@ struct Configurator {
     scratch_header: Option<BindKey>,
     scratch_key: String,
     width: i32,
-    unsaved: bool
+    unsaved: bool,
+    capturenext: Option<CaptureInput>,
+    index: u8
+}
+
+#[derive(PartialEq, Debug, Clone)]
+enum CaptureInput {
+    NoKey,
+    ExitKey,
+    LaunchKey,
+    KillKey,
+    MiniKey,
+    ScratchKey
 }
 
 #[derive(Deserialize, Debug, Serialize)]
@@ -275,7 +287,9 @@ impl Default for Configurator {
             scratch_header: decodeheader(&data.scratchh, BindKey::PrimaryKey),
             scratch_key: data.scratchk,
             width: data.width,
-            unsaved: false
+            unsaved: false,
+            capturenext: Some(CaptureInput::NoKey),
+            index: 0
         }
     }
 }
@@ -290,18 +304,14 @@ enum Message {
     PrimaryKeyChanged(ShortcutKey),
     SecondaryKeyChanged(ShortcutKey),
     ExitHeaderChanged(BindKey),
-    ExitKeyChanged(String),
     LaunchHeaderChanged(BindKey),
-    LaunchKeyChanged(String),
     KillHeaderChanged(BindKey),
-    KillKeyChanged(String),
     MiniHeaderChanged(BindKey),
-    MiniKeyChanged(String),
     ScratchHeaderChanged(BindKey),
-    ScratchKeyChanged(String),
     WidthIncr,
     WidthDecr,
-    KeyboardUpdate(iced::keyboard::Event)
+    KeyboardUpdate(iced::keyboard::Event),
+    Capture(CaptureInput)
 }
 
 #[derive(Debug, Clone, Copy, Default, PartialEq)]
@@ -536,18 +546,8 @@ impl Application for Configurator {
                 self.unsaved = true;
                 iced::Command::none()
             }
-            Message::ExitKeyChanged(x) => {
-                self.exit_key = x;
-                self.unsaved = true;
-                iced::Command::none()
-            }
             Message::LaunchHeaderChanged(x) => {
                 self.launch_header = Some(x);
-                self.unsaved = true;
-                iced::Command::none()
-            }
-            Message::LaunchKeyChanged(x) => {
-                self.launch_key = x;
                 self.unsaved = true;
                 iced::Command::none()
             }
@@ -556,28 +556,13 @@ impl Application for Configurator {
                 self.unsaved = true;
                 iced::Command::none()
             }
-            Message::KillKeyChanged(x) => {
-                self.kill_key = x;
-                self.unsaved = true;
-                iced::Command::none()
-            }
             Message::MiniHeaderChanged(x) => {
                 self.minimize_header = Some(x);
                 self.unsaved = true;
                 iced::Command::none()
             }
-            Message::MiniKeyChanged(x) => {
-                self.minimize_key = x;
-                self.unsaved = true;
-                iced::Command::none()
-            }
             Message::ScratchHeaderChanged(x) => {
                 self.scratch_header = Some(x);
-                self.unsaved = true;
-                iced::Command::none()
-            }
-            Message::ScratchKeyChanged(x) => {
-                self.scratch_key = x;
                 self.unsaved = true;
                 iced::Command::none()
             }
@@ -598,94 +583,123 @@ impl Application for Configurator {
             Message::KeyboardUpdate(x) => {
                 match x {
                     iced::keyboard::Event::KeyPressed { key_code, modifiers} => {
-                        if key_code == iced::keyboard::KeyCode::Up {
-                            if iced::keyboard::Modifiers::shift(modifiers) {//go up a page
-                                self.current_page = match self.current_page {
-                                    Page::Main => {
-                                        Page::Init
+                        match self.capturenext.as_ref().unwrap() {
+                            &CaptureInput::NoKey => {
+                                if key_code == iced::keyboard::KeyCode::Up {
+                                    if iced::keyboard::Modifiers::shift(modifiers) {//go up a page
+                                        self.current_page = match self.current_page {
+                                            Page::Main => {
+                                                Page::Init
+                                            }
+                                            Page::Bind => {
+                                                Page::Main
+                                            }
+                                            Page::Bar => {
+                                                Page::Bind
+                                            }
+                                            Page::Init => {
+                                                Page::Bar
+                                            }
+                                        }
                                     }
-                                    Page::Bind => {
-                                        Page::Main
+                                } else if key_code == iced::keyboard::KeyCode::Down {
+                                    if iced::keyboard::Modifiers::shift(modifiers) {//go down a page
+                                        self.current_page = match self.current_page {
+                                            Page::Main => {
+                                                Page::Bind
+                                            }
+                                            Page::Bind => {
+                                                Page::Bar
+                                            }
+                                            Page::Bar => {
+                                                Page::Init
+                                            }
+                                            Page::Init => {
+                                                Page::Main
+                                            }
+                                       }
                                     }
-                                    Page::Bar => {
-                                        Page::Bind
+                                } else if key_code == iced::keyboard::KeyCode::S { //save
+                                if self.unsaved {
+                                    {//Block that writes cfgvars
+                                    let home = get_home();
+                                    let data;
+                                    let primary = rip_shortcut(self.primary_key);
+                                    let secondary = rip_shortcut(self.secondary_key);
+                                    let exith = rip_bind(self.exit_header);
+                                    let exitk = &self.exit_key;
+                                    let launchh = rip_bind(self.launch_header);
+                                    let launchk = &self.launch_key;
+                                    let killh = rip_bind(self.kill_header);
+                                    let killk = &self.kill_key;
+                                    let minih = rip_bind(self.minimize_header);
+                                    let minik = &self.minimize_key;
+                                    let scratchh = rip_bind(self.scratch_header);
+                                    let scratchk = &self.scratch_key;
+                                    let borderval = rip_border(self.border);
+                                    let widthval = &self.width;
+                                    let path = format!("{home}/sway/cfgvars");
+                                    data = format!("#AUTO-GENERATED CONFIG, do not edit, any changed will be overwritten\ndefault_border {borderval} {widthval} \nset $pri {primary}\nset $sec {secondary}\n \nset $exit {exith}+{exitk}\nset $launch {launchh}+{launchk}\nset $kill {killh}+{killk}\nset $mini {minih}+{minik}\nset $scratch {scratchh}+{scratchk}");
+                    
+                                    fs::write(path, data).expect("failed to write file");
+                    
+                                    Command::new("swaymsg")
+                                        .arg("reload")
+                                        .spawn()
+                                        .expect("oops, swaymsg failed, do you have sway installed?");
                                     }
-                                    Page::Init => {
-                                        Page::Bar
-                                    }
+                                    {//Block that writes swaycfg.toml
+                                    let home = get_home();
+                                    let path = format!("{home}/swaycfg/swaycfg.toml");
+                                    let data = FileData{
+                                        theme: encodetheme(self.theme.clone()).to_string(),
+                                        border: encodeborder(self.border).to_string(),
+                                        width: self.width,
+                                        primary: encodepri(self.primary_key).to_string(),
+                                        secondary: encodepri(self.secondary_key).to_string(),
+                                        exith: encodeheader(self.exit_header).to_string(),
+                                        exitk: self.exit_key.clone(),
+                                        launchh: encodeheader(self.launch_header).to_string(),
+                                        launchk: self.launch_key.clone(),
+                                        killh: encodeheader(self.kill_header).to_string(),
+                                        killk: self.kill_key.clone(),
+                                        minih: encodeheader(self.minimize_header).to_string(),
+                                        minik: self.minimize_key.clone(),
+                                        scratchh: encodeheader(self.scratch_header).to_string(),
+                                        scratchk: self.scratch_key.clone()
+                                    };
+                                    let toml = to_string(&data).expect("failed to generate toml");
+                                    fs::write(path, toml).expect("failed to write swaycfg.toml");
                                 }
-                            }
-                        } else if key_code == iced::keyboard::KeyCode::Down {
-                            if iced::keyboard::Modifiers::shift(modifiers) {//go down a page
-                                self.current_page = match self.current_page {
-                                    Page::Main => {
-                                        Page::Bind
-                                    }
-                                    Page::Bind => {
-                                        Page::Bar
-                                    }
-                                    Page::Bar => {
-                                        Page::Init
-                                    }
-                                    Page::Init => {
-                                        Page::Main
-                                    }
                                 }
+                                    self.unsaved = false;
                             }
-                        } else if key_code == iced::keyboard::KeyCode::S { //save
-                            if self.unsaved {
-                                {//Block that writes cfgvars
-                                let home = get_home();
-                                let data;
-                                let primary = rip_shortcut(self.primary_key);
-                                let secondary = rip_shortcut(self.secondary_key);
-                                let exith = rip_bind(self.exit_header);
-                                let exitk = &self.exit_key;
-                                let launchh = rip_bind(self.launch_header);
-                                let launchk = &self.launch_key;
-                                let killh = rip_bind(self.kill_header);
-                                let killk = &self.kill_key;
-                                let minih = rip_bind(self.minimize_header);
-                                let minik = &self.minimize_key;
-                                let scratchh = rip_bind(self.scratch_header);
-                                let scratchk = &self.scratch_key;
-                                let borderval = rip_border(self.border);
-                                let widthval = &self.width;
-                                let path = format!("{home}/sway/cfgvars");
-                                data = format!("#AUTO-GENERATED CONFIG, do not edit, any changed will be overwritten\ndefault_border {borderval} {widthval} \nset $pri {primary}\nset $sec {secondary}\n \nset $exit {exith}+{exitk}\nset $launch {launchh}+{launchk}\nset $kill {killh}+{killk}\nset $mini {minih}+{minik}\nset $scratch {scratchh}+{scratchk}");
-                
-                                fs::write(path, data).expect("failed to write file");
-                
-                                Command::new("swaymsg")
-                                    .arg("reload")
-                                    .spawn()
-                                    .expect("oops, swaymsg failed, do you have sway installed?");
-                                }
-                                {//Block that writes swaycfg.toml
-                                let home = get_home();
-                                let path = format!("{home}/swaycfg/swaycfg.toml");
-                                let data = FileData{
-                                    theme: encodetheme(self.theme.clone()).to_string(),
-                                    border: encodeborder(self.border).to_string(),
-                                    width: self.width,
-                                    primary: encodepri(self.primary_key).to_string(),
-                                    secondary: encodepri(self.secondary_key).to_string(),
-                                    exith: encodeheader(self.exit_header).to_string(),
-                                    exitk: self.exit_key.clone(),
-                                    launchh: encodeheader(self.launch_header).to_string(),
-                                    launchk: self.launch_key.clone(),
-                                    killh: encodeheader(self.kill_header).to_string(),
-                                    killk: self.kill_key.clone(),
-                                    minih: encodeheader(self.minimize_header).to_string(),
-                                    minik: self.minimize_key.clone(),
-                                    scratchh: encodeheader(self.scratch_header).to_string(),
-                                    scratchk: self.scratch_key.clone()
-                                };
-                                let toml = to_string(&data).expect("failed to generate toml");
-                                fs::write(path, toml).expect("failed to write swaycfg.toml");
+                            } 
+                            &CaptureInput::ExitKey => {
+                                self.exit_key = format!("{:?}", key_code);
+                                self.capturenext = Some(CaptureInput::NoKey);
+                                self.unsaved = true;
                             }
+                            &CaptureInput::LaunchKey => {
+                                self.launch_key = format!("{:?}", key_code);
+                                self.capturenext = Some(CaptureInput::NoKey);
+                                self.unsaved = true;
                             }
-                                self.unsaved = false;
+                            &CaptureInput::KillKey => {
+                                self.kill_key = format!("{:?}", key_code);
+                                self.capturenext = Some(CaptureInput::NoKey);
+                                self.unsaved = true;
+                            }
+                            &CaptureInput::MiniKey => {
+                                self.minimize_key = format!("{:?}", key_code);
+                                self.capturenext = Some(CaptureInput::NoKey);
+                                self.unsaved = true;
+                            }
+                            &CaptureInput::ScratchKey => {
+                                self.scratch_key = format!("{:?}", key_code);
+                                self.capturenext = Some(CaptureInput::NoKey);
+                                self.unsaved = true;
+                            }
                         }
                     }
                     iced::keyboard::Event::KeyReleased {..} => {
@@ -698,6 +712,10 @@ impl Application for Configurator {
 
                     }
                 }
+                iced::Command::none()
+            }
+            Message::Capture(x) => {
+                self.capturenext = Some(x);
                 iced::Command::none()
             }
         }
@@ -853,11 +871,8 @@ impl Application for Configurator {
                 Message::ExitHeaderChanged,
                 )
                 .placeholder("choose");
-                let exitkeyselect = text_input(
-                &bindstr.keyplaceholder,
-                &self.exit_key,
-                Message::ExitKeyChanged
-                ).width(50);
+                let exitkey = String::as_str(&self.exit_key);
+                let exitkeyselect = Button::new(exitkey).on_press(Message::Capture(CaptureInput::ExitKey)).width(50);
                 let exitscrow = Row::new()
                     .push(exitsclabel)
                     .push(exitheaderselect)
@@ -870,11 +885,8 @@ impl Application for Configurator {
                     Message::LaunchHeaderChanged,
                     )
                     .placeholder("choose");
-                let launchkeyselect = text_input(
-                    &bindstr.keyplaceholder,
-                    &self.launch_key,
-                    Message::LaunchKeyChanged
-                ).width(50);
+                let launchkey = String::as_str(&self.launch_key);
+                let launchkeyselect = Button::new(launchkey).on_press(Message::Capture(CaptureInput::LaunchKey)).width(50);
                 let launchscrow = Row::new()
                     .push(launchsclabel)
                     .push(launchheaderselect)
@@ -887,11 +899,8 @@ impl Application for Configurator {
                     Message::KillHeaderChanged,
                     )
                     .placeholder("choose");
-                let killkeyselect = text_input(
-                    &bindstr.keyplaceholder,
-                    &self.kill_key,
-                    Message::KillKeyChanged
-                ).width(50);
+                let killkey = String::as_str(&self.kill_key);
+                let killkeyselect = Button::new(killkey).on_press(Message::Capture(CaptureInput::KillKey)).width(50);
                 let killscrow = Row::new()
                     .push(killsclabel)
                     .push(killheaderselect)
@@ -904,11 +913,8 @@ impl Application for Configurator {
                  Message::MiniHeaderChanged,
                  )
                     .placeholder("choose");
-                let minikeyselect = text_input(
-                 &bindstr.keyplaceholder,
-                &self.minimize_key,
-                Message::MiniKeyChanged
-                ).width(50);
+                let minikey = String::as_str(&self.minimize_key);
+                let minikeyselect = Button::new(minikey).on_press(Message::Capture(CaptureInput::MiniKey)).width(50);
                 let miniscrow = Row::new()
                     .push(minisclabel)
                     .push(miniheaderselect)
@@ -921,11 +927,8 @@ impl Application for Configurator {
                     Message::ScratchHeaderChanged,
                     )
                     .placeholder("choose");
-                let scratchkeyselect = text_input(
-                    &bindstr.keyplaceholder,
-                    &self.scratch_key,
-                    Message::ScratchKeyChanged
-                ).width(50);
+                let scratchkey = String::as_str(&self.scratch_key);
+                let scratchkeyselect = Button::new(scratchkey).on_press(Message::Capture(CaptureInput::ScratchKey)).width(50);
                 let scratchscrow = Row::new()
                     .push(scratchsclabel)
                     .push(scratchheaderselect)
