@@ -1,5 +1,5 @@
 use iced::theme::{self, Theme};
-use iced::{Result, Sandbox, Settings, Alignment, Length};
+use iced::{Result, Application, Settings, Alignment, Length, executor};
 use iced::widget::{Button, Row, Column, Container, pick_list, text_input, Text, Scrollable};
 use std::process::Command;
 use std::fs::{self, read_to_string};
@@ -300,7 +300,8 @@ enum Message {
     ScratchHeaderChanged(BindKey),
     ScratchKeyChanged(String),
     WidthIncr,
-    WidthDecr
+    WidthDecr,
+    KeyboardUpdate(iced::keyboard::Event)
 }
 
 #[derive(Debug, Clone, Copy, Default, PartialEq)]
@@ -427,17 +428,23 @@ impl std::fmt::Display for BindKey {
     }
 }
 
-impl Sandbox for Configurator {
+impl Application for Configurator {
     type Message = Message;
-    fn new() -> Self {
-        Self::default()
+    type Theme = Theme;
+    type Executor = executor::Default;
+    type Flags = ();
+    fn new(_flags: ()) -> (Self, iced::Command<Message>) {
+        (
+            Self::default(),
+            iced::Command::none()
+        )
     }
     fn title(&self) -> String {
         let globalstr = self.locale.global.as_ref().unwrap();
         let title = globalstr.title.clone();
         format!("{title}{}", self.current_page.to_string())
     }
-    fn update(&mut self, message: Self::Message) {
+    fn update(&mut self, message: Self::Message) -> iced::Command<Message> {
         match message {
             Message::Save => {
                 if self.unsaved {
@@ -492,82 +499,206 @@ impl Sandbox for Configurator {
                 fs::write(path, toml).expect("failed to write swaycfg.toml");
             }
             }
-                self.unsaved = false
+                self.unsaved = false;
+                iced::Command::none()
             }
             Message::ThemeLight => {
                 self.theme = Theme::Light;
                 self.unsaved = true;
+                iced::Command::none()
             }
             Message::ThemeDark => {
                 self.theme = Theme::Dark;
                 self.unsaved = true;
+                iced::Command::none()
             }
             Message::BorderToggled(x) => {
                 self.border = Some(x);
                 self.unsaved = true;
+                iced::Command::none()
             }
             Message::PageChanged(x) => {
                 self.current_page = x;
+                iced::Command::none()
             }
             Message::PrimaryKeyChanged(x) => {
                 self.primary_key = Some(x);
                 self.unsaved = true;
+                iced::Command::none()
             }
             Message::SecondaryKeyChanged(x) => {
                 self.secondary_key = Some(x);
                 self.unsaved = true;
+                iced::Command::none()
             }
             Message::ExitHeaderChanged(x) => {
                 self.exit_header = Some(x);
                 self.unsaved = true;
+                iced::Command::none()
             }
             Message::ExitKeyChanged(x) => {
                 self.exit_key = x;
                 self.unsaved = true;
+                iced::Command::none()
             }
             Message::LaunchHeaderChanged(x) => {
                 self.launch_header = Some(x);
                 self.unsaved = true;
+                iced::Command::none()
             }
             Message::LaunchKeyChanged(x) => {
                 self.launch_key = x;
                 self.unsaved = true;
+                iced::Command::none()
             }
             Message::KillHeaderChanged(x) => {
                 self.kill_header = Some(x);
                 self.unsaved = true;
+                iced::Command::none()
             }
             Message::KillKeyChanged(x) => {
                 self.kill_key = x;
                 self.unsaved = true;
+                iced::Command::none()
             }
             Message::MiniHeaderChanged(x) => {
                 self.minimize_header = Some(x);
                 self.unsaved = true;
+                iced::Command::none()
             }
             Message::MiniKeyChanged(x) => {
                 self.minimize_key = x;
                 self.unsaved = true;
+                iced::Command::none()
             }
             Message::ScratchHeaderChanged(x) => {
                 self.scratch_header = Some(x);
                 self.unsaved = true;
+                iced::Command::none()
             }
             Message::ScratchKeyChanged(x) => {
                 self.scratch_key = x;
                 self.unsaved = true;
+                iced::Command::none()
             }
             Message::WidthIncr => {
                 if self.width <= 19 {
                     self.width = self.width + 1;
                     self.unsaved = true;
                 }
+                iced::Command::none()
             }
             Message::WidthDecr => {
                 if self.width >= 1 {
                     self.width = self.width -1;
                     self.unsaved = true;
                 }
+                iced::Command::none()
+            }
+            Message::KeyboardUpdate(x) => {
+                match x {
+                    iced::keyboard::Event::KeyPressed { key_code, modifiers} => {
+                        if key_code == iced::keyboard::KeyCode::Up {
+                            if iced::keyboard::Modifiers::shift(modifiers) {//go up a page
+                                self.current_page = match self.current_page {
+                                    Page::Main => {
+                                        Page::Init
+                                    }
+                                    Page::Bind => {
+                                        Page::Main
+                                    }
+                                    Page::Bar => {
+                                        Page::Bind
+                                    }
+                                    Page::Init => {
+                                        Page::Bar
+                                    }
+                                }
+                            }
+                        } else if key_code == iced::keyboard::KeyCode::Down {
+                            if iced::keyboard::Modifiers::shift(modifiers) {//go down a page
+                                self.current_page = match self.current_page {
+                                    Page::Main => {
+                                        Page::Bind
+                                    }
+                                    Page::Bind => {
+                                        Page::Bar
+                                    }
+                                    Page::Bar => {
+                                        Page::Init
+                                    }
+                                    Page::Init => {
+                                        Page::Main
+                                    }
+                                }
+                            }
+                        } else if key_code == iced::keyboard::KeyCode::S { //save
+                            if self.unsaved {
+                                {//Block that writes cfgvars
+                                let home = get_home();
+                                let data;
+                                let primary = rip_shortcut(self.primary_key);
+                                let secondary = rip_shortcut(self.secondary_key);
+                                let exith = rip_bind(self.exit_header);
+                                let exitk = &self.exit_key;
+                                let launchh = rip_bind(self.launch_header);
+                                let launchk = &self.launch_key;
+                                let killh = rip_bind(self.kill_header);
+                                let killk = &self.kill_key;
+                                let minih = rip_bind(self.minimize_header);
+                                let minik = &self.minimize_key;
+                                let scratchh = rip_bind(self.scratch_header);
+                                let scratchk = &self.scratch_key;
+                                let borderval = rip_border(self.border);
+                                let widthval = &self.width;
+                                let path = format!("{home}/sway/cfgvars");
+                                data = format!("#AUTO-GENERATED CONFIG, do not edit, any changed will be overwritten\ndefault_border {borderval} {widthval} \nset $pri {primary}\nset $sec {secondary}\n \nset $exit {exith}+{exitk}\nset $launch {launchh}+{launchk}\nset $kill {killh}+{killk}\nset $mini {minih}+{minik}\nset $scratch {scratchh}+{scratchk}");
+                
+                                fs::write(path, data).expect("failed to write file");
+                
+                                Command::new("swaymsg")
+                                    .arg("reload")
+                                    .spawn()
+                                    .expect("oops, swaymsg failed, do you have sway installed?");
+                                }
+                                {//Block that writes swaycfg.toml
+                                let home = get_home();
+                                let path = format!("{home}/swaycfg/swaycfg.toml");
+                                let data = FileData{
+                                    theme: encodetheme(self.theme.clone()).to_string(),
+                                    border: encodeborder(self.border).to_string(),
+                                    width: self.width,
+                                    primary: encodepri(self.primary_key).to_string(),
+                                    secondary: encodepri(self.secondary_key).to_string(),
+                                    exith: encodeheader(self.exit_header).to_string(),
+                                    exitk: self.exit_key.clone(),
+                                    launchh: encodeheader(self.launch_header).to_string(),
+                                    launchk: self.launch_key.clone(),
+                                    killh: encodeheader(self.kill_header).to_string(),
+                                    killk: self.kill_key.clone(),
+                                    minih: encodeheader(self.minimize_header).to_string(),
+                                    minik: self.minimize_key.clone(),
+                                    scratchh: encodeheader(self.scratch_header).to_string(),
+                                    scratchk: self.scratch_key.clone()
+                                };
+                                let toml = to_string(&data).expect("failed to generate toml");
+                                fs::write(path, toml).expect("failed to write swaycfg.toml");
+                            }
+                            }
+                                self.unsaved = false;
+                        }
+                    }
+                    iced::keyboard::Event::KeyReleased {..} => {
+
+                    }
+                    iced::keyboard::Event::CharacterReceived(..) => {
+
+                    }
+                    iced::keyboard::Event::ModifiersChanged(..) => {
+
+                    }
+                }
+                iced::Command::none()
             }
         }
     }
@@ -832,6 +963,17 @@ impl Sandbox for Configurator {
             .width(Length::Fill)
             .height(Length::Fill)
             .into()
+    }
+    fn subscription(&self) -> iced::Subscription<Message> {
+        iced::subscription::events_with(
+            |event, _| {
+                if let iced::Event::Keyboard(keyboard_event) = event {
+                    Some(Message::KeyboardUpdate(keyboard_event))
+                } else {
+                    None
+                }
+            }
+        )
     }
     fn theme(&self) -> Theme {
         self.theme.clone()
