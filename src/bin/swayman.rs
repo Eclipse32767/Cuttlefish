@@ -1,5 +1,5 @@
 use iced::theme::{self, Theme};
-use iced::{Result, Sandbox, Settings, alignment, Alignment, Length};
+use iced::{Result, Settings, alignment, Alignment, Length, Application, Command, executor};
 use iced::widget::{Button, Row, Column, Container, Text, Scrollable};
 use std::fs::read_to_string;
 use std::env;
@@ -193,23 +193,53 @@ impl Default for Manual {
 #[derive(Debug, Clone)]
 enum Message {
     PageIncr,
-    PageDecr
+    PageDecr,
+    KeyboardUpdate(iced::keyboard::Event)
 }
-impl Sandbox for Manual {
+impl Application for Manual {
     type Message = Message;
-    fn new() -> Self {
-        Self::default()
+    type Theme = Theme;
+    type Executor = executor::Default;
+    type Flags = ();
+    fn new(_flags: ()) -> (Self, Command<Message>) {
+        (
+            Self::default(),
+            Command::none()
+        )
     }
     fn title(&self) -> String {
         format!("Sway Manual")
     }
-    fn update(&mut self, message: Self::Message) {
+    fn update(&mut self, message: Self::Message) -> Command<Message> {
         match message {
             Message::PageIncr => {
                 if self.current_page < 3 {self.current_page = self.current_page + 1;}
+                Command::none()
             }
             Message::PageDecr => {
                 if self.current_page > 0 {self.current_page = self.current_page -1;}
+                Command::none()
+            }
+            Message::KeyboardUpdate(x) => {
+                match x {
+                    iced::keyboard::Event::KeyPressed { key_code, modifiers: _ } => {
+                        if key_code == iced::keyboard::KeyCode::Right {
+                            if self.current_page < 3 {self.current_page = self.current_page + 1;}
+                        } else if key_code == iced::keyboard::KeyCode::Left {
+                            if self.current_page > 0 {self.current_page = self.current_page -1;}
+                        }
+                    }
+                    iced::keyboard::Event::KeyReleased {..} => {
+
+                    }
+                    iced::keyboard::Event::CharacterReceived(..) => {
+
+                    }
+                    iced::keyboard::Event::ModifiersChanged(..) => {
+
+                    }
+                }
+                Command::none()
             }
         }
     }
@@ -311,6 +341,17 @@ impl Sandbox for Manual {
             .width(Length::Fill)
             .height(Length::Fill)
             .into()
+    }
+    fn subscription(&self) -> iced::Subscription<Message> {
+        iced::subscription::events_with(
+            |event, _| {
+                if let iced::Event::Keyboard(keyboard_event) = event {
+                    Some(Message::KeyboardUpdate(keyboard_event))
+                } else {
+                    None
+                }
+            }
+        )
     }
     fn theme(&self) -> Theme {
         self.theme.clone()
