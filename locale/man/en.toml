@@ -27,7 +27,7 @@ postexit = "This will close out the desktop entirely, destroying all unsaved wor
 
 [workspaces]
 title = "Workspaces"
-head = "There exists 10 workspaces in this environment-\n In effect each one is its own desktop where you can move applications to or visit the applications located there.\n\n"
+head = "There are 10 workspaces in this environment-\n In effect each one is its own desktop where you can move applications to or visit the applications located there.\n\n"
 prefocus = "To move yourself to a workspace, press:\n"
 focus = "+A Number Key.\n"
 postfocus = "This will move you to the workspace corresponding to the number you pressed.\n \n"
