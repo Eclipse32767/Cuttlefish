@@ -6,6 +6,12 @@ use std::fs::{self, read_to_string};
 use std::env;
 use serde_derive::{Deserialize, Serialize};
 use toml::{self, from_str, to_string};
+use libcfg::{getcfgdata, FileData};
+mod libcfg;
+use langswaycfg::{get_lang, Translation};
+mod langswaycfg;
+
+mod liblocale;
 
 fn main() -> Result {
     Configurator::run(Settings::default())
@@ -19,15 +25,6 @@ pub fn get_home() -> String {
             Err(..) => panic!("Failed to find config directory, make sure XDG_CONFIG_HOME or HOME are set")
         }
     }
-}
-pub fn get_lang() -> Translation {
-    let locale = whoami::lang().collect::<Vec<String>>();
-    let lang = locale[1].clone();
-    let home = get_home();
-    let langpath = format!("{home}/swaycfg/locale/cfg/{lang}.toml");
-    let langfile = read_to_string(langpath).expect("no locale found");
-    let decoded: Translation = from_str(&langfile).unwrap();
-    decoded
 }
 
 pub fn rip_shortcut(opt: Option<ShortcutKey>) -> &'static str {
@@ -74,71 +71,7 @@ pub fn rip_border(opt: Option<Border>) -> &'static str {
     }
     x
 }
-#[derive(Deserialize, Debug, Serialize)]
-pub struct Translation {
-    global: Option<PageGlobals>,
-    mainpage: Option<MainPage>,
-    bindpage: Option<BindPage>,
-    autopage: Option<AutoPage>,
-    barpage: Option<BarPage>,
-    prettyprint: Option<PrettyPrint>
-}
-#[derive(Deserialize, Debug, Serialize)]
-pub struct MainPage {
-    borders: String,
-    width: String,
-    theme: String,
-    light: String,
-    dark: String
-}
-#[derive(Deserialize, Debug, Serialize)]
-pub struct BindPage {
-    exit: String,
-    keyplaceholder: String,
-    launch: String,
-    kill: String,
-    mini: String,
-    scratch: String,
-}
-#[derive(Deserialize, Debug, Serialize)]
-pub struct AutoPage {
 
-}
-#[derive(Deserialize, Debug, Serialize)]
-pub struct BarPage {
-
-}
-#[derive(Deserialize, Debug, Serialize)]
-pub struct PrettyPrint {
-    borderno: String,
-    bordernormal: String,
-    bordercsd: String,
-    borderpixel: String,
-    keysuper: String,
-    keyalt: String,
-    keyshift: String,
-    keyctrl: String,
-    bindpri: String,
-    bindsec: String,
-    bindboth: String,
-    pagemain: String,
-    pagebind: String,
-    pagebar: String,
-    pageinit: String
-}
-#[derive(Deserialize, Debug, Serialize)]
-pub struct PageGlobals {
-    title: String,
-    label: String,
-    main: String,
-    bind: String,
-    bar: String,
-    init: String,
-    save: String,
-    saved: String,
-    primary: String,
-    secondary: String,
-}
 struct Configurator {
     theme: Theme,
     locale: Translation,
@@ -173,37 +106,6 @@ enum CaptureInput {
     ScratchKey
 }
 
-#[derive(Deserialize, Debug, Serialize)]
-pub struct FileData {
-    theme: String,
-    border: String,
-    width: i32,
-    primary: String,
-    secondary: String,
-    exith: String,
-    exitk: String,
-    launchh: String,
-    launchk: String,
-    killh: String,
-    killk: String,
-    minih: String,
-    minik: String,
-    scratchh: String,
-    scratchk: String
-}
-pub fn getcfgdata() -> FileData {
-    let home = get_home();
-    let path = format!("{home}/swaycfg/swaycfg.toml");
-    let file = match read_to_string(path) {
-        Ok(var) => var,
-        Err(..) => match read_to_string("/etc/swaycfg/swaycfg.toml") {
-            Ok(var) => var,
-            Err(..) => panic!("Failed to find swaycfg.toml in any valid directory")
-        }
-    };
-    let decoded: FileData = from_str(&file).unwrap();
-    decoded
-}
 pub fn decodetheme(x: &str, default: Theme) -> Theme {
     match x {
         "dark" => Theme::Dark,
@@ -322,7 +224,8 @@ pub enum Page {
     Main,
     Bind,
     Bar,
-    Init
+    Init,
+    Anim
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -420,6 +323,7 @@ impl std::fmt::Display for Page {
                 Page::Bind => pretty.pagebind,
                 Page::Bar => pretty.pagebar,
                 Page::Init => pretty.pageinit,
+                Page::Anim => pretty.pageanim,
             }
         )
     }
@@ -454,7 +358,7 @@ impl Application for Configurator {
     fn title(&self) -> String {
         let globalstr = self.locale.global.as_ref().unwrap();
         let title = globalstr.title.clone();
-        format!("{title}{}", self.current_page.to_string())
+        format!("j{}", self.current_page.to_string())
     }
     fn update(&mut self, message: Self::Message) -> iced::Command<Message> {
         match message {
@@ -544,6 +448,9 @@ impl Application for Configurator {
                     Page::Init => {
                         self.indexmax = 0;
                     }
+                    Page::Anim => {
+                        self.indexmax = 0;
+                    }
                 }
                 iced::Command::none()
             }
@@ -611,9 +518,12 @@ impl Application for Configurator {
                                                 self.indexmax = 3;
                                                 Page::Main
                                             }
-                                            Page::Bar => {
+                                            Page::Anim => {
                                                 self.indexmax = 6;
                                                 Page::Bind
+                                            }
+                                            Page::Bar => {
+                                                Page::Anim
                                             }
                                             Page::Init => {
                                                 Page::Bar
@@ -632,6 +542,9 @@ impl Application for Configurator {
                                                 Page::Bind
                                             }
                                             Page::Bind => {
+                                                Page::Anim
+                                            }
+                                            Page::Anim => {
                                                 Page::Bar
                                             }
                                             Page::Bar => {
@@ -722,6 +635,9 @@ impl Application for Configurator {
                                     Page::Init => {
 
                                     }
+                                    Page::Anim => {
+
+                                    }
                                 }
                             }
                             } 
@@ -780,6 +696,7 @@ impl Application for Configurator {
         let bindtxt = String::as_str(&globalstr.bind);
         let bartxt = String::as_str(&globalstr.bar);
         let inittxt = String::as_str(&globalstr.init);
+        let animtxt = String::as_str(&globalstr.anim);
         let pagetxt = String::as_str(&globalstr.label);
         let mut pagemain = Button::new(maintxt)
             .on_press(Message::PageChanged(Page::Main));
@@ -789,6 +706,8 @@ impl Application for Configurator {
             .on_press(Message::PageChanged(Page::Bar));
         let mut pageinit = Button::new(inittxt)
             .on_press(Message::PageChanged(Page::Init));
+        let mut pageanim = Button::new(animtxt)
+            .on_press(Message::PageChanged(Page::Anim));
         let pagelabel = Text::new(pagetxt);
         match self.current_page {
             Page::Main => {
@@ -803,11 +722,15 @@ impl Application for Configurator {
             Page::Init => {
                 pageinit = pageinit.style(theme::Button::Secondary);
             }
+            Page::Anim => {
+                pageanim = pageanim.style(theme::Button::Secondary);
+            }
         }
         let pagecol = Column::new()
             .push(pagelabel)
             .push(pagemain)
             .push(pagebind)
+            .push(pageanim)
             .push(pagebar)
             .push(pageinit)
             .spacing(10)
@@ -1058,6 +981,9 @@ impl Application for Configurator {
 
             }
             Page::Init => {
+
+            }
+            Page::Anim => {
 
             }
         }

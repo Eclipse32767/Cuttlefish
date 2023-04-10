@@ -1,10 +1,12 @@
 use iced::theme::{self, Theme};
 use iced::{Result, Settings, alignment, Alignment, Length, Application, Command, executor};
 use iced::widget::{Button, Row, Column, Container, Text, Scrollable};
-use std::fs::read_to_string;
-use std::env;
-use serde_derive::{Deserialize, Serialize};
-use toml::{self, from_str};
+use libcfg::{getcfgdata};
+mod libcfg;
+use langswayman::{get_lang, Translation};
+mod langswayman;
+
+mod liblocale;
 
 fn main() -> Result {
     Manual::run(Settings::default())
@@ -26,117 +28,6 @@ struct Manual {
     minimize_key: String,
     scratch_header: String,
     scratch_key: String
-}
-
-#[derive(Deserialize, Debug, Serialize)]
-pub struct FileData {
-    theme: String,
-    primary: String,
-    secondary: String,
-    exith: String,
-    exitk: String,
-    launchh: String,
-    launchk: String,
-    killh: String,
-    killk: String,
-    minih: String,
-    minik: String,
-    scratchh: String,
-    scratchk: String
-}
-
-#[derive(Deserialize, Debug, Serialize)]
-pub struct Translation {
-    globals: Option<GlobalStrings>,
-    navigation: Option<NavStrings>,
-    advanced: Option<AdvStrings>,
-    workspaces: Option<WorkStrings>,
-    minimization: Option<MiniStrings>
-}
-#[derive(Deserialize, Debug, Serialize)]
-pub struct GlobalStrings {
-    title: String,
-    backtxt: String,
-    forwardtxt: String,
-}
-#[derive(Deserialize, Debug, Serialize)]
-pub struct NavStrings {
-    title: String,
-    prefocus: String,
-    focus: String,
-    postfocus: String,
-    premove: String,
-    movetxt: String,
-    postmove: String,
-    immutable: String,
-}
-#[derive(Deserialize, Debug, Serialize)]
-pub struct AdvStrings {
-    title: String,
-    presearch: String,
-    search: String,
-    postsearch: String,
-    prekill: String,
-    kill: String,
-    postkill: String,
-    preexit: String,
-    exit: String,
-    postexit: String,
-}
-#[derive(Deserialize, Debug, Serialize)]
-pub struct WorkStrings {
-    title: String,
-    head: String,
-    prefocus: String,
-    focus: String,
-    postfocus: String,
-    premove: String,
-    movetxt: String,
-    postmove: String,
-    immutable: String,
-}
-#[derive(Deserialize, Debug, Serialize)]
-pub struct MiniStrings {
-    title: String,
-    premove: String,
-    movetxt: String,
-    postmove: String,
-    prefocus: String,
-    focus: String,
-    postfocus: String
-}
-
-pub fn get_lang() -> Translation {
-    let locale = whoami::lang().collect::<Vec<String>>();
-    let lang = locale[1].clone();
-    let home = get_home();
-    let langpath = format!("{home}/swaycfg/locale/man/{lang}.toml");
-    let langfile = read_to_string(langpath).expect("no locale found");
-    let decoded: Translation = from_str(&langfile).unwrap();
-    decoded
-}
-pub fn get_home() -> String {
-    match env::var("XDG_CONFIG_HOME") {
-        Ok(var) => var,
-        Err(..) => match env::var("HOME") {
-            Ok(var) => format!("{var}/.config"),
-            Err(..) => panic!("Failed to find config directory, make sure XDG_CONFIG_HOME or HOME are set")
-        }
-    }
-}
-
-pub fn getcfgdata() -> FileData {
-    let home = get_home();
-    let path = format!("{home}/swaycfg/swaycfg.toml");
-    let file = match read_to_string(path) {
-        Ok(var) => var,
-        Err(..) => match read_to_string("/etc/swaycfg/swaycfg.toml") {
-            Ok(var) => var,
-            Err(..) => panic!("Failed to find swaycfg.toml in any valid directory")
-        }
-    };
-    let decoded: FileData = from_str(&file).unwrap();
-    decoded
 }
 
 pub fn decodetheme(x: &str, default: Theme) -> Theme {
