@@ -159,7 +159,8 @@ struct Configurator {
     width: i32,
     unsaved: bool,
     capturenext: Option<CaptureInput>,
-    index: u8
+    index: u8,
+    indexmax: u8,
 }
 
 #[derive(PartialEq, Debug, Clone)]
@@ -289,7 +290,8 @@ impl Default for Configurator {
             width: data.width,
             unsaved: false,
             capturenext: Some(CaptureInput::NoKey),
-            index: 0
+            index: 0,
+            indexmax: 3,
         }
     }
 }
@@ -529,6 +531,20 @@ impl Application for Configurator {
             }
             Message::PageChanged(x) => {
                 self.current_page = x;
+                match x {
+                    Page::Main => {
+                        self.indexmax = 3;
+                    }
+                    Page::Bind => {
+                        self.indexmax = 6;
+                    }
+                    Page::Bar => {
+                        self.indexmax = 0;
+                    }
+                    Page::Init => {
+                        self.indexmax = 0;
+                    }
+                }
                 iced::Command::none()
             }
             Message::PrimaryKeyChanged(x) => {
@@ -592,20 +608,27 @@ impl Application for Configurator {
                                                 Page::Init
                                             }
                                             Page::Bind => {
+                                                self.indexmax = 3;
                                                 Page::Main
                                             }
                                             Page::Bar => {
+                                                self.indexmax = 6;
                                                 Page::Bind
                                             }
                                             Page::Init => {
                                                 Page::Bar
                                             }
                                         }
+                                    } else {
+                                        if self.index != 0 {
+                                            self.index = self.index -1;
+                                        }
                                     }
                                 } else if key_code == iced::keyboard::KeyCode::Down {
                                     if iced::keyboard::Modifiers::shift(modifiers) {//go down a page
                                         self.current_page = match self.current_page {
                                             Page::Main => {
+                                                self.indexmax = 6;
                                                 Page::Bind
                                             }
                                             Page::Bind => {
@@ -615,9 +638,14 @@ impl Application for Configurator {
                                                 Page::Init
                                             }
                                             Page::Init => {
+                                                self.indexmax = 3;
                                                 Page::Main
                                             }
                                        }
+                                    } else {
+                                        if self.index != self.indexmax {
+                                            self.index = self.index +1;
+                                        }
                                     }
                                 } else if key_code == iced::keyboard::KeyCode::S { //save
                                 if self.unsaved {
@@ -673,6 +701,28 @@ impl Application for Configurator {
                                 }
                                 }
                                     self.unsaved = false;
+                            } else if key_code == iced::keyboard::KeyCode::Enter {
+                                match self.current_page {
+                                    Page::Main => {
+                                        if self.index == 0 {
+                                            if self.theme == Theme::Dark {
+                                                self.theme = Theme::Light;
+                                            } else {
+                                                self.theme = Theme::Dark;
+                                            }
+                                            self.unsaved = true;
+                                        }
+                                    }
+                                    Page::Bind => {
+
+                                    }
+                                    Page::Bar => {
+
+                                    }
+                                    Page::Init => {
+
+                                    }
+                                }
                             }
                             } 
                             &CaptureInput::ExitKey => {
@@ -721,6 +771,7 @@ impl Application for Configurator {
         }
     }
     fn view(&self) -> iced::Element<'_, Self::Message> {
+        let selectionmarker: Text = Text::new("=>");
         let globalstr = self.locale.global.as_ref().unwrap();
         let mainstr = self.locale.mainpage.as_ref().unwrap();
         let bindstr = self.locale.bindpage.as_ref().unwrap();
@@ -777,36 +828,30 @@ impl Application for Configurator {
             .push(save)
             .align_items(Alignment::Center);
 
-        let primarypick = pick_list(
-            &ShortcutKey::ALL[..], 
-            self.primary_key, 
-            Message::PrimaryKeyChanged,
-            )
-            .placeholder("choose");
-        let secondarypick = pick_list(
-            &ShortcutKey::ALL[..], 
-            self.secondary_key, 
-            Message::SecondaryKeyChanged,
-            )
-            .placeholder("choose");
-        let primarytxt = String::as_str(&globalstr.primary);
-        let secondarytxt = String::as_str(&globalstr.secondary);
-        let primarylabel: Text = Text::new(primarytxt);
-        let secondarylabel: Text = Text::new(secondarytxt);
-        let primaryrow = Row::new()
-            .push(primarylabel)
-            .push(primarypick)
-            .spacing(10);
-        let secondaryrow = Row::new()
-            .push(secondarylabel)
-            .push(secondarypick)
-            .spacing(10);
         
         let mut settings = Column::new().spacing(10);
 
 
         match self.current_page {
             Page::Main => {
+
+                let primarypick = pick_list(
+                    &ShortcutKey::ALL[..], 
+                    self.primary_key, 
+                    Message::PrimaryKeyChanged,
+                    )
+                    .placeholder("choose");
+                let secondarypick = pick_list(
+                    &ShortcutKey::ALL[..], 
+                    self.secondary_key, 
+                    Message::SecondaryKeyChanged,
+                    )
+                    .placeholder("choose");
+                let primarytxt = String::as_str(&globalstr.primary);
+                let secondarytxt = String::as_str(&globalstr.secondary);
+                let primarylabel: Text = Text::new(primarytxt);
+                let secondarylabel: Text = Text::new(secondarytxt);
+
                 let bordertoggle = pick_list(
                     &Border::ALL[..], 
                     self.border, 
@@ -824,13 +869,6 @@ impl Application for Configurator {
                 } else if self.width == 0 {
                     widthdown = widthdown.style(theme::Button::Secondary);
                 }
-                let borderrow = Row::new()
-                    .push(borderlabel)
-                    .push(bordertoggle)
-                    .push(widthlabel)
-                    .push(widthup)
-                    .push(widthdown)
-                    .spacing(10);
 
                 let lighttxt = String::as_str(&mainstr.light);
                 let darktxt = String::as_str(&mainstr.dark);
@@ -851,11 +889,37 @@ impl Application for Configurator {
                         panic!("oops");
                     }
                 }
-                let themerow = Row::new()
+                let mut borderrow = Row::new().spacing(10);
+                let mut themerow = Row::new().spacing(10);
+                let mut primaryrow = Row::new().spacing(10);
+                let mut secondaryrow = Row::new().spacing(10);
+
+                if self.index == 0 {
+                    themerow = themerow.push(selectionmarker);
+                } else if self.index == 1 {
+                    borderrow = borderrow.push(selectionmarker);
+                } else if self.index == 2 {
+                    primaryrow = primaryrow.push(selectionmarker);
+                } else if self.index == 3 {
+                    secondaryrow = secondaryrow.push(selectionmarker);
+                }
+
+                borderrow = borderrow
+                    .push(borderlabel)
+                    .push(bordertoggle)
+                    .push(widthlabel)
+                    .push(widthup)
+                    .push(widthdown);
+                themerow = themerow
                     .push(themelabel)
                     .push(light)
-                    .push(dark)
-                    .spacing(20);
+                    .push(dark);
+                primaryrow = primaryrow
+                    .push(primarylabel)
+                    .push(primarypick);
+                secondaryrow = secondaryrow
+                    .push(secondarylabel)
+                    .push(secondarypick);
         
                 settings = settings
                     .push(themerow)
@@ -864,6 +928,24 @@ impl Application for Configurator {
                     .push(secondaryrow);
             }
             Page::Bind => {
+                let primarypick = pick_list(
+                    &ShortcutKey::ALL[..], 
+                    self.primary_key, 
+                    Message::PrimaryKeyChanged,
+                    )
+                    .placeholder("choose");
+                let secondarypick = pick_list(
+                    &ShortcutKey::ALL[..], 
+                    self.secondary_key, 
+                    Message::SecondaryKeyChanged,
+                    )
+                    .placeholder("choose");
+                let primarytxt = String::as_str(&globalstr.primary);
+                let secondarytxt = String::as_str(&globalstr.secondary);
+                let primarylabel: Text = Text::new(primarytxt);
+                let secondarylabel: Text = Text::new(secondarytxt);
+
+
                 let exitsclabel = Text::new(bindstr.exit.clone());
                 let exitheaderselect = pick_list(
                 &BindKey::ALL[..], 
@@ -872,12 +954,7 @@ impl Application for Configurator {
                 )
                 .placeholder("choose");
                 let exitkey = String::as_str(&self.exit_key);
-                let exitkeyselect = Button::new(exitkey).on_press(Message::Capture(CaptureInput::ExitKey)).width(50);
-                let exitscrow = Row::new()
-                    .push(exitsclabel)
-                    .push(exitheaderselect)
-                    .push(exitkeyselect)
-                    .spacing(10);
+                let mut exitkeyselect = Button::new(exitkey).on_press(Message::Capture(CaptureInput::ExitKey)).width(50);
                 let launchsclabel: Text = Text::new(bindstr.launch.clone());
                 let launchheaderselect = pick_list(
                     &BindKey::ALL[..], 
@@ -886,12 +963,7 @@ impl Application for Configurator {
                     )
                     .placeholder("choose");
                 let launchkey = String::as_str(&self.launch_key);
-                let launchkeyselect = Button::new(launchkey).on_press(Message::Capture(CaptureInput::LaunchKey)).width(50);
-                let launchscrow = Row::new()
-                    .push(launchsclabel)
-                    .push(launchheaderselect)
-                    .push(launchkeyselect)
-                    .spacing(10);
+                let mut launchkeyselect = Button::new(launchkey).on_press(Message::Capture(CaptureInput::LaunchKey)).width(50);
                 let killsclabel: Text = Text::new(bindstr.kill.clone());
                 let killheaderselect = pick_list(
                     &BindKey::ALL[..], 
@@ -900,12 +972,7 @@ impl Application for Configurator {
                     )
                     .placeholder("choose");
                 let killkey = String::as_str(&self.kill_key);
-                let killkeyselect = Button::new(killkey).on_press(Message::Capture(CaptureInput::KillKey)).width(50);
-                let killscrow = Row::new()
-                    .push(killsclabel)
-                    .push(killheaderselect)
-                    .push(killkeyselect)
-                    .spacing(10);
+                let mut killkeyselect = Button::new(killkey).on_press(Message::Capture(CaptureInput::KillKey)).width(50);
                 let minisclabel: Text = Text::new(bindstr.mini.clone());
                 let miniheaderselect = pick_list(
                  &BindKey::ALL[..], 
@@ -914,12 +981,7 @@ impl Application for Configurator {
                  )
                     .placeholder("choose");
                 let minikey = String::as_str(&self.minimize_key);
-                let minikeyselect = Button::new(minikey).on_press(Message::Capture(CaptureInput::MiniKey)).width(50);
-                let miniscrow = Row::new()
-                    .push(minisclabel)
-                    .push(miniheaderselect)
-                    .push(minikeyselect)
-                    .spacing(10);
+                let mut minikeyselect = Button::new(minikey).on_press(Message::Capture(CaptureInput::MiniKey)).width(50);
                 let scratchsclabel: Text = Text::new(bindstr.scratch.clone());
                 let scratchheaderselect = pick_list(
                     &BindKey::ALL[..], 
@@ -928,7 +990,56 @@ impl Application for Configurator {
                     )
                     .placeholder("choose");
                 let scratchkey = String::as_str(&self.scratch_key);
-                let scratchkeyselect = Button::new(scratchkey).on_press(Message::Capture(CaptureInput::ScratchKey)).width(50);
+                let mut scratchkeyselect = Button::new(scratchkey).on_press(Message::Capture(CaptureInput::ScratchKey)).width(50);
+                
+                match self.capturenext.as_ref().unwrap() {
+                    CaptureInput::NoKey => {
+                    }
+                    CaptureInput::ExitKey => {
+                        exitkeyselect = exitkeyselect.style(theme::Button::Secondary);
+                    }
+                    CaptureInput::KillKey => {
+                        killkeyselect = killkeyselect.style(theme::Button::Secondary);
+                    }
+                    CaptureInput::LaunchKey => {
+                        launchkeyselect = launchkeyselect.style(theme::Button::Secondary);
+                    }
+                    CaptureInput::MiniKey => {
+                        minikeyselect = minikeyselect.style(theme::Button::Secondary);
+                    }
+                    CaptureInput::ScratchKey => {
+                        scratchkeyselect = scratchkeyselect.style(theme::Button::Secondary);
+                    }
+                }
+
+                let primaryrow = Row::new()
+                    .push(primarylabel)
+                    .push(primarypick)
+                    .spacing(10);
+                let secondaryrow = Row::new()
+                    .push(secondarylabel)
+                    .push(secondarypick)
+                    .spacing(10);
+                let exitscrow = Row::new()
+                    .push(exitsclabel)
+                    .push(exitheaderselect)
+                    .push(exitkeyselect)
+                    .spacing(10);
+                let launchscrow = Row::new()
+                    .push(launchsclabel)
+                    .push(launchheaderselect)
+                    .push(launchkeyselect)
+                    .spacing(10);
+                let killscrow = Row::new()
+                    .push(killsclabel)
+                    .push(killheaderselect)
+                    .push(killkeyselect)
+                    .spacing(10);
+                let miniscrow = Row::new()
+                    .push(minisclabel)
+                    .push(miniheaderselect)
+                    .push(minikeyselect)
+                    .spacing(10);
                 let scratchscrow = Row::new()
                     .push(scratchsclabel)
                     .push(scratchheaderselect)
