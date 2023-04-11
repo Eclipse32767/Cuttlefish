@@ -5,7 +5,7 @@ use libcfg::{getcfgdata};
 mod libcfg;
 use langswayman::{get_lang, Translation};
 mod langswayman;
-
+mod langswaycfg;
 mod liblocale;
 
 fn main() -> Result {

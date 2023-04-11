@@ -1,12 +1,7 @@
 use iced::theme::{self, Theme};
 use iced::{Result, Application, Settings, Alignment, Length, executor};
 use iced::widget::{Button, Row, Column, Container, pick_list, Text, Scrollable};
-use std::process::Command;
-use std::fs::{self, read_to_string};
-use std::env;
-use serde_derive::{Deserialize, Serialize};
-use toml::{self, from_str, to_string};
-use libcfg::{getcfgdata, FileData};
+use libcfg::{getcfgdata, BindKey, Border, ShortcutKey, decodeheader, decodeborder, decodepri, decodetheme, mkwmcfg, mkselfcfg};
 mod libcfg;
 use langswaycfg::{get_lang, Translation};
 mod langswaycfg;
@@ -17,60 +12,6 @@ fn main() -> Result {
     Configurator::run(Settings::default())
 }
 
-pub fn get_home() -> String {
-    match env::var("XDG_CONFIG_HOME") {
-        Ok(var) => var,
-        Err(..) => match env::var("HOME") {
-            Ok(var) => format!("{var}/.config"),
-            Err(..) => panic!("Failed to find config directory, make sure XDG_CONFIG_HOME or HOME are set")
-        }
-    }
-}
-
-pub fn rip_shortcut(opt: Option<ShortcutKey>) -> &'static str {
-    let x;
-    match opt {
-        Some(..) => {
-            x = match opt.unwrap() {
-                ShortcutKey::Alt => "Mod1",
-                ShortcutKey::Ctrl => "Control",
-                ShortcutKey::Shift => "Shift",
-                ShortcutKey::Super => "Mod4"
-            };
-        }
-        None => x = ""
-    }
-    x
-}
-pub fn rip_bind(opt: Option<BindKey>) -> &'static str {
-    let x;
-    match opt {
-        Some(..) => {
-            x = match opt.unwrap() {
-                BindKey::PrimaryKey => "$pri",
-                BindKey::SecondaryKey => "$sec",
-                BindKey::BothKey => "$pri+$sec"
-            }
-        }
-        None => x = ""
-    }
-    x
-}
-pub fn rip_border(opt: Option<Border>) -> &'static str {
-    let x;
-    match opt {
-        Some(..) => {
-            x = match opt.unwrap() {
-                Border::No => "none",
-                Border::Csd => "csd",
-                Border::Normal => "normal",
-                Border::Pixel => "pixel"
-            }
-        }
-        None => x = ""
-    }
-    x
-}
 
 struct Configurator {
     theme: Theme,
@@ -106,69 +47,6 @@ enum CaptureInput {
     ScratchKey
 }
 
-pub fn decodetheme(x: &str, default: Theme) -> Theme {
-    match x {
-        "dark" => Theme::Dark,
-        "light" => Theme::Light,
-        &_ => default
-    }
-}
-pub fn decodeborder(x: &str, default: Border) -> Option<Border> {
-    match x {
-        "none" => Some(Border::No),
-        "csd" => Some(Border::Csd),
-        "normal" => Some(Border::Normal),
-        "pixel" => Some(Border::Pixel),
-        &_ => Some(default)
-    }
-}
-pub fn decodepri(x: &str, default: ShortcutKey) -> Option<ShortcutKey> {
-    match x {
-        "super" => Some(ShortcutKey::Super),
-        "alt" => Some(ShortcutKey::Alt),
-        "control" => Some(ShortcutKey::Ctrl),
-        "shift" => Some(ShortcutKey::Shift),
-        &_ => Some(default)
-    }
-}
-pub fn decodeheader(x: &str, default: BindKey) -> Option<BindKey> {
-    match x {
-        "pri" => Some(BindKey::PrimaryKey),
-        "sec" => Some(BindKey::SecondaryKey),
-        "both" => Some(BindKey::BothKey),
-        &_ => Some(default)
-    }
-}
-pub fn encodetheme(x: Theme) -> &'static str {
-    match x {
-        Theme::Dark => "dark",
-        Theme::Light => "light",
-        Theme::Custom(..) => "light"
-    }
-}
-pub fn encodeborder(x: Option<Border>) -> &'static str {
-    match x.unwrap() {
-        Border::No => "none",
-        Border::Normal => "normal",
-        Border::Csd => "csd",
-        Border::Pixel => "pixel"
-    }
-}
-pub fn encodepri(x: Option<ShortcutKey>) -> &'static str {
-    match x.unwrap() {
-        ShortcutKey::Super => "super",
-        ShortcutKey::Alt => "alt",
-        ShortcutKey::Ctrl => "control",
-        ShortcutKey::Shift => "shift"
-    }
-}
-pub fn encodeheader(x: Option<BindKey>) -> &'static str {
-    match x.unwrap() {
-        BindKey::PrimaryKey => "pri",
-        BindKey::SecondaryKey => "sec",
-        BindKey::BothKey => "both"
-    }
-}
 impl Default for Configurator {
     fn default() -> Self {
         let data = getcfgdata();
@@ -228,89 +106,6 @@ pub enum Page {
     Anim
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum Border {
-    #[default]
-    No,
-    Normal,
-    Csd,
-    Pixel,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum ShortcutKey {
-    #[default]
-    Super,
-    Alt,
-    Shift,
-    Ctrl
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum BindKey {
-    #[default]
-    PrimaryKey,
-    SecondaryKey,
-    BothKey
-}
-
-impl Border {
-    const ALL: [Border; 4] = [
-        Border::No,
-        Border::Normal,
-        Border::Csd,
-        Border::Pixel,
-    ];
-}
-impl ShortcutKey {
-    const ALL: [ShortcutKey; 4] = [
-        ShortcutKey::Super,
-        ShortcutKey::Alt,
-        ShortcutKey::Shift,
-        ShortcutKey::Ctrl,
-    ];
-}
-impl BindKey {
-    const ALL: [BindKey; 3] = [
-        BindKey::PrimaryKey,
-        BindKey::SecondaryKey,
-        BindKey::BothKey,
-    ];
-}
-
-impl std::fmt::Display for Border {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let locale = get_lang();
-        let pretty = locale.prettyprint.unwrap();
-        write!(
-            f,
-            "{}",
-            match self {
-                Border::No => pretty.borderno,
-                Border::Normal => pretty.bordernormal,
-                Border::Csd => pretty.bordercsd,
-                Border::Pixel => pretty.borderpixel,
-            }
-        )
-    }
-}
-
-impl std::fmt::Display for ShortcutKey {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let locale = get_lang();
-        let pretty = locale.prettyprint.unwrap();
-        write!(
-            f,
-            "{}",
-            match self {
-                ShortcutKey::Super => pretty.keysuper,
-                ShortcutKey::Alt => pretty.keyalt,
-                ShortcutKey::Shift => pretty.keyshift,
-                ShortcutKey::Ctrl => pretty.keyctrl,
-            }
-        )
-    }
-}
 impl std::fmt::Display for Page {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let locale = get_lang();
@@ -324,21 +119,6 @@ impl std::fmt::Display for Page {
                 Page::Bar => pretty.pagebar,
                 Page::Init => pretty.pageinit,
                 Page::Anim => pretty.pageanim,
-            }
-        )
-    }
-}
-impl std::fmt::Display for BindKey {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let locale = get_lang();
-        let pretty = locale.prettyprint.unwrap();
-        write!(
-            f,
-            "{}",
-            match self {
-                BindKey::PrimaryKey => pretty.bindpri,
-                BindKey::SecondaryKey => pretty.bindsec,
-                BindKey::BothKey => pretty.bindboth
             }
         )
     }
@@ -358,63 +138,15 @@ impl Application for Configurator {
     fn title(&self) -> String {
         let globalstr = self.locale.global.as_ref().unwrap();
         let title = globalstr.title.clone();
-        format!("j{}", self.current_page.to_string())
+        format!("{title}{}", self.current_page.to_string())
     }
     fn update(&mut self, message: Self::Message) -> iced::Command<Message> {
         match message {
             Message::Save => {
                 if self.unsaved {
-                {//Block that writes cfgvars
-                let home = get_home();
-                let data;
-                let primary = rip_shortcut(self.primary_key);
-                let secondary = rip_shortcut(self.secondary_key);
-                let exith = rip_bind(self.exit_header);
-                let exitk = &self.exit_key;
-                let launchh = rip_bind(self.launch_header);
-                let launchk = &self.launch_key;
-                let killh = rip_bind(self.kill_header);
-                let killk = &self.kill_key;
-                let minih = rip_bind(self.minimize_header);
-                let minik = &self.minimize_key;
-                let scratchh = rip_bind(self.scratch_header);
-                let scratchk = &self.scratch_key;
-                let borderval = rip_border(self.border);
-                let widthval = &self.width;
-                let path = format!("{home}/sway/cfgvars");
-                data = format!("#AUTO-GENERATED CONFIG, do not edit, any changed will be overwritten\ndefault_border {borderval} {widthval} \nset $pri {primary}\nset $sec {secondary}\n \nset $exit {exith}+{exitk}\nset $launch {launchh}+{launchk}\nset $kill {killh}+{killk}\nset $mini {minih}+{minik}\nset $scratch {scratchh}+{scratchk}");
-
-                fs::write(path, data).expect("failed to write file");
-
-                Command::new("swaymsg")
-                    .arg("reload")
-                    .spawn()
-                    .expect("oops, swaymsg failed, do you have sway installed?");
+                    mkwmcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), self.border, self.width);
+                    mkselfcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), self.border, self.width, self.theme.clone());
                 }
-                {//Block that writes swaycfg.toml
-                let home = get_home();
-                let path = format!("{home}/swaycfg/swaycfg.toml");
-                let data = FileData{
-                    theme: encodetheme(self.theme.clone()).to_string(),
-                    border: encodeborder(self.border).to_string(),
-                    width: self.width,
-                    primary: encodepri(self.primary_key).to_string(),
-                    secondary: encodepri(self.secondary_key).to_string(),
-                    exith: encodeheader(self.exit_header).to_string(),
-                    exitk: self.exit_key.clone(),
-                    launchh: encodeheader(self.launch_header).to_string(),
-                    launchk: self.launch_key.clone(),
-                    killh: encodeheader(self.kill_header).to_string(),
-                    killk: self.kill_key.clone(),
-                    minih: encodeheader(self.minimize_header).to_string(),
-                    minik: self.minimize_key.clone(),
-                    scratchh: encodeheader(self.scratch_header).to_string(),
-                    scratchk: self.scratch_key.clone()
-                };
-                let toml = to_string(&data).expect("failed to generate toml");
-                fs::write(path, toml).expect("failed to write swaycfg.toml");
-            }
-            }
                 self.unsaved = false;
                 iced::Command::none()
             }
@@ -561,58 +293,10 @@ impl Application for Configurator {
                                         }
                                     }
                                 } else if key_code == iced::keyboard::KeyCode::S { //save
-                                if self.unsaved {
-                                    {//Block that writes cfgvars
-                                    let home = get_home();
-                                    let data;
-                                    let primary = rip_shortcut(self.primary_key);
-                                    let secondary = rip_shortcut(self.secondary_key);
-                                    let exith = rip_bind(self.exit_header);
-                                    let exitk = &self.exit_key;
-                                    let launchh = rip_bind(self.launch_header);
-                                    let launchk = &self.launch_key;
-                                    let killh = rip_bind(self.kill_header);
-                                    let killk = &self.kill_key;
-                                    let minih = rip_bind(self.minimize_header);
-                                    let minik = &self.minimize_key;
-                                    let scratchh = rip_bind(self.scratch_header);
-                                    let scratchk = &self.scratch_key;
-                                    let borderval = rip_border(self.border);
-                                    let widthval = &self.width;
-                                    let path = format!("{home}/sway/cfgvars");
-                                    data = format!("#AUTO-GENERATED CONFIG, do not edit, any changed will be overwritten\ndefault_border {borderval} {widthval} \nset $pri {primary}\nset $sec {secondary}\n \nset $exit {exith}+{exitk}\nset $launch {launchh}+{launchk}\nset $kill {killh}+{killk}\nset $mini {minih}+{minik}\nset $scratch {scratchh}+{scratchk}");
-                    
-                                    fs::write(path, data).expect("failed to write file");
-                    
-                                    Command::new("swaymsg")
-                                        .arg("reload")
-                                        .spawn()
-                                        .expect("oops, swaymsg failed, do you have sway installed?");
+                                    if self.unsaved {
+                                        mkwmcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), self.border, self.width);
+                                        mkselfcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), self.border, self.width, self.theme.clone());
                                     }
-                                    {//Block that writes swaycfg.toml
-                                    let home = get_home();
-                                    let path = format!("{home}/swaycfg/swaycfg.toml");
-                                    let data = FileData{
-                                        theme: encodetheme(self.theme.clone()).to_string(),
-                                        border: encodeborder(self.border).to_string(),
-                                        width: self.width,
-                                        primary: encodepri(self.primary_key).to_string(),
-                                        secondary: encodepri(self.secondary_key).to_string(),
-                                        exith: encodeheader(self.exit_header).to_string(),
-                                        exitk: self.exit_key.clone(),
-                                        launchh: encodeheader(self.launch_header).to_string(),
-                                        launchk: self.launch_key.clone(),
-                                        killh: encodeheader(self.kill_header).to_string(),
-                                        killk: self.kill_key.clone(),
-                                        minih: encodeheader(self.minimize_header).to_string(),
-                                        minik: self.minimize_key.clone(),
-                                        scratchh: encodeheader(self.scratch_header).to_string(),
-                                        scratchk: self.scratch_key.clone()
-                                    };
-                                    let toml = to_string(&data).expect("failed to generate toml");
-                                    fs::write(path, toml).expect("failed to write swaycfg.toml");
-                                }
-                                }
                                     self.unsaved = false;
                             } else if key_code == iced::keyboard::KeyCode::Enter {
                                 match self.current_page {
