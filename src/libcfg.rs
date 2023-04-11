@@ -9,21 +9,21 @@ use crate::langswaycfg;
 
 #[derive(Deserialize, Debug, Serialize)]
 pub struct FileData {
-    pub(crate) theme: String,
+    pub theme: String,
     pub(crate) border: String,
     pub(crate) width: i32,
-    pub(crate) primary: String,
-    pub(crate) secondary: String,
-    pub(crate) exith: String,
-    pub(crate) exitk: String,
-    pub(crate) launchh: String,
-    pub(crate) launchk: String,
-    pub(crate) killh: String,
-    pub(crate) killk: String,
-    pub(crate) minih: String,
-    pub(crate) minik: String,
-    pub(crate) scratchh: String,
-    pub(crate) scratchk: String
+    pub primary: String,
+    pub secondary: String,
+    pub exith: String,
+    pub exitk: String,
+    pub launchh: String,
+    pub launchk: String,
+    pub killh: String,
+    pub killk: String,
+    pub minih: String,
+    pub minik: String,
+    pub scratchh: String,
+    pub scratchk: String
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]

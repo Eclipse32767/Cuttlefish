@@ -1,12 +1,16 @@
 use iced::theme::{self, Theme};
 use iced::{Result, Settings, alignment, Alignment, Length, Application, Command, executor};
 use iced::widget::{Button, Row, Column, Container, Text, Scrollable};
-use libcfg::{getcfgdata};
+use iced_style::{Color};
+use libcfg::{getcfgdata, decodetheme};
 mod libcfg;
 use langswayman::{get_lang, Translation};
 mod langswayman;
 mod langswaycfg;
 mod liblocale;
+use libstyle::{ButtonStyle};
+mod libstyle;
+
 
 fn main() -> Result {
     Manual::run(Settings::default())
@@ -28,14 +32,6 @@ struct Manual {
     minimize_key: String,
     scratch_header: String,
     scratch_key: String
-}
-
-pub fn decodetheme(x: &str, default: Theme) -> Theme {
-    match x {
-        "dark" => Theme::Dark,
-        "light" => Theme::Light,
-        &_ => default
-    }
 }
 pub fn prettypri(x: &str) -> &'static str {
     match x {
@@ -138,17 +134,23 @@ impl Application for Manual {
         let globalstr = self.locale.globals.as_ref().unwrap();
         let backtxt = String::as_str(&globalstr.backtxt);
         let forwardtxt = String::as_str(&globalstr.forwardtxt);
+        let activebtn = ButtonStyle{ border_radius: 10.0, txt_color: Color::from_rgb(0.0, 0.0, 255.0), bg_color: Color::from_rgb(255.0, 255.0, 255.0), border_color: Color::from_rgb(0.0, 0.0, 0.0), border_width: 5.0 };
+        let inactivebtn = ButtonStyle{ border_radius: 10.0, txt_color: Color::from_rgb(0.0, 0.0, 255.0), bg_color: Color::from_rgb(255.0, 255.0, 255.0), border_color: Color::from_rgb(0.0, 0.0, 0.0), border_width: 0.0 };
         let mut pageleft = Button::new(backtxt)
-            .on_press(Message::PageDecr);
+            .on_press(Message::PageDecr)
+            .style(theme::Button::Custom(std::boxed::Box::new(activebtn.clone())));
         let mut pageright = Button::new(forwardtxt)
-            .on_press(Message::PageIncr);
+            .on_press(Message::PageIncr)
+            .style(theme::Button::Custom(std::boxed::Box::new(activebtn.clone())));
+
+
         let mut settings = Column::new().spacing(10);
         let humanpg = self.current_page+1;
         let pgnum = Text::new(format!("{humanpg}"));
         let mut pgtitle = Text::new("Page Title").horizontal_alignment(alignment::Horizontal::Center);
         if self.current_page == 0 {
             let navstr = self.locale.navigation.as_ref().unwrap();
-            pageleft = pageleft.style(theme::Button::Secondary);
+            pageleft = pageleft.style(theme::Button::Custom(std::boxed::Box::new(inactivebtn.clone())));
             let title = navstr.title.clone();
             pgtitle = Text::new(format!("{title}"));
             let primary_key = self.primary_key.clone();
@@ -201,7 +203,7 @@ impl Application for Manual {
             settings = settings.push(text);
         } else if self.current_page == 3 {
             let ministr = self.locale.minimization.as_ref().unwrap();
-            pageright = pageright.style(theme::Button::Secondary);
+            pageright = pageright.style(theme::Button::Custom(std::boxed::Box::new(inactivebtn.clone())));
             let title = ministr.title.clone();
             pgtitle = Text::new(title);
             let minih = self.minimize_header.clone();
