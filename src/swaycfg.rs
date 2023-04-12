@@ -1,11 +1,13 @@
 use iced::theme::{self, Theme};
 use iced::{Result, Application, Settings, Alignment, Length, executor};
 use iced::widget::{Button, Row, Column, Container, pick_list, Text, Scrollable};
+use iced_style::Color;
 use libcfg::{getcfgdata, BindKey, Border, ShortcutKey, decodeheader, decodeborder, decodepri, decodetheme, mkwmcfg, mkselfcfg};
 mod libcfg;
 use langswaycfg::{get_lang, Translation};
 mod langswaycfg;
-
+use libstyle::ButtonStyle;
+mod libstyle;
 mod liblocale;
 
 fn main() -> Result {
@@ -371,6 +373,25 @@ impl Application for Configurator {
         }
     }
     fn view(&self) -> iced::Element<'_, Self::Message> {
+
+        //let sidebarActiveBtn = ButtonStyle{ border_radius: 10.0, txt_color: Color::from_rgb(202.0, 211.0, 245.0), bg_color: Color::from_rgb(36.0, 39.0, 58.0), border_color: Color::from_rgb(0.0, 0.0, 0.0), border_width: 1.0};
+        let sidebarActiveBtn = ButtonStyle{
+            border_radius: 10.0,
+            txt_color: Color::from_rgb8( 0xCA, 0xD3, 0xF5),
+            bg_color: Color::from_rgb8(0x24, 0x27, 0x3A),
+            border_color: Color::from_rgb8(0, 0, 0),
+            border_width: 0.0,
+            shadow_offset: iced::Vector {x: 0.0, y: 0.0}
+        };
+        let sidebarInactiveBtn = ButtonStyle{
+            border_radius: 10.0,
+            txt_color: Color::from_rgb8(0xA5, 0xAD, 0xCB),
+            bg_color: Color::from_rgb8(0x18, 0x19, 0x26),
+            border_color: Color::from_rgb8(0, 0, 0),
+            border_width: 0.0,
+            shadow_offset: iced::Vector {x: 0.0, y: 0.0}
+        };
+
         let selectionmarker: Text = Text::new("=>");
         let globalstr = self.locale.global.as_ref().unwrap();
         let mainstr = self.locale.mainpage.as_ref().unwrap();
@@ -383,31 +404,41 @@ impl Application for Configurator {
         let animtxt = String::as_str(&globalstr.anim);
         let pagetxt = String::as_str(&globalstr.label);
         let mut pagemain = Button::new(maintxt)
-            .on_press(Message::PageChanged(Page::Main));
+            .on_press(Message::PageChanged(Page::Main))
+            .width(150)
+            .style(theme::Button::Custom(std::boxed::Box::new(sidebarActiveBtn.clone())));
         let mut pagebind = Button::new(bindtxt)
-            .on_press(Message::PageChanged(Page::Bind));
+            .on_press(Message::PageChanged(Page::Bind))
+            .width(150)
+            .style(theme::Button::Custom(std::boxed::Box::new(sidebarActiveBtn.clone())));
         let mut pagebar = Button::new(bartxt)
-            .on_press(Message::PageChanged(Page::Bar));
+            .on_press(Message::PageChanged(Page::Bar))
+            .width(150)
+            .style(theme::Button::Custom(std::boxed::Box::new(sidebarActiveBtn.clone())));
         let mut pageinit = Button::new(inittxt)
-            .on_press(Message::PageChanged(Page::Init));
+            .on_press(Message::PageChanged(Page::Init))
+            .width(150)
+            .style(theme::Button::Custom(std::boxed::Box::new(sidebarActiveBtn.clone())));
         let mut pageanim = Button::new(animtxt)
-            .on_press(Message::PageChanged(Page::Anim));
+            .on_press(Message::PageChanged(Page::Anim))
+            .width(150)
+            .style(theme::Button::Custom(std::boxed::Box::new(sidebarActiveBtn.clone())));
         let pagelabel = Text::new(pagetxt);
         match self.current_page {
             Page::Main => {
-                pagemain = pagemain.style(theme::Button::Secondary);
+                pagemain = pagemain.style(theme::Button::Custom(std::boxed::Box::new(sidebarInactiveBtn.clone())));
             }
             Page::Bind => {
-                pagebind = pagebind.style(theme::Button::Secondary);
+                pagebind = pagebind.style(theme::Button::Custom(std::boxed::Box::new(sidebarInactiveBtn.clone())));
             }
             Page::Bar => {
-                pagebar = pagebar.style(theme::Button::Secondary);
+                pagebar = pagebar.style(theme::Button::Custom(std::boxed::Box::new(sidebarInactiveBtn.clone())));
             }
             Page::Init => {
-                pageinit = pageinit.style(theme::Button::Secondary);
+                pageinit = pageinit.style(theme::Button::Custom(std::boxed::Box::new(sidebarInactiveBtn.clone())));
             }
             Page::Anim => {
-                pageanim = pageanim.style(theme::Button::Secondary);
+                pageanim = pageanim.style(theme::Button::Custom(std::boxed::Box::new(sidebarInactiveBtn.clone())));
             }
         }
         let pagecol = Column::new()

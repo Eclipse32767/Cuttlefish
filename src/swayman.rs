@@ -134,8 +134,8 @@ impl Application for Manual {
         let globalstr = self.locale.globals.as_ref().unwrap();
         let backtxt = String::as_str(&globalstr.backtxt);
         let forwardtxt = String::as_str(&globalstr.forwardtxt);
-        let activebtn = ButtonStyle{ border_radius: 10.0, txt_color: Color::from_rgb(0.0, 0.0, 255.0), bg_color: Color::from_rgb(255.0, 255.0, 255.0), border_color: Color::from_rgb(0.0, 0.0, 0.0), border_width: 5.0 };
-        let inactivebtn = ButtonStyle{ border_radius: 10.0, txt_color: Color::from_rgb(0.0, 0.0, 255.0), bg_color: Color::from_rgb(255.0, 255.0, 255.0), border_color: Color::from_rgb(0.0, 0.0, 0.0), border_width: 0.0 };
+        let activebtn = ButtonStyle{ border_radius: 10.0, txt_color: Color::from_rgb(0.0, 0.0, 255.0), bg_color: Color::from_rgb(255.0, 255.0, 255.0), border_color: Color::from_rgb(0.0, 0.0, 0.0), border_width: 5.0, shadow_offset: iced::Vector {x: 0.0, y: 0.0}};
+        let inactivebtn = ButtonStyle{ border_radius: 10.0, txt_color: Color::from_rgb(0.0, 0.0, 255.0), bg_color: Color::from_rgb(255.0, 255.0, 255.0), border_color: Color::from_rgb(0.0, 0.0, 0.0), border_width: 0.0, shadow_offset: iced::Vector {x: 0.0, y: 0.0}};
         let mut pageleft = Button::new(backtxt)
             .on_press(Message::PageDecr)
             .style(theme::Button::Custom(std::boxed::Box::new(activebtn.clone())));
