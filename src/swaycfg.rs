@@ -1,6 +1,7 @@
 use iced::theme::{self, Theme};
 use iced::{Result, Application, Settings, Alignment, Length, executor};
 use iced::widget::{Button, Row, Column, Container, pick_list, Text, Scrollable};
+use iced::keyboard::KeyCode;
 use iced_style::Color;
 use libcfg::{getcfgdata, BindKey, Border, ShortcutKey, decodeheader, decodeborder, decodepri, decodetheme, mkwmcfg, mkselfcfg};
 mod libcfg;
@@ -242,7 +243,7 @@ impl Application for Configurator {
                     iced::keyboard::Event::KeyPressed { key_code, modifiers} => {
                         match self.capturenext.as_ref().unwrap() {
                             &CaptureInput::NoKey => {
-                                if key_code == iced::keyboard::KeyCode::Up {
+                                if key_code == KeyCode::Up {
                                     if iced::keyboard::Modifiers::shift(modifiers) {//go up a page
                                         self.current_page = match self.current_page {
                                             Page::Main => {
@@ -268,7 +269,7 @@ impl Application for Configurator {
                                             self.index = self.index -1;
                                         }
                                     }
-                                } else if key_code == iced::keyboard::KeyCode::Down {
+                                } else if key_code == KeyCode::Down {
                                     if iced::keyboard::Modifiers::shift(modifiers) {//go down a page
                                         self.current_page = match self.current_page {
                                             Page::Main => {
@@ -290,42 +291,173 @@ impl Application for Configurator {
                                             }
                                        }
                                     } else {
-                                        if self.index != self.indexmax {
+                                        if self.index < self.indexmax {
                                             self.index = self.index +1;
                                         }
                                     }
-                                } else if key_code == iced::keyboard::KeyCode::S { //save
+                                } else if key_code == KeyCode::S { //save
                                     if self.unsaved {
                                         mkwmcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), self.border, self.width);
                                         mkselfcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), self.border, self.width, self.theme.clone());
                                     }
                                     self.unsaved = false;
-                            } else if key_code == iced::keyboard::KeyCode::Enter {
-                                match self.current_page {
-                                    Page::Main => {
-                                        if self.index == 0 {
-                                            if self.theme == Theme::Dark {
-                                                self.theme = Theme::Light;
-                                            } else {
-                                                self.theme = Theme::Dark;
+                                } else if key_code == KeyCode::Enter {
+                                    match self.current_page {
+                                        Page::Main => {
+                                            if self.index == 0 {
+                                                if self.theme == Theme::Dark {
+                                                    self.theme = Theme::Light;
+                                                } else {
+                                                    self.theme = Theme::Dark;
+                                                }
+                                                self.unsaved = true;
                                             }
+                                        }
+                                        Page::Bind => {
+                                            if self.index == 2 {
+                                                self.capturenext = Some(CaptureInput::ExitKey);
+                                            } else if self.index == 3 {
+                                                self.capturenext = Some(CaptureInput::LaunchKey);
+                                            } else if self.index == 4 {
+                                                self.capturenext = Some(CaptureInput::KillKey);
+                                            } else if self.index == 5 {
+                                                self.capturenext = Some(CaptureInput::MiniKey);
+                                            } else if self.index == 6 {
+                                                self.capturenext = Some(CaptureInput::ScratchKey);
+                                            }
+                                        }
+                                        Page::Bar => {
+
+                                        }
+                                        Page::Init => {
+
+                                        }
+                                        Page::Anim => {
+
+                                        }
+                                    }
+                                } else if key_code == KeyCode::Equals && self.index == 1 && self.current_page == Page::Main && self.width < 20{
+                                    self.width = self.width + 1;
+                                } else if key_code == KeyCode::Minus && self.index == 1 && self.current_page == Page::Main && self.width > 0 {
+                                    self.width = self.width - 1;
+                                } else if key_code == KeyCode::Key1 {
+                                    if self.current_page == Page::Main {
+                                        if self.index == 2 {
+                                            self.primary_key = Some(ShortcutKey::Super);
+                                            self.unsaved = true;
+                                        } else if self.index == 3 {
+                                            self.secondary_key = Some(ShortcutKey::Super);
+                                            self.unsaved = true;
+                                        }
+                                    } else if self.current_page == Page::Bind {
+                                        if self.index == 0 {
+                                            self.primary_key = Some(ShortcutKey::Super);
+                                            self.unsaved = true;
+                                        } else if self.index == 1 {
+                                            self.secondary_key = Some(ShortcutKey::Super);
+                                            self.unsaved = true;
+                                        } else if self.index == 2 {
+                                            self.exit_header = Some(BindKey::PrimaryKey);
+                                            self.unsaved = true;
+                                        } else if self.index == 3 {
+                                            self.launch_header = Some(BindKey::PrimaryKey);
+                                            self.unsaved = true;
+                                        } else if self.index == 4 {
+                                            self.kill_header = Some(BindKey::PrimaryKey);
+                                            self.unsaved = true;
+                                        } else if self.index == 5 {
+                                            self.minimize_header = Some(BindKey::PrimaryKey);
+                                            self.unsaved = true;
+                                        } else if self.index == 6 {
+                                            self.scratch_header = Some(BindKey::PrimaryKey);
                                             self.unsaved = true;
                                         }
                                     }
-                                    Page::Bind => {
-
+                                } else if key_code == KeyCode::Key2 {
+                                    if self.current_page == Page::Main {
+                                        if self.index == 2 {
+                                            self.primary_key = Some(ShortcutKey::Alt);
+                                            self.unsaved = true;
+                                        } else if self.index == 3 {
+                                            self.secondary_key = Some(ShortcutKey::Alt);
+                                            self.unsaved = true;
+                                        }
+                                    } else if self.current_page == Page::Bind {
+                                        if self.index == 0 {
+                                            self.primary_key = Some(ShortcutKey::Alt);
+                                            self.unsaved = true;
+                                        } else if self.index == 1 {
+                                            self.secondary_key = Some(ShortcutKey::Alt);
+                                            self.unsaved = true;
+                                        } else if self.index == 2 {
+                                            self.exit_header = Some(BindKey::SecondaryKey);
+                                            self.unsaved = true;
+                                        } else if self.index == 3 {
+                                            self.launch_header = Some(BindKey::SecondaryKey);
+                                            self.unsaved = true;
+                                        } else if self.index == 4 {
+                                            self.kill_header = Some(BindKey::SecondaryKey);
+                                            self.unsaved = true;
+                                        } else if self.index == 5 {
+                                            self.minimize_header = Some(BindKey::SecondaryKey);
+                                            self.unsaved = true;
+                                        } else if self.index == 6 {
+                                            self.scratch_header = Some(BindKey::SecondaryKey);
+                                            self.unsaved = true;
+                                        }
                                     }
-                                    Page::Bar => {
-
+                                } else if key_code == KeyCode::Key3 {
+                                    if self.current_page == Page::Main {
+                                        if self.index == 2 {
+                                            self.primary_key = Some(ShortcutKey::Shift);
+                                            self.unsaved = true;
+                                        } else if self.index == 3 {
+                                            self.secondary_key = Some(ShortcutKey::Shift);
+                                            self.unsaved = true;
+                                        }
+                                    } else if self.current_page == Page::Bind {
+                                        if self.index == 0 {
+                                            self.primary_key = Some(ShortcutKey::Shift);
+                                            self.unsaved = true;
+                                        } else if self.index == 1 {
+                                            self.secondary_key = Some(ShortcutKey::Shift);
+                                            self.unsaved = true;
+                                        } else if self.index == 2 {
+                                            self.exit_header = Some(BindKey::BothKey);
+                                            self.unsaved = true;
+                                        } else if self.index == 3 {
+                                            self.launch_header = Some(BindKey::BothKey);
+                                            self.unsaved = true;
+                                        } else if self.index == 4 {
+                                            self.kill_header = Some(BindKey::BothKey);
+                                            self.unsaved = true;
+                                        } else if self.index == 5 {
+                                            self.minimize_header = Some(BindKey::BothKey);
+                                            self.unsaved = true;
+                                        } else if self.index == 6 {
+                                            self.scratch_header = Some(BindKey::BothKey);
+                                            self.unsaved = true;
+                                        }
                                     }
-                                    Page::Init => {
-
-                                    }
-                                    Page::Anim => {
-
+                                } else if key_code == KeyCode::Key4 {
+                                    if self.current_page == Page::Main {
+                                        if self.index == 2 {
+                                            self.primary_key = Some(ShortcutKey::Ctrl);
+                                            self.unsaved = true;
+                                        } else if self.index == 3 {
+                                            self.secondary_key = Some(ShortcutKey::Ctrl);
+                                            self.unsaved = true;
+                                        }
+                                    } else if self.current_page == Page::Bind {
+                                        if self.index == 0 {
+                                            self.primary_key = Some(ShortcutKey::Ctrl);
+                                            self.unsaved = true;
+                                        } else if self.index == 1 {
+                                            self.secondary_key = Some(ShortcutKey::Ctrl);
+                                            self.unsaved = true;
+                                        }
                                     }
                                 }
-                            }
                             } 
                             &CaptureInput::ExitKey => {
                                 self.exit_key = format!("{:?}", key_code);
@@ -649,36 +781,57 @@ impl Application for Configurator {
                         scratchkeyselect = scratchkeyselect.style(theme::Button::Secondary);
                     }
                 }
-
-                let primaryrow = Row::new()
+                let mut primaryrow = Row::new();
+                let mut secondaryrow = Row::new();
+                let mut exitscrow = Row::new();
+                let mut launchscrow = Row::new();
+                let mut killscrow = Row::new();
+                let mut miniscrow = Row::new();
+                let mut scratchscrow = Row::new();
+                if self.index == 0 {
+                    primaryrow = primaryrow.push(selectionmarker);
+                } else if self.index == 1 {
+                    secondaryrow = secondaryrow.push(selectionmarker);
+                } else if self.index == 2 {
+                    exitscrow = exitscrow.push(selectionmarker);
+                } else if self.index == 3 {
+                    launchscrow = launchscrow.push(selectionmarker);
+                } else if self.index == 4 {
+                    killscrow = killscrow.push(selectionmarker);
+                } else if self.index == 5 {
+                    miniscrow = miniscrow.push(selectionmarker);
+                } else if self.index == 6 {
+                    scratchscrow = scratchscrow.push(selectionmarker);
+                }
+                primaryrow = primaryrow
                     .push(primarylabel)
                     .push(primarypick)
                     .spacing(10);
-                let secondaryrow = Row::new()
+                secondaryrow = secondaryrow
                     .push(secondarylabel)
                     .push(secondarypick)
                     .spacing(10);
-                let exitscrow = Row::new()
+                exitscrow = exitscrow
                     .push(exitsclabel)
                     .push(exitheaderselect)
                     .push(exitkeyselect)
                     .spacing(10);
-                let launchscrow = Row::new()
+                launchscrow = launchscrow
                     .push(launchsclabel)
                     .push(launchheaderselect)
                     .push(launchkeyselect)
                     .spacing(10);
-                let killscrow = Row::new()
+                killscrow = killscrow
                     .push(killsclabel)
                     .push(killheaderselect)
                     .push(killkeyselect)
                     .spacing(10);
-                let miniscrow = Row::new()
+                miniscrow = miniscrow
                     .push(minisclabel)
                     .push(miniheaderselect)
                     .push(minikeyselect)
                     .spacing(10);
-                let scratchscrow = Row::new()
+                scratchscrow = scratchscrow
                     .push(scratchsclabel)
                     .push(scratchheaderselect)
                     .push(scratchkeyselect)
