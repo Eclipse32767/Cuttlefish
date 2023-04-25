@@ -16,9 +16,9 @@ toml = "0.7.3"
 whoami = "1.4.0"
 
 [[bin]]
-name = "swaycfg"
+name = "cuttlefish"
 path = "src/swaycfg.rs"
 
 [[bin]]
-name = "swayman"
+name = "sunfish"
 path = "src/swayman.rs"
