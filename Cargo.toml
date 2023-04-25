@@ -17,8 +17,8 @@ whoami = "1.4.0"
 
 [[bin]]
 name = "cuttlefish"
-path = "src/swaycfg.rs"
+path = "src/cuttlefish.rs"
 
 [[bin]]
 name = "sunfish"
-path = "src/swayman.rs"
+path = "src/sunfish.rs"
