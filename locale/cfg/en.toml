@@ -1,5 +1,5 @@
 [global]
-title = "Sway Configurator -- "
+title = "Cuttlefish Configurator -- "
 label = "Available Pages"
 main = "Main Page"
 bind = "Bindings Page"
