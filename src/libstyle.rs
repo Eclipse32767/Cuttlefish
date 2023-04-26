@@ -12,7 +12,7 @@ pub struct ButtonStyle {
 }
 impl button::StyleSheet for ButtonStyle {
     type Style = Theme;
-    fn active(&self, style: &Theme) -> button::Appearance {
+    fn active(&self, _style: &Theme) -> button::Appearance {
         button::Appearance {
             shadow_offset: self.shadow_offset.clone(),
             border_radius: self.border_radius.clone(),

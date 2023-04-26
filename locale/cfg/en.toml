@@ -30,6 +30,11 @@ scratch = "Retrieve App from Minimization"
 
 [autopage]
 
+[animpage]
+width = "The Width of The Window Borders:"
+radius = "The roundedness of window corners:"
+gaps = "The Size of The Standard Window Gaps:"
+
 [prettyprint]
 borderno = "No Border"
 bordernormal = "Outline With Title Bars"

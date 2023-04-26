@@ -10,7 +10,8 @@ pub struct Translation {
     pub(crate) bindpage: Option<BindPage>,
     pub(crate) autopage: Option<AutoPage>,
     pub(crate) barpage: Option<BarPage>,
-    pub(crate) prettyprint: Option<PrettyPrint>
+    pub(crate) prettyprint: Option<PrettyPrint>,
+    pub(crate) animpage: Option<AnimPage>,
 }
 #[derive(Deserialize, Debug, Serialize)]
 pub struct MainPage {
@@ -36,6 +37,13 @@ pub struct AutoPage {
 #[derive(Deserialize, Debug, Serialize)]
 pub struct BarPage {
 
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct AnimPage {
+    pub(crate) width: String,
+    pub(crate) radius: String,
+    pub(crate) gaps: String,
 }
 #[derive(Deserialize, Debug, Serialize)]
 pub struct PrettyPrint {

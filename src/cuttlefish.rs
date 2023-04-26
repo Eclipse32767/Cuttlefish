@@ -3,7 +3,7 @@ use iced::{Result, Application, Settings, Alignment, Length, executor};
 use iced::widget::{Button, Row, Column, Container, pick_list, Text, Scrollable};
 use iced::keyboard::KeyCode;
 use iced_style::Color;
-use libcfg::{getcfgdata, BindKey, Border, ShortcutKey, decodeheader, decodeborder, decodepri, decodetheme, mkwmcfg, mkselfcfg};
+use libcfg::{getcfgdata, BindKey, ShortcutKey, Border, decodeheader, decodepri, decodetheme, mkwmcfg, mkselfcfg};
 mod libcfg;
 use langswaycfg::{get_lang, Translation};
 mod langswaycfg;
@@ -11,15 +11,17 @@ use libstyle::ButtonStyle;
 mod libstyle;
 mod liblocale;
 
+
+//This is Cuttlefish, Our Configuration Tool
+
 fn main() -> Result {
     Configurator::run(Settings::default())
 }
 
 
-struct Configurator {
+struct Configurator { //The basic configurator struct, contains most program state
     theme: Theme,
     locale: Translation,
-    border: Option<Border>,
     current_page: Page,
     primary_key: Option<ShortcutKey>,
     secondary_key: Option<ShortcutKey>,
@@ -33,15 +35,15 @@ struct Configurator {
     minimize_key: String,
     scratch_header: Option<BindKey>,
     scratch_key: String,
-    width: i32,
     unsaved: bool,
     capturenext: Option<CaptureInput>,
     index: u8,
     indexmax: u8,
+    border: Border
 }
 
 #[derive(PartialEq, Debug, Clone)]
-enum CaptureInput {
+enum CaptureInput { //enum used to store what binding should be captured into
     NoKey,
     ExitKey,
     LaunchKey,
@@ -53,10 +55,9 @@ enum CaptureInput {
 impl Default for Configurator {
     fn default() -> Self {
         let data = getcfgdata();
-        Configurator {
+        Configurator { //here we extract all of the data from the config file
             theme: decodetheme(&data.theme, Theme::Light),
             locale: get_lang(),
-            border: decodeborder(&data.border, Border::Normal),
             current_page: Page::Main,
             primary_key: decodepri(&data.primary, ShortcutKey::Super),
             secondary_key: decodepri(&data.secondary, ShortcutKey::Shift),
@@ -70,21 +71,20 @@ impl Default for Configurator {
             minimize_key: data.minik,
             scratch_header: decodeheader(&data.scratchh, BindKey::PrimaryKey),
             scratch_key: data.scratchk,
-            width: data.width,
             unsaved: false,
             capturenext: Some(CaptureInput::NoKey),
             index: 0,
-            indexmax: 3,
+            indexmax: 2,
+            border: data.border.clone().unwrap(),
         }
     }
 }
 
 #[derive(Debug, Clone)]
-enum Message {
+enum Message { // The Message enum, used to send data to the configurator's update function
     Save,
     ThemeLight,
     ThemeDark,
-    BorderToggled(Border),
     PageChanged(Page),
     PrimaryKeyChanged(ShortcutKey),
     SecondaryKeyChanged(ShortcutKey),
@@ -93,14 +93,20 @@ enum Message {
     KillHeaderChanged(BindKey),
     MiniHeaderChanged(BindKey),
     ScratchHeaderChanged(BindKey),
-    WidthIncr,
-    WidthDecr,
     KeyboardUpdate(iced::keyboard::Event),
-    Capture(CaptureInput)
+    Capture(CaptureInput),
+    Incr(IncrVal),
+    Decr(IncrVal),
+}
+#[derive(Debug, Clone)]
+enum IncrVal {
+    WidthVal,
+    RadiusVal,
+    GapsVal,
 }
 
 #[derive(Debug, Clone, Copy, Default, PartialEq)]
-pub enum Page {
+pub enum Page { //page enum, used to store the currently focused page
     #[default]
     Main,
     Bind,
@@ -116,7 +122,7 @@ impl std::fmt::Display for Page {
         write!(
             f,
             "{}",
-            match self {
+            match self { //respect locale preferences when prettyprinting
                 Page::Main => pretty.pagemain,
                 Page::Bind => pretty.pagebind,
                 Page::Bar => pretty.pagebar,
@@ -132,23 +138,23 @@ impl Application for Configurator {
     type Theme = Theme;
     type Executor = executor::Default;
     type Flags = ();
-    fn new(_flags: ()) -> (Self, iced::Command<Message>) {
+    fn new(_flags: ()) -> (Self, iced::Command<Message>) { //code that initializes the app
         (
             Self::default(),
             iced::Command::none()
         )
     }
-    fn title(&self) -> String {
+    fn title(&self) -> String { //code that sets the app title
         let globalstr = self.locale.global.as_ref().unwrap();
         let title = globalstr.title.clone();
         format!("{title}{}", self.current_page.to_string())
     }
-    fn update(&mut self, message: Self::Message) -> iced::Command<Message> {
+    fn update(&mut self, message: Self::Message) -> iced::Command<Message> { //update function, parses messages
         match message {
             Message::Save => {
                 if self.unsaved {
-                    mkwmcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), self.border, self.width);
-                    mkselfcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), self.border, self.width, self.theme.clone());
+                    mkwmcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone());
+                    mkselfcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), self.theme.clone(), Some(self.border));
                 }
                 self.unsaved = false;
                 iced::Command::none()
@@ -163,16 +169,11 @@ impl Application for Configurator {
                 self.unsaved = true;
                 iced::Command::none()
             }
-            Message::BorderToggled(x) => {
-                self.border = Some(x);
-                self.unsaved = true;
-                iced::Command::none()
-            }
             Message::PageChanged(x) => {
                 self.current_page = x;
                 match x {
                     Page::Main => {
-                        self.indexmax = 3;
+                        self.indexmax = 2;
                     }
                     Page::Bind => {
                         self.indexmax = 6;
@@ -224,25 +225,11 @@ impl Application for Configurator {
                 self.unsaved = true;
                 iced::Command::none()
             }
-            Message::WidthIncr => {
-                if self.width <= 19 {
-                    self.width = self.width + 1;
-                    self.unsaved = true;
-                }
-                iced::Command::none()
-            }
-            Message::WidthDecr => {
-                if self.width >= 1 {
-                    self.width = self.width -1;
-                    self.unsaved = true;
-                }
-                iced::Command::none()
-            }
-            Message::KeyboardUpdate(x) => {
+            Message::KeyboardUpdate(x) => { //keyboard event parser
                 match x {
-                    iced::keyboard::Event::KeyPressed { key_code, modifiers} => {
-                        match self.capturenext.as_ref().unwrap() {
-                            &CaptureInput::NoKey => {
+                    iced::keyboard::Event::KeyPressed { key_code, modifiers} => { // code for handling keypresses
+                        match self.capturenext.as_ref().unwrap() { //check if next input should be captured
+                            &CaptureInput::NoKey => { // if no captures are wanted, go through this parsing block
                                 if key_code == KeyCode::Up {
                                     if iced::keyboard::Modifiers::shift(modifiers) {//go up a page
                                         self.current_page = match self.current_page {
@@ -250,7 +237,7 @@ impl Application for Configurator {
                                                 Page::Init
                                             }
                                             Page::Bind => {
-                                                self.indexmax = 3;
+                                                self.indexmax = 2;
                                                 Page::Main
                                             }
                                             Page::Anim => {
@@ -264,7 +251,7 @@ impl Application for Configurator {
                                                 Page::Bar
                                             }
                                         }
-                                    } else {
+                                    } else { //move the minicursor up
                                         if self.index != 0 {
                                             self.index = self.index -1;
                                         }
@@ -286,34 +273,34 @@ impl Application for Configurator {
                                                 Page::Init
                                             }
                                             Page::Init => {
-                                                self.indexmax = 3;
+                                                self.indexmax = 2;
                                                 Page::Main
                                             }
                                        }
-                                    } else {
+                                    } else { //move the minicursor down
                                         if self.index < self.indexmax {
                                             self.index = self.index +1;
                                         }
                                     }
                                 } else if key_code == KeyCode::S { //save
                                     if self.unsaved {
-                                        mkwmcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), self.border, self.width);
-                                        mkselfcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), self.border, self.width, self.theme.clone());
+                                        mkwmcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone());
+                                        mkselfcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), self.theme.clone(), Some(self.border));
                                     }
                                     self.unsaved = false;
-                                } else if key_code == KeyCode::Enter {
+                                } else if key_code == KeyCode::Enter { // if the enter key is pressed, interact with certain widgets
                                     match self.current_page {
                                         Page::Main => {
-                                            if self.index == 0 {
-                                                if self.theme == Theme::Dark {
+                                            if self.index == 0 { // if theme selector block is marked
+                                                if self.theme == Theme::Dark { // set the theme to light
                                                     self.theme = Theme::Light;
-                                                } else {
+                                                } else { // set the theme to dark
                                                     self.theme = Theme::Dark;
                                                 }
                                                 self.unsaved = true;
                                             }
                                         }
-                                        Page::Bind => {
+                                        Page::Bind => { // set the captures if needed
                                             if self.index == 2 {
                                                 self.capturenext = Some(CaptureInput::ExitKey);
                                             } else if self.index == 3 {
@@ -336,10 +323,6 @@ impl Application for Configurator {
 
                                         }
                                     }
-                                } else if key_code == KeyCode::Equals && self.index == 1 && self.current_page == Page::Main && self.width < 20{
-                                    self.width = self.width + 1;
-                                } else if key_code == KeyCode::Minus && self.index == 1 && self.current_page == Page::Main && self.width > 0 {
-                                    self.width = self.width - 1;
                                 } else if key_code == KeyCode::Key1 {
                                     if self.current_page == Page::Main {
                                         if self.index == 2 {
@@ -457,6 +440,32 @@ impl Application for Configurator {
                                             self.unsaved = true;
                                         }
                                     }
+                                } else if key_code == KeyCode::Right {
+                                    if self.current_page == Page::Anim {
+                                        if self.index == 0 {
+                                            self.border.width = self.border.width + 1;
+                                            self.unsaved = true;
+                                        } else if self.index == 1 {
+                                            self.border.gaps = self.border.gaps + 1;
+                                            self.unsaved = true;
+                                        } else if self.index == 2 {
+                                            self.border.radius = self.border.radius + 1;
+                                            self.unsaved = true;
+                                        }
+                                    }
+                                } else if key_code == KeyCode::Left {
+                                    if self.current_page == Page::Anim {
+                                        if self.index == 0 && self.border.width > 0 {
+                                            self.border.width = self.border.width - 1;
+                                            self.unsaved = true;
+                                        } else if self.index == 1 && self.border.gaps > 0 {
+                                            self.border.gaps = self.border.gaps - 1;
+                                            self.unsaved = true;
+                                        } else if self.index == 2 && self.border.radius > 0 {
+                                            self.border.radius = self.border.radius - 1;
+                                            self.unsaved = true;
+                                        }
+                                    }
                                 }
                             } 
                             &CaptureInput::ExitKey => {
@@ -502,12 +511,29 @@ impl Application for Configurator {
                 self.capturenext = Some(x);
                 iced::Command::none()
             }
+            Message::Incr(x) => {
+                match x {
+                    IncrVal::WidthVal => self.border.width = self.border.width + 1,
+                    IncrVal::RadiusVal => self.border.radius = self.border.radius + 1,
+                    IncrVal::GapsVal => self.border.gaps = self.border.gaps + 1,
+                }
+                self.unsaved = true;
+                iced::Command::none()
+            }
+            Message::Decr(x) => {
+                match x {
+                    IncrVal::WidthVal => if self.border.width > 0 {self.border.width = self.border.width - 1},
+                    IncrVal::RadiusVal => if self.border.radius > 0 {self.border.radius = self.border.radius - 1},
+                    IncrVal::GapsVal => if self.border.gaps > 0 {self.border.gaps = self.border.gaps - 1},
+                }
+                self.unsaved = true;
+                iced::Command::none()
+            }
         }
     }
     fn view(&self) -> iced::Element<'_, Self::Message> {
-
-        //let sidebarActiveBtn = ButtonStyle{ border_radius: 10.0, txt_color: Color::from_rgb(202.0, 211.0, 245.0), bg_color: Color::from_rgb(36.0, 39.0, 58.0), border_color: Color::from_rgb(0.0, 0.0, 0.0), border_width: 1.0};
-        let sidebarActiveBtn = ButtonStyle{
+        //define button styles
+        let sidebar_active_btn = ButtonStyle{
             border_radius: 10.0,
             txt_color: Color::from_rgb8( 0xCA, 0xD3, 0xF5),
             bg_color: Color::from_rgb8(0x24, 0x27, 0x3A),
@@ -515,7 +541,7 @@ impl Application for Configurator {
             border_width: 0.0,
             shadow_offset: iced::Vector {x: 0.0, y: 0.0}
         };
-        let sidebarInactiveBtn = ButtonStyle{
+        let sidebar_inactive_btn = ButtonStyle{
             border_radius: 10.0,
             txt_color: Color::from_rgb8(0xA5, 0xAD, 0xCB),
             bg_color: Color::from_rgb8(0x18, 0x19, 0x26),
@@ -538,39 +564,39 @@ impl Application for Configurator {
         let mut pagemain = Button::new(maintxt)
             .on_press(Message::PageChanged(Page::Main))
             .width(150)
-            .style(theme::Button::Custom(std::boxed::Box::new(sidebarActiveBtn.clone())));
+            .style(theme::Button::Custom(std::boxed::Box::new(sidebar_active_btn.clone())));
         let mut pagebind = Button::new(bindtxt)
             .on_press(Message::PageChanged(Page::Bind))
             .width(150)
-            .style(theme::Button::Custom(std::boxed::Box::new(sidebarActiveBtn.clone())));
+            .style(theme::Button::Custom(std::boxed::Box::new(sidebar_active_btn.clone())));
         let mut pagebar = Button::new(bartxt)
             .on_press(Message::PageChanged(Page::Bar))
             .width(150)
-            .style(theme::Button::Custom(std::boxed::Box::new(sidebarActiveBtn.clone())));
+            .style(theme::Button::Custom(std::boxed::Box::new(sidebar_active_btn.clone())));
         let mut pageinit = Button::new(inittxt)
             .on_press(Message::PageChanged(Page::Init))
             .width(150)
-            .style(theme::Button::Custom(std::boxed::Box::new(sidebarActiveBtn.clone())));
+            .style(theme::Button::Custom(std::boxed::Box::new(sidebar_active_btn.clone())));
         let mut pageanim = Button::new(animtxt)
             .on_press(Message::PageChanged(Page::Anim))
             .width(150)
-            .style(theme::Button::Custom(std::boxed::Box::new(sidebarActiveBtn.clone())));
+            .style(theme::Button::Custom(std::boxed::Box::new(sidebar_active_btn.clone())));
         let pagelabel = Text::new(pagetxt);
         match self.current_page {
             Page::Main => {
-                pagemain = pagemain.style(theme::Button::Custom(std::boxed::Box::new(sidebarInactiveBtn.clone())));
+                pagemain = pagemain.style(theme::Button::Custom(std::boxed::Box::new(sidebar_inactive_btn.clone())));
             }
             Page::Bind => {
-                pagebind = pagebind.style(theme::Button::Custom(std::boxed::Box::new(sidebarInactiveBtn.clone())));
+                pagebind = pagebind.style(theme::Button::Custom(std::boxed::Box::new(sidebar_inactive_btn.clone())));
             }
             Page::Bar => {
-                pagebar = pagebar.style(theme::Button::Custom(std::boxed::Box::new(sidebarInactiveBtn.clone())));
+                pagebar = pagebar.style(theme::Button::Custom(std::boxed::Box::new(sidebar_inactive_btn.clone())));
             }
             Page::Init => {
-                pageinit = pageinit.style(theme::Button::Custom(std::boxed::Box::new(sidebarInactiveBtn.clone())));
+                pageinit = pageinit.style(theme::Button::Custom(std::boxed::Box::new(sidebar_inactive_btn.clone())));
             }
             Page::Anim => {
-                pageanim = pageanim.style(theme::Button::Custom(std::boxed::Box::new(sidebarInactiveBtn.clone())));
+                pageanim = pageanim.style(theme::Button::Custom(std::boxed::Box::new(sidebar_inactive_btn.clone())));
             }
         }
         let pagecol = Column::new()
@@ -622,24 +648,6 @@ impl Application for Configurator {
                 let primarylabel: Text = Text::new(primarytxt);
                 let secondarylabel: Text = Text::new(secondarytxt);
 
-                let bordertoggle = pick_list(
-                    &Border::ALL[..], 
-                    self.border, 
-                    Message::BorderToggled,
-                    )
-                    .placeholder("choose");
-                let borderlabel = Text::new(mainstr.borders.clone());
-                let widthlabel: Text = Text::new(format!("{} {}px", mainstr.width, self.width));
-                let mut widthup = Button::new("+")
-                    .on_press(Message::WidthIncr);
-                let mut widthdown = Button::new("-")
-                    .on_press(Message::WidthDecr);
-                if self.width == 20 {
-                    widthup = widthup.style(theme::Button::Secondary);
-                } else if self.width == 0 {
-                    widthdown = widthdown.style(theme::Button::Secondary);
-                }
-
                 let lighttxt = String::as_str(&mainstr.light);
                 let darktxt = String::as_str(&mainstr.dark);
                 let themetxt = String::as_str(&mainstr.theme);
@@ -659,7 +667,6 @@ impl Application for Configurator {
                         panic!("oops");
                     }
                 }
-                let mut borderrow = Row::new().spacing(10);
                 let mut themerow = Row::new().spacing(10);
                 let mut primaryrow = Row::new().spacing(10);
                 let mut secondaryrow = Row::new().spacing(10);
@@ -667,19 +674,10 @@ impl Application for Configurator {
                 if self.index == 0 {
                     themerow = themerow.push(selectionmarker);
                 } else if self.index == 1 {
-                    borderrow = borderrow.push(selectionmarker);
-                } else if self.index == 2 {
                     primaryrow = primaryrow.push(selectionmarker);
-                } else if self.index == 3 {
+                } else if self.index == 2 {
                     secondaryrow = secondaryrow.push(selectionmarker);
                 }
-
-                borderrow = borderrow
-                    .push(borderlabel)
-                    .push(bordertoggle)
-                    .push(widthlabel)
-                    .push(widthup)
-                    .push(widthdown);
                 themerow = themerow
                     .push(themelabel)
                     .push(light)
@@ -693,7 +691,6 @@ impl Application for Configurator {
         
                 settings = settings
                     .push(themerow)
-                    .push(borderrow)
                     .push(primaryrow)
                     .push(secondaryrow);
             }
@@ -852,7 +849,56 @@ impl Application for Configurator {
 
             }
             Page::Anim => {
+                let animstr = self.locale.animpage.clone().unwrap();
 
+                let widthincr = Button::new("+").on_press(Message::Incr(IncrVal::WidthVal)).width(30);
+                let widthdecr = Button::new("-").on_press(Message::Decr(IncrVal::WidthVal)).width(30);
+                let widthvaluepeek = Text::new(format!("{}", self.border.width));
+                let widthlabel = Text::new(animstr.width);
+
+                let mut widthrow = Row::new().spacing(10);
+
+                let gapsincr = Button::new("+").on_press(Message::Incr(IncrVal::GapsVal)).width(30);
+                let gapsdecr = Button::new("-").on_press(Message::Decr(IncrVal::GapsVal)).width(30);
+                let gapsvaluepeek = Text::new(format!("{}", self.border.gaps));
+                let gapslabel = Text::new(animstr.gaps);
+
+                let mut gapsrow = Row::new().spacing(10);
+
+                let radincr = Button::new("+").on_press(Message::Incr(IncrVal::RadiusVal)).width(30);
+                let raddecr = Button::new("-").on_press(Message::Decr(IncrVal::RadiusVal)).width(30);
+                let radvaluepeek = Text::new(format!("{}", self.border.radius));
+                let radlabel = Text::new(animstr.radius);
+
+                let mut radrow = Row::new().spacing(10);
+
+                if self.index == 0 {
+                    widthrow = widthrow.push(selectionmarker);
+                } else if self.index == 1 {
+                    gapsrow = gapsrow.push(selectionmarker);
+                } else if self.index == 2 {
+                    radrow = radrow.push(selectionmarker);
+                }
+
+                widthrow = widthrow
+                    .push(widthlabel)
+                    .push(widthdecr)
+                    .push(widthvaluepeek)
+                    .push(widthincr);
+                gapsrow = gapsrow
+                    .push(gapslabel)
+                    .push(gapsdecr)
+                    .push(gapsvaluepeek)
+                    .push(gapsincr);
+                radrow = radrow
+                    .push(radlabel)
+                    .push(raddecr)
+                    .push(radvaluepeek)
+                    .push(radincr);
+                settings = settings
+                    .push(widthrow)
+                    .push(gapsrow)
+                    .push(radrow);
             }
         }
 

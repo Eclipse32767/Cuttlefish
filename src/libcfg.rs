@@ -10,8 +10,6 @@ use crate::langswaycfg;
 #[derive(Deserialize, Debug, Serialize)]
 pub struct FileData {
     pub theme: String,
-    pub(crate) border: String,
-    pub(crate) width: i32,
     pub primary: String,
     pub secondary: String,
     pub exith: String,
@@ -23,16 +21,15 @@ pub struct FileData {
     pub minih: String,
     pub minik: String,
     pub scratchh: String,
-    pub scratchk: String
+    pub scratchk: String,
+    pub border: Option<Border>
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum Border {
-    #[default]
-    No,
-    Normal,
-    Csd,
-    Pixel,
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct Border {
+    pub width: i32,
+    pub radius: i32,
+    pub gaps: i32,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -52,14 +49,6 @@ pub enum BindKey {
     BothKey
 }
 
-impl Border {
-    pub(crate) const ALL: [Border; 4] = [
-        Border::No,
-        Border::Normal,
-        Border::Csd,
-        Border::Pixel,
-    ];
-}
 impl ShortcutKey {
     pub(crate) const ALL: [ShortcutKey; 4] = [
         ShortcutKey::Super,
@@ -74,23 +63,6 @@ impl BindKey {
         BindKey::SecondaryKey,
         BindKey::BothKey,
     ];
-}
-
-impl std::fmt::Display for Border {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let locale = get_lang();
-        let pretty = locale.prettyprint.unwrap();
-        write!(
-            f,
-            "{}",
-            match self {
-                Border::No => pretty.borderno,
-                Border::Normal => pretty.bordernormal,
-                Border::Csd => pretty.bordercsd,
-                Border::Pixel => pretty.borderpixel,
-            }
-        )
-    }
 }
 
 impl std::fmt::Display for ShortcutKey {
@@ -154,15 +126,6 @@ pub fn decodetheme(x: &str, default: iced::Theme) -> iced::Theme {
         &_ => default
     }
 }
-pub fn decodeborder(x: &str, default: Border) -> Option<Border> {
-    Some(match x {
-        "none" => Border::No,
-        "csd" => Border::Csd,
-        "normal" => Border::Normal,
-        "pixel" => Border::Pixel,
-        &_ => default
-    })
-}
 pub fn decodepri(x: &str, default: ShortcutKey) -> Option<ShortcutKey> {
     Some(match x {
         "super" => ShortcutKey::Super,
@@ -185,14 +148,6 @@ pub fn encodetheme(x: iced::Theme) -> &'static str {
         iced::Theme::Dark => "dark",
         iced::Theme::Light => "light",
         iced::Theme::Custom(..) => "light"
-    }
-}
-pub fn encodeborder(x: Option<Border>) -> &'static str {
-    match x.unwrap() {
-        Border::No => "none",
-        Border::Normal => "normal",
-        Border::Csd => "csd",
-        Border::Pixel => "pixel"
     }
 }
 pub fn encodepri(x: Option<ShortcutKey>) -> &'static str {
@@ -225,15 +180,7 @@ pub fn rip_bind(opt: Option<BindKey>) -> &'static str {
         BindKey::BothKey => "$pri+$sec"
     }
 }
-pub fn rip_border(opt:  Option<Border>) -> &'static str {
-    match opt.unwrap() {
-        Border::No => "none",
-        Border::Csd => "csd",
-        Border::Normal => "normal",
-        Border::Pixel => "pixel"
-    }
-}
-pub fn mkwmcfg(primary_key: Option<ShortcutKey>, secondary_key: Option<ShortcutKey>, exit_header: Option<BindKey>, exit_key: String, launch_header: Option<BindKey>, launch_key: String, kill_header: Option<BindKey>, kill_key: String, mini_header: Option<BindKey>, mini_key: String, scratch_header: Option<BindKey>, scratch_key: String, border: Option<Border>, width: i32) {
+pub fn mkwmcfg(primary_key: Option<ShortcutKey>, secondary_key: Option<ShortcutKey>, exit_header: Option<BindKey>, exit_key: String, launch_header: Option<BindKey>, launch_key: String, kill_header: Option<BindKey>, kill_key: String, mini_header: Option<BindKey>, mini_key: String, scratch_header: Option<BindKey>, scratch_key: String) {
     let home = get_home();
     let data;
     let primary = rip_shortcut(primary_key);
@@ -248,10 +195,8 @@ pub fn mkwmcfg(primary_key: Option<ShortcutKey>, secondary_key: Option<ShortcutK
     let minik = &mini_key;
     let scratchh = rip_bind(scratch_header);
     let scratchk = &scratch_key;
-    let borderval = rip_border(border);
-    let widthval = &width;
     let path = format!("{home}/sway/cfgvars");
-    data = format!("#AUTO-GENERATED CONFIG, do not edit, any changed will be overwritten\ndefault_border {borderval} {widthval} \nset $pri {primary}\nset $sec {secondary}\n \nset $exit {exith}+{exitk}\nset $launch {launchh}+{launchk}\nset $kill {killh}+{killk}\nset $mini {minih}+{minik}\nset $scratch {scratchh}+{scratchk}");
+    data = format!("#AUTO-GENERATED CONFIG, do not edit, any changed will be overwritten\nset $pri {primary}\nset $sec {secondary}\n \nset $exit {exith}+{exitk}\nset $launch {launchh}+{launchk}\nset $kill {killh}+{killk}\nset $mini {minih}+{minik}\nset $scratch {scratchh}+{scratchk}");
 
     fs::write(path, data).expect("failed to write file");
 
@@ -260,13 +205,11 @@ pub fn mkwmcfg(primary_key: Option<ShortcutKey>, secondary_key: Option<ShortcutK
         .spawn()
         .expect("oops, swaymsg failed, do you have sway installed?");
 }
-pub fn mkselfcfg(primary_key: Option<ShortcutKey>, secondary_key: Option<ShortcutKey>, exit_header: Option<BindKey>, exit_key: String, launch_header: Option<BindKey>, launch_key: String, kill_header: Option<BindKey>, kill_key: String, mini_header: Option<BindKey>, mini_key: String, scratch_header: Option<BindKey>, scratch_key: String, border: Option<Border>, width: i32, theme: iced::Theme) {
+pub fn mkselfcfg(primary_key: Option<ShortcutKey>, secondary_key: Option<ShortcutKey>, exit_header: Option<BindKey>, exit_key: String, launch_header: Option<BindKey>, launch_key: String, kill_header: Option<BindKey>, kill_key: String, mini_header: Option<BindKey>, mini_key: String, scratch_header: Option<BindKey>, scratch_key: String, theme: iced::Theme, border: Option<Border>) {
     let home = get_home();
     let path = format!("{home}/swaycfg/swaycfg.toml");
     let data = FileData{
         theme: encodetheme(theme.clone()).to_string(),
-        border: encodeborder(border).to_string(),
-        width: width,
         primary: encodepri(primary_key).to_string(),
         secondary: encodepri(secondary_key).to_string(),
         exith: encodeheader(exit_header).to_string(),
@@ -278,7 +221,8 @@ pub fn mkselfcfg(primary_key: Option<ShortcutKey>, secondary_key: Option<Shortcu
         minih: encodeheader(mini_header).to_string(),
         minik: mini_key.clone(),
         scratchh: encodeheader(scratch_header).to_string(),
-        scratchk: scratch_key.clone()
+        scratchk: scratch_key.clone(),
+        border: border.clone()
     };
     let toml = to_string(&data).expect("failed to generate toml");
     fs::write(path, toml).expect("failed to write swaycfg.toml");
