@@ -1,7 +1,7 @@
 use serde_derive::{Deserialize, Serialize};
 use toml::{self, from_str, to_string};
 use std::fs::read_to_string;
-use std::env;
+use std::{env, default};
 use std::process::Command;
 use std::fs;
 use langswaycfg::get_lang;
@@ -30,6 +30,23 @@ pub struct Border {
     pub width: i32,
     pub radius: i32,
     pub gaps: i32,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum WindowAnimation {
+    Slide,
+    Popin,
+    #[default]
+    None
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum WorkAnimation {
+    Slide,
+    SlideVert,
+    Fade,
+    #[default]
+    None
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -64,7 +81,21 @@ impl BindKey {
         BindKey::BothKey,
     ];
 }
-
+impl WindowAnimation {
+    pub const ALL: [WindowAnimation; 3] = [
+        WindowAnimation::None,
+        WindowAnimation::Popin,
+        WindowAnimation::Slide
+    ];
+}
+impl WorkAnimation {
+    pub const ALL: [WorkAnimation; 4] = [
+        WorkAnimation::None,
+        WorkAnimation::Slide,
+        WorkAnimation::SlideVert,
+        WorkAnimation::Fade
+    ];
+}
 impl std::fmt::Display for ShortcutKey {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let locale = get_lang();
@@ -92,6 +123,33 @@ impl std::fmt::Display for BindKey {
                 BindKey::PrimaryKey => pretty.bindpri,
                 BindKey::SecondaryKey => pretty.bindsec,
                 BindKey::BothKey => pretty.bindboth
+            }
+        )
+    }
+}
+impl std::fmt::Display for WindowAnimation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                WindowAnimation::None => "No Animation",
+                WindowAnimation::Popin => "Pop-in",
+                WindowAnimation::Slide => "Slide on in"
+            }
+        )
+    }
+}
+impl std::fmt::Display for WorkAnimation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                WorkAnimation::None => "No Animation",
+                WorkAnimation::Fade => "Fade Into New Workspace",
+                WorkAnimation::Slide => "Slide In Horizontally",
+                WorkAnimation::SlideVert => "Slide In Vertically"
             }
         )
     }

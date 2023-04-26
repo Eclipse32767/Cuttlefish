@@ -3,7 +3,7 @@ use iced::{Result, Application, Settings, Alignment, Length, executor};
 use iced::widget::{Button, Row, Column, Container, pick_list, Text, Scrollable};
 use iced::keyboard::KeyCode;
 use iced_style::Color;
-use libcfg::{getcfgdata, BindKey, ShortcutKey, Border, decodeheader, decodepri, decodetheme, mkwmcfg, mkselfcfg};
+use libcfg::{getcfgdata, BindKey, ShortcutKey, WindowAnimation, WorkAnimation, Border, decodeheader, decodepri, decodetheme, mkwmcfg, mkselfcfg};
 mod libcfg;
 use langswaycfg::{get_lang, Translation};
 mod langswaycfg;
@@ -39,7 +39,10 @@ struct Configurator { //The basic configurator struct, contains most program sta
     capturenext: Option<CaptureInput>,
     index: u8,
     indexmax: u8,
-    border: Border
+    border: Border,
+    window_anim: Option<WindowAnimation>,
+    work_anim: Option<WorkAnimation>,
+    blur: bool
 }
 
 #[derive(PartialEq, Debug, Clone)]
@@ -76,6 +79,9 @@ impl Default for Configurator {
             index: 0,
             indexmax: 2,
             border: data.border.clone().unwrap(),
+            window_anim: Some(WindowAnimation::Popin),
+            work_anim: Some(WorkAnimation::SlideVert),
+            blur: true
         }
     }
 }
@@ -97,6 +103,9 @@ enum Message { // The Message enum, used to send data to the configurator's upda
     Capture(CaptureInput),
     Incr(IncrVal),
     Decr(IncrVal),
+    ChangeWindowAnim(WindowAnimation),
+    ChangeWorkAnim(WorkAnimation),
+    BlurToggled(bool),
 }
 #[derive(Debug, Clone)]
 enum IncrVal {
@@ -185,7 +194,7 @@ impl Application for Configurator {
                         self.indexmax = 0;
                     }
                     Page::Anim => {
-                        self.indexmax = 2;
+                        self.indexmax = 4;
                     }
                 }
                 iced::Command::none()
@@ -246,7 +255,7 @@ impl Application for Configurator {
                                                 Page::Bind
                                             }
                                             Page::Bar => {
-                                                self.indexmax = 2;
+                                                self.indexmax = 4;
                                                 Page::Anim
                                             }
                                             Page::Init => {
@@ -267,7 +276,7 @@ impl Application for Configurator {
                                                 Page::Bind
                                             }
                                             Page::Bind => {
-                                                self.indexmax = 2;
+                                                self.indexmax = 4;
                                                 Page::Anim
                                             }
                                             Page::Anim => {
@@ -331,10 +340,10 @@ impl Application for Configurator {
                                     }
                                 } else if key_code == KeyCode::Key1 {
                                     if self.current_page == Page::Main {
-                                        if self.index == 2 {
+                                        if self.index == 1 {
                                             self.primary_key = Some(ShortcutKey::Super);
                                             self.unsaved = true;
-                                        } else if self.index == 3 {
+                                        } else if self.index == 2 {
                                             self.secondary_key = Some(ShortcutKey::Super);
                                             self.unsaved = true;
                                         }
@@ -364,10 +373,10 @@ impl Application for Configurator {
                                     }
                                 } else if key_code == KeyCode::Key2 {
                                     if self.current_page == Page::Main {
-                                        if self.index == 2 {
+                                        if self.index == 1 {
                                             self.primary_key = Some(ShortcutKey::Alt);
                                             self.unsaved = true;
-                                        } else if self.index == 3 {
+                                        } else if self.index == 2 {
                                             self.secondary_key = Some(ShortcutKey::Alt);
                                             self.unsaved = true;
                                         }
@@ -397,10 +406,10 @@ impl Application for Configurator {
                                     }
                                 } else if key_code == KeyCode::Key3 {
                                     if self.current_page == Page::Main {
-                                        if self.index == 2 {
+                                        if self.index == 1 {
                                             self.primary_key = Some(ShortcutKey::Shift);
                                             self.unsaved = true;
-                                        } else if self.index == 3 {
+                                        } else if self.index == 2 {
                                             self.secondary_key = Some(ShortcutKey::Shift);
                                             self.unsaved = true;
                                         }
@@ -430,10 +439,10 @@ impl Application for Configurator {
                                     }
                                 } else if key_code == KeyCode::Key4 {
                                     if self.current_page == Page::Main {
-                                        if self.index == 2 {
+                                        if self.index == 1 {
                                             self.primary_key = Some(ShortcutKey::Ctrl);
                                             self.unsaved = true;
-                                        } else if self.index == 3 {
+                                        } else if self.index == 2 {
                                             self.secondary_key = Some(ShortcutKey::Ctrl);
                                             self.unsaved = true;
                                         }
@@ -532,6 +541,21 @@ impl Application for Configurator {
                     IncrVal::RadiusVal => if self.border.radius > 0 {self.border.radius = self.border.radius - 1},
                     IncrVal::GapsVal => if self.border.gaps > 0 {self.border.gaps = self.border.gaps - 1},
                 }
+                self.unsaved = true;
+                iced::Command::none()
+            }
+            Message::ChangeWindowAnim(x) => {
+                self.window_anim = Some(x);
+                self.unsaved = true;
+                iced::Command::none()
+            }
+            Message::ChangeWorkAnim(x) => {
+                self.work_anim = Some(x);
+                self.unsaved = true;
+                iced::Command::none()
+            }
+            Message::BlurToggled(x) => {
+                self.blur = x;
                 self.unsaved = true;
                 iced::Command::none()
             }
@@ -852,7 +876,7 @@ impl Application for Configurator {
 
             }
             Page::Init => {
-
+                
             }
             Page::Anim => {
                 let animstr = self.locale.animpage.clone().unwrap();
@@ -878,6 +902,36 @@ impl Application for Configurator {
 
                 let mut radrow = Row::new().spacing(10);
 
+                let winpick = pick_list(
+                    &WindowAnimation::ALL[..], 
+                    self.window_anim, 
+                    Message::ChangeWindowAnim,
+                    )
+                    .placeholder("choose");
+                let winlabel = Text::new("The Window Animations To Be Used:");
+
+                let mut winrow = Row::new().spacing(10);
+
+                let workpick = pick_list(
+                    &WorkAnimation::ALL[..],
+                    self.work_anim,
+                    Message::ChangeWorkAnim,
+                    )
+                    .placeholder("choose");
+                let worklabel = Text::new("The Animation to be used for Workspaces");
+
+                let mut workrow = Row::new().spacing(10);
+
+                let blurlabel = Text::new("Whether or not to use window blur");
+                let mut bluron = Button::new("Enable").on_press(Message::BlurToggled(true));
+                let mut bluroff = Button::new("Disable").on_press(Message::BlurToggled(false));
+                if self.blur {
+                    bluron = Button::new("Enabled").on_press(Message::BlurToggled(true)).style(theme::Button::Secondary);
+                } else {
+                    bluroff = Button::new("Disabled").on_press(Message::BlurToggled(false)).style(theme::Button::Secondary);
+                }
+                let mut blurrow = Row::new().spacing(10);
+
                 if self.border.width == 0 {
                     widthdecr = widthdecr.style(theme::Button::Secondary);
                 }
@@ -894,6 +948,10 @@ impl Application for Configurator {
                     gapsrow = gapsrow.push(selectionmarker);
                 } else if self.index == 2 {
                     radrow = radrow.push(selectionmarker);
+                } else if self.index == 3 {
+                    winrow = winrow.push(selectionmarker);
+                } else if self.index == 4 {
+                    workrow = workrow.push(selectionmarker);
                 }
 
                 widthrow = widthrow
@@ -911,10 +969,23 @@ impl Application for Configurator {
                     .push(raddecr)
                     .push(radvaluepeek)
                     .push(radincr);
+                winrow = winrow
+                    .push(winlabel)
+                    .push(winpick);
+                workrow = workrow
+                    .push(worklabel)
+                    .push(workpick);
+                blurrow = blurrow
+                    .push(blurlabel)
+                    .push(bluroff)
+                    .push(bluron);
                 settings = settings
                     .push(widthrow)
                     .push(gapsrow)
-                    .push(radrow);
+                    .push(radrow)
+                    .push(winrow)
+                    .push(workrow)
+                    .push(blurrow);
             }
         }
 
