@@ -185,7 +185,7 @@ impl Application for Configurator {
                         self.indexmax = 0;
                     }
                     Page::Anim => {
-                        self.indexmax = 0;
+                        self.indexmax = 2;
                     }
                 }
                 iced::Command::none()
@@ -234,6 +234,7 @@ impl Application for Configurator {
                                     if iced::keyboard::Modifiers::shift(modifiers) {//go up a page
                                         self.current_page = match self.current_page {
                                             Page::Main => {
+                                                self.indexmax = 0;
                                                 Page::Init
                                             }
                                             Page::Bind => {
@@ -245,9 +246,11 @@ impl Application for Configurator {
                                                 Page::Bind
                                             }
                                             Page::Bar => {
+                                                self.indexmax = 2;
                                                 Page::Anim
                                             }
                                             Page::Init => {
+                                                self.indexmax = 0;
                                                 Page::Bar
                                             }
                                         }
@@ -264,12 +267,15 @@ impl Application for Configurator {
                                                 Page::Bind
                                             }
                                             Page::Bind => {
+                                                self.indexmax = 2;
                                                 Page::Anim
                                             }
                                             Page::Anim => {
+                                                self.indexmax = 0;
                                                 Page::Bar
                                             }
                                             Page::Bar => {
+                                                self.indexmax = 0;
                                                 Page::Init
                                             }
                                             Page::Init => {
@@ -852,25 +858,35 @@ impl Application for Configurator {
                 let animstr = self.locale.animpage.clone().unwrap();
 
                 let widthincr = Button::new("+").on_press(Message::Incr(IncrVal::WidthVal)).width(30);
-                let widthdecr = Button::new("-").on_press(Message::Decr(IncrVal::WidthVal)).width(30);
+                let mut widthdecr = Button::new("-").on_press(Message::Decr(IncrVal::WidthVal)).width(30);
                 let widthvaluepeek = Text::new(format!("{}", self.border.width));
                 let widthlabel = Text::new(animstr.width);
 
                 let mut widthrow = Row::new().spacing(10);
 
                 let gapsincr = Button::new("+").on_press(Message::Incr(IncrVal::GapsVal)).width(30);
-                let gapsdecr = Button::new("-").on_press(Message::Decr(IncrVal::GapsVal)).width(30);
+                let mut gapsdecr = Button::new("-").on_press(Message::Decr(IncrVal::GapsVal)).width(30);
                 let gapsvaluepeek = Text::new(format!("{}", self.border.gaps));
                 let gapslabel = Text::new(animstr.gaps);
 
                 let mut gapsrow = Row::new().spacing(10);
 
                 let radincr = Button::new("+").on_press(Message::Incr(IncrVal::RadiusVal)).width(30);
-                let raddecr = Button::new("-").on_press(Message::Decr(IncrVal::RadiusVal)).width(30);
+                let mut raddecr = Button::new("-").on_press(Message::Decr(IncrVal::RadiusVal)).width(30);
                 let radvaluepeek = Text::new(format!("{}", self.border.radius));
                 let radlabel = Text::new(animstr.radius);
 
                 let mut radrow = Row::new().spacing(10);
+
+                if self.border.width == 0 {
+                    widthdecr = widthdecr.style(theme::Button::Secondary);
+                }
+                if self.border.gaps == 0 {
+                    gapsdecr = gapsdecr.style(theme::Button::Secondary);
+                }
+                if self.border.radius == 0 {
+                    raddecr = raddecr.style(theme::Button::Secondary);
+                }
 
                 if self.index == 0 {
                     widthrow = widthrow.push(selectionmarker);
