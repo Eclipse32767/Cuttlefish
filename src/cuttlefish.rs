@@ -3,7 +3,7 @@ use iced::{Result, Application, Settings, Alignment, Length, executor};
 use iced::widget::{Button, Row, Column, Container, pick_list, Text, Scrollable};
 use iced::keyboard::KeyCode;
 use iced_style::Color;
-use libcfg::{getcfgdata, BindKey, ShortcutKey, WindowAnimation, WorkAnimation, Border, decodeheader, decodepri, decodetheme, mkwmcfg, mkselfcfg};
+use libcfg::{getcfgdata, BindKey, ShortcutKey, WindowAnimation, WorkAnimation, Border, decodeheader, decodepri, decodetheme, mkwmcfg, mkselfcfg, decodewinanim, decodeworkanim, decodeblur};
 mod libcfg;
 use langswaycfg::{get_lang, Translation};
 mod langswaycfg;
@@ -79,9 +79,9 @@ impl Default for Configurator {
             index: 0,
             indexmax: 2,
             border: data.border.clone().unwrap(),
-            window_anim: Some(WindowAnimation::Popin),
-            work_anim: Some(WorkAnimation::SlideVert),
-            blur: true
+            window_anim: decodewinanim(&data.winanim, WindowAnimation::None),
+            work_anim: decodeworkanim(&data.workanim, WorkAnimation::None),
+            blur: decodeblur(&data.blur)
         }
     }
 }
@@ -163,7 +163,7 @@ impl Application for Configurator {
             Message::Save => {
                 if self.unsaved {
                     mkwmcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone());
-                    mkselfcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), self.theme.clone(), Some(self.border));
+                    mkselfcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), self.theme.clone(), Some(self.border), self.window_anim, self.work_anim, self.blur);
                 }
                 self.unsaved = false;
                 iced::Command::none()
@@ -194,8 +194,11 @@ impl Application for Configurator {
                         self.indexmax = 0;
                     }
                     Page::Anim => {
-                        self.indexmax = 4;
+                        self.indexmax = 5;
                     }
+                }
+                if self.index > self.indexmax {
+                    self.index = self.indexmax;
                 }
                 iced::Command::none()
             }
@@ -255,13 +258,16 @@ impl Application for Configurator {
                                                 Page::Bind
                                             }
                                             Page::Bar => {
-                                                self.indexmax = 4;
+                                                self.indexmax = 5;
                                                 Page::Anim
                                             }
                                             Page::Init => {
                                                 self.indexmax = 0;
                                                 Page::Bar
                                             }
+                                        };
+                                        if self.index > self.indexmax {
+                                            self.index = self.indexmax;
                                         }
                                     } else { //move the minicursor up
                                         if self.index != 0 {
@@ -276,7 +282,7 @@ impl Application for Configurator {
                                                 Page::Bind
                                             }
                                             Page::Bind => {
-                                                self.indexmax = 4;
+                                                self.indexmax = 5;
                                                 Page::Anim
                                             }
                                             Page::Anim => {
@@ -300,7 +306,7 @@ impl Application for Configurator {
                                 } else if key_code == KeyCode::S { //save
                                     if self.unsaved {
                                         mkwmcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone());
-                                        mkselfcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), self.theme.clone(), Some(self.border));
+                                        mkselfcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), self.theme.clone(), Some(self.border), self.window_anim, self.work_anim, self.blur);
                                     }
                                     self.unsaved = false;
                                 } else if key_code == KeyCode::Enter { // if the enter key is pressed, interact with certain widgets
@@ -335,7 +341,9 @@ impl Application for Configurator {
 
                                         }
                                         Page::Anim => {
-
+                                            if self.index == 5 {
+                                                self.blur = !self.blur;
+                                            }
                                         }
                                     }
                                 } else if key_code == KeyCode::Key1 {
@@ -584,6 +592,7 @@ impl Application for Configurator {
         let globalstr = self.locale.global.as_ref().unwrap();
         let mainstr = self.locale.mainpage.as_ref().unwrap();
         let bindstr = self.locale.bindpage.as_ref().unwrap();
+        let animstr = self.locale.animpage.as_ref().unwrap();
 
         let maintxt = String::as_str(&globalstr.main);
         let bindtxt = String::as_str(&globalstr.bind);
@@ -879,26 +888,25 @@ impl Application for Configurator {
                 
             }
             Page::Anim => {
-                let animstr = self.locale.animpage.clone().unwrap();
 
                 let widthincr = Button::new("+").on_press(Message::Incr(IncrVal::WidthVal)).width(30);
                 let mut widthdecr = Button::new("-").on_press(Message::Decr(IncrVal::WidthVal)).width(30);
                 let widthvaluepeek = Text::new(format!("{}", self.border.width));
-                let widthlabel = Text::new(animstr.width);
+                let widthlabel = Text::new(animstr.width.clone());
 
                 let mut widthrow = Row::new().spacing(10);
 
                 let gapsincr = Button::new("+").on_press(Message::Incr(IncrVal::GapsVal)).width(30);
                 let mut gapsdecr = Button::new("-").on_press(Message::Decr(IncrVal::GapsVal)).width(30);
                 let gapsvaluepeek = Text::new(format!("{}", self.border.gaps));
-                let gapslabel = Text::new(animstr.gaps);
+                let gapslabel = Text::new(animstr.gaps.clone());
 
                 let mut gapsrow = Row::new().spacing(10);
 
                 let radincr = Button::new("+").on_press(Message::Incr(IncrVal::RadiusVal)).width(30);
                 let mut raddecr = Button::new("-").on_press(Message::Decr(IncrVal::RadiusVal)).width(30);
                 let radvaluepeek = Text::new(format!("{}", self.border.radius));
-                let radlabel = Text::new(animstr.radius);
+                let radlabel = Text::new(animstr.radius.clone());
 
                 let mut radrow = Row::new().spacing(10);
 
@@ -908,7 +916,7 @@ impl Application for Configurator {
                     Message::ChangeWindowAnim,
                     )
                     .placeholder("choose");
-                let winlabel = Text::new("The Window Animations To Be Used:");
+                let winlabel = Text::new(animstr.winanim.clone());
 
                 let mut winrow = Row::new().spacing(10);
 
@@ -918,17 +926,21 @@ impl Application for Configurator {
                     Message::ChangeWorkAnim,
                     )
                     .placeholder("choose");
-                let worklabel = Text::new("The Animation to be used for Workspaces");
+                let worklabel = Text::new(animstr.workanim.clone());
 
                 let mut workrow = Row::new().spacing(10);
 
-                let blurlabel = Text::new("Whether or not to use window blur");
-                let mut bluron = Button::new("Enable").on_press(Message::BlurToggled(true));
-                let mut bluroff = Button::new("Disable").on_press(Message::BlurToggled(false));
+                let enable = String::as_str(&animstr.enableblur);
+                let disable = String::as_str(&animstr.disableblur);
+                let enabled = String::as_str(&animstr.enabledblur);
+                let disabled = String::as_str(&animstr.disabledblur);
+                let blurlabel = Text::new(animstr.blur.clone());
+                let mut bluron = Button::new(enable).on_press(Message::BlurToggled(true));
+                let mut bluroff = Button::new(disable).on_press(Message::BlurToggled(false));
                 if self.blur {
-                    bluron = Button::new("Enabled").on_press(Message::BlurToggled(true)).style(theme::Button::Secondary);
+                    bluron = Button::new(enabled).on_press(Message::BlurToggled(true)).style(theme::Button::Secondary);
                 } else {
-                    bluroff = Button::new("Disabled").on_press(Message::BlurToggled(false)).style(theme::Button::Secondary);
+                    bluroff = Button::new(disabled).on_press(Message::BlurToggled(false)).style(theme::Button::Secondary);
                 }
                 let mut blurrow = Row::new().spacing(10);
 
@@ -952,6 +964,8 @@ impl Application for Configurator {
                     winrow = winrow.push(selectionmarker);
                 } else if self.index == 4 {
                     workrow = workrow.push(selectionmarker);
+                } else if self.index == 5 {
+                    blurrow = blurrow.push(selectionmarker);
                 }
 
                 widthrow = widthrow

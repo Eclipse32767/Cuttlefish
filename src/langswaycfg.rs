@@ -44,6 +44,13 @@ pub struct AnimPage {
     pub(crate) width: String,
     pub(crate) radius: String,
     pub(crate) gaps: String,
+    pub(crate) winanim: String,
+    pub(crate) workanim: String,
+    pub(crate) blur: String,
+    pub(crate) enableblur: String,
+    pub(crate) enabledblur: String,
+    pub(crate) disableblur: String,
+    pub(crate) disabledblur: String
 }
 #[derive(Deserialize, Debug, Serialize)]
 pub struct PrettyPrint {
@@ -62,7 +69,14 @@ pub struct PrettyPrint {
     pub(crate) pagebind: String,
     pub(crate) pagebar: String,
     pub(crate) pageinit: String,
-    pub(crate) pageanim: String
+    pub(crate) pageanim: String,
+    pub(crate) winnone: String,
+    pub(crate) winpop: String,
+    pub(crate) winslide: String,
+    pub(crate) worknone: String,
+    pub(crate) workfade: String,
+    pub(crate) workslide: String,
+    pub(crate) workslidev: String
 }
 #[derive(Deserialize, Debug, Serialize)]
 pub struct PageGlobals {

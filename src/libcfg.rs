@@ -22,7 +22,10 @@ pub struct FileData {
     pub minik: String,
     pub scratchh: String,
     pub scratchk: String,
-    pub border: Option<Border>
+    pub border: Option<Border>,
+    pub winanim: String,
+    pub workanim: String,
+    pub blur: String
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
@@ -129,27 +132,31 @@ impl std::fmt::Display for BindKey {
 }
 impl std::fmt::Display for WindowAnimation {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let locale = get_lang();
+        let pretty = locale.prettyprint.unwrap();
         write!(
             f,
             "{}",
             match self {
-                WindowAnimation::None => "No Animation",
-                WindowAnimation::Popin => "Pop-in",
-                WindowAnimation::Slide => "Slide on in"
+                WindowAnimation::None => pretty.winnone,
+                WindowAnimation::Popin => pretty.winpop,
+                WindowAnimation::Slide => pretty.winslide
             }
         )
     }
 }
 impl std::fmt::Display for WorkAnimation {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let locale = get_lang();
+        let pretty = locale.prettyprint.unwrap();
         write!(
             f,
             "{}",
             match self {
-                WorkAnimation::None => "No Animation",
-                WorkAnimation::Fade => "Fade Into New Workspace",
-                WorkAnimation::Slide => "Slide In Horizontally",
-                WorkAnimation::SlideVert => "Slide In Vertically"
+                WorkAnimation::None => pretty.worknone,
+                WorkAnimation::Fade => pretty.workfade,
+                WorkAnimation::Slide => pretty.workslide,
+                WorkAnimation::SlideVert => pretty.workslidev
             }
         )
     }
@@ -182,6 +189,30 @@ pub fn decodetheme(x: &str, default: iced::Theme) -> iced::Theme {
         "dark" => iced::Theme::Dark,
         "light" => iced::Theme::Light,
         &_ => default
+    }
+}
+pub fn decodeworkanim(x: &str, default: WorkAnimation) -> Option<WorkAnimation> {
+    Some(match x {
+        "none" => WorkAnimation::None,
+        "fade" => WorkAnimation::Fade,
+        "slide" => WorkAnimation::Slide,
+        "slidev" => WorkAnimation::SlideVert,
+        &_ => default
+    })
+}
+pub fn decodewinanim(x: &str, default: WindowAnimation) -> Option<WindowAnimation> {
+    Some(match x {
+        "none" => WindowAnimation::None,
+        "popin" => WindowAnimation::Popin,
+        "slide" => WindowAnimation::Slide,
+        &_ => default
+    })
+}
+pub fn decodeblur(x: &str) -> bool{
+    match x {
+        "y" => true,
+        "n" => false,
+        &_ => true
     }
 }
 pub fn decodepri(x: &str, default: ShortcutKey) -> Option<ShortcutKey> {
@@ -221,6 +252,28 @@ pub fn encodeheader(x: Option<BindKey>) -> &'static str {
         BindKey::PrimaryKey => "pri",
         BindKey::SecondaryKey => "sec",
         BindKey::BothKey => "both"
+    }
+}
+pub fn encodeworkanim(x: Option<WorkAnimation>) -> &'static str {
+    match x.unwrap() {
+        WorkAnimation::None => "none",
+        WorkAnimation::Fade => "fade",
+        WorkAnimation::Slide => "slide",
+        WorkAnimation::SlideVert => "slidev",
+    }
+}
+pub fn encodewinanim(x: Option<WindowAnimation>) -> &'static str{
+    match x.unwrap() {
+        WindowAnimation::None => "none",
+        WindowAnimation::Popin => "popin",
+        WindowAnimation::Slide => "slide"
+    }
+}
+pub fn encodeblur(x: bool) -> &'static str {
+    if x {
+        "y"
+    } else {
+        "n"
     }
 }
 pub fn rip_shortcut(opt: Option<ShortcutKey>) -> &'static str {
@@ -263,7 +316,7 @@ pub fn mkwmcfg(primary_key: Option<ShortcutKey>, secondary_key: Option<ShortcutK
         .spawn()
         .expect("oops, swaymsg failed, do you have sway installed?");
 }
-pub fn mkselfcfg(primary_key: Option<ShortcutKey>, secondary_key: Option<ShortcutKey>, exit_header: Option<BindKey>, exit_key: String, launch_header: Option<BindKey>, launch_key: String, kill_header: Option<BindKey>, kill_key: String, mini_header: Option<BindKey>, mini_key: String, scratch_header: Option<BindKey>, scratch_key: String, theme: iced::Theme, border: Option<Border>) {
+pub fn mkselfcfg(primary_key: Option<ShortcutKey>, secondary_key: Option<ShortcutKey>, exit_header: Option<BindKey>, exit_key: String, launch_header: Option<BindKey>, launch_key: String, kill_header: Option<BindKey>, kill_key: String, mini_header: Option<BindKey>, mini_key: String, scratch_header: Option<BindKey>, scratch_key: String, theme: iced::Theme, border: Option<Border>, winanim: Option<WindowAnimation>, workanim: Option<WorkAnimation>, blur: bool) {
     let home = get_home();
     let path = format!("{home}/swaycfg/swaycfg.toml");
     let data = FileData{
@@ -280,7 +333,10 @@ pub fn mkselfcfg(primary_key: Option<ShortcutKey>, secondary_key: Option<Shortcu
         minik: mini_key.clone(),
         scratchh: encodeheader(scratch_header).to_string(),
         scratchk: scratch_key.clone(),
-        border: border.clone()
+        border: border.clone(),
+        winanim: encodewinanim(winanim).to_string(),
+        workanim: encodeworkanim(workanim).to_string(),
+        blur: encodeblur(blur).to_string(),
     };
     let toml = to_string(&data).expect("failed to generate toml");
     fs::write(path, toml).expect("failed to write swaycfg.toml");
