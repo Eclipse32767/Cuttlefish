@@ -1,7 +1,8 @@
+#![allow(dead_code)]
 use serde_derive::{Deserialize, Serialize};
 use toml::{self, from_str, to_string};
 use std::fs::read_to_string;
-use std::{env, default};
+use std::{env};
 use std::process::Command;
 use std::fs;
 use langswaycfg::get_lang;
