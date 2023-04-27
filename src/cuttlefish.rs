@@ -343,6 +343,7 @@ impl Application for Configurator {
                                         Page::Anim => {
                                             if self.index == 5 {
                                                 self.blur = !self.blur;
+                                                self.unsaved = true;
                                             }
                                         }
                                     }
@@ -378,6 +379,14 @@ impl Application for Configurator {
                                             self.scratch_header = Some(BindKey::PrimaryKey);
                                             self.unsaved = true;
                                         }
+                                    } else if self.current_page == Page::Anim {
+                                        if self.index == 3 {
+                                            self.window_anim = Some(WindowAnimation::None);
+                                            self.unsaved = true;
+                                        } else if self.index == 4 {
+                                            self.work_anim = Some(WorkAnimation::None);
+                                            self.unsaved = true;
+                                        }
                                     }
                                 } else if key_code == KeyCode::Key2 {
                                     if self.current_page == Page::Main {
@@ -409,6 +418,14 @@ impl Application for Configurator {
                                             self.unsaved = true;
                                         } else if self.index == 6 {
                                             self.scratch_header = Some(BindKey::SecondaryKey);
+                                            self.unsaved = true;
+                                        }
+                                    } else if self.current_page == Page::Anim {
+                                        if self.index == 3 {
+                                            self.window_anim = Some(WindowAnimation::Popin);
+                                            self.unsaved = true;
+                                        } else if self.index == 4 {
+                                            self.work_anim = Some(WorkAnimation::Slide);
                                             self.unsaved = true;
                                         }
                                     }
@@ -444,6 +461,14 @@ impl Application for Configurator {
                                             self.scratch_header = Some(BindKey::BothKey);
                                             self.unsaved = true;
                                         }
+                                    } else if self.current_page == Page::Anim {
+                                        if self.index == 3 {
+                                            self.window_anim = Some(WindowAnimation::Slide);
+                                            self.unsaved = true;
+                                        } else if self.index == 4 {
+                                            self.work_anim = Some(WorkAnimation::SlideVert);
+                                            self.unsaved = true;
+                                        }
                                     }
                                 } else if key_code == KeyCode::Key4 {
                                     if self.current_page == Page::Main {
@@ -460,6 +485,11 @@ impl Application for Configurator {
                                             self.unsaved = true;
                                         } else if self.index == 1 {
                                             self.secondary_key = Some(ShortcutKey::Ctrl);
+                                            self.unsaved = true;
+                                        }
+                                    } else if self.current_page == Page::Anim {
+                                        if self.index == 4 {
+                                            self.work_anim = Some(WorkAnimation::Fade);
                                             self.unsaved = true;
                                         }
                                     }
