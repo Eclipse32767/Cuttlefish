@@ -601,21 +601,81 @@ impl Application for Configurator {
     }
     fn view(&self) -> iced::Element<'_, Self::Message> {
         //define button styles
-        let sidebar_active_btn = ButtonStyle{
-            border_radius: 10.0,
-            txt_color: Color::from_rgb8( 0xCA, 0xD3, 0xF5),
-            bg_color: Color::from_rgb8(0x24, 0x27, 0x3A),
-            border_color: Color::from_rgb8(0, 0, 0),
-            border_width: 0.0,
-            shadow_offset: iced::Vector {x: 0.0, y: 0.0}
+        let sidebar_active_btn = match self.theme {
+            Theme::Light => ButtonStyle{
+                border_radius: 10.0,
+                txt_color: Color::from_rgb8( 0x00, 0x19, 0x36),
+                bg_color: Color::from_rgb8(0xD2, 0xF0, 0xFF),
+                border_color: Color::from_rgb8(0, 0, 0),
+                border_width: 0.0,
+                shadow_offset: iced::Vector {x: 0.0, y: 0.0}
+            },
+            Theme::Dark => ButtonStyle{
+                border_radius: 10.0,
+                txt_color: Color::from_rgb8( 0xD2, 0xF0, 0xFF),
+                bg_color: Color::from_rgb8(0x00, 0x20, 0x46),
+                border_color: Color::from_rgb8(0, 0, 0),
+                border_width: 0.0,
+                shadow_offset: iced::Vector {x: 0.0, y: 0.0}
+            },
+            Theme::Custom(..) => panic!()
         };
-        let sidebar_inactive_btn = ButtonStyle{
-            border_radius: 10.0,
-            txt_color: Color::from_rgb8(0xA5, 0xAD, 0xCB),
-            bg_color: Color::from_rgb8(0x18, 0x19, 0x26),
-            border_color: Color::from_rgb8(0, 0, 0),
-            border_width: 0.0,
-            shadow_offset: iced::Vector {x: 0.0, y: 0.0}
+        let sidebar_inactive_btn = match self.theme {
+            Theme::Custom(..) => panic!(),
+            Theme::Light => ButtonStyle{
+                border_radius: 10.0,
+                txt_color: Color::from_rgb8(0x00, 0x19, 0x36),
+                bg_color: Color::from_rgb8(0xC6, 0xEC, 0xFF),
+                border_color: Color::from_rgb8(0, 0, 0),
+                border_width: 0.0,
+                shadow_offset: iced::Vector {x: 0.0, y: 0.0}
+            },
+            Theme::Dark => ButtonStyle{
+                border_radius: 10.0,
+                txt_color: Color::from_rgb8(0xD2, 0xF0, 0xFF),
+                bg_color: Color::from_rgb8(0x00, 0x29, 0x58),
+                border_color: Color::from_rgb8(0, 0, 0),
+                border_width: 0.0,
+                shadow_offset: iced::Vector {x: 0.0, y: 0.0}
+            }
+        };
+        let body_active_btn = match self.theme {
+            Theme::Custom(..) => panic!(),
+            Theme::Light => ButtonStyle{
+                border_radius: 10.0,
+                txt_color: Color::from_rgb8(0x00, 0x20, 0x46),
+                bg_color: Color::from_rgb8(0x00, 0xF1, 0xD6),
+                border_color: Color::from_rgb8(0, 0, 0),
+                border_width: 0.0,
+                shadow_offset: iced::Vector {x: 0.0, y: 0.0}
+            },
+            Theme::Dark => ButtonStyle{
+                border_radius: 10.0,
+                txt_color: Color::from_rgb8(0x00, 0x20, 0x46),
+                bg_color: Color::from_rgb8(0x00, 0xCD, 0xB6),
+                border_color: Color::from_rgb8(0, 0, 0),
+                border_width: 0.0,
+                shadow_offset: iced::Vector {x: 0.0, y: 0.0}
+            }
+        };
+        let body_inactive_btn = match self.theme {
+            Theme::Custom(..) => panic!(),
+            Theme::Light => ButtonStyle{
+                border_radius: 10.0,
+                txt_color: Color::from_rgb8(0x00, 0x20, 0x46),
+                bg_color: Color::from_rgb8(0xC6, 0xEC, 0xFF),
+                border_color: Color::from_rgb8(0, 0, 0),
+                border_width: 0.0,
+                shadow_offset: iced::Vector {x: 0.0, y: 0.0}
+            },
+            Theme::Dark => ButtonStyle{
+                border_radius: 10.0,
+                txt_color: Color::from_rgb8(0xD2, 0xF0, 0xFF),
+                bg_color: Color::from_rgb8(0x00, 0x29, 0x58),
+                border_color: Color::from_rgb8(0, 0, 0),
+                border_width: 0.0,
+                shadow_offset: iced::Vector {x: 0.0, y: 0.0}
+            }
         };
 
         let selectionmarker: Text = Text::new("=>");
@@ -683,11 +743,12 @@ impl Application for Configurator {
         let savedtxt = String::as_str(&globalstr.saved);
         if self.unsaved {
             save = Button::new(savetxt)
-            .on_press(Message::Save);
+            .on_press(Message::Save)
+            .style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
         } else {
             save = Button::new(savedtxt)
             .on_press(Message::Save)
-            .style(theme::Button::Secondary);
+            .style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
         }
         let saverow = Row::new()
             .push(save)
@@ -721,16 +782,18 @@ impl Application for Configurator {
                 let darktxt = String::as_str(&mainstr.dark);
                 let themetxt = String::as_str(&mainstr.theme);
                 let mut light = Button::new(lighttxt)
-                    .on_press(Message::ThemeLight);
+                    .on_press(Message::ThemeLight)
+                    .style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let mut dark = Button::new(darktxt)
-                    .on_press(Message::ThemeDark);
+                    .on_press(Message::ThemeDark)
+                    .style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let themelabel = Text::new(themetxt);
                 match self.theme {
                     Theme::Light => {
-                        light = light.style(theme::Button::Secondary);
+                        light = light.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
                     }
                     Theme::Dark => {
-                        dark = dark.style(theme::Button::Secondary);
+                        dark = dark.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
                     }
                     Theme::Custom(..) => {
                         panic!("oops");
@@ -790,7 +853,7 @@ impl Application for Configurator {
                 )
                 .placeholder("choose");
                 let exitkey = String::as_str(&self.exit_key);
-                let mut exitkeyselect = Button::new(exitkey).on_press(Message::Capture(CaptureInput::ExitKey)).width(50);
+                let mut exitkeyselect = Button::new(exitkey).on_press(Message::Capture(CaptureInput::ExitKey)).width(50).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let launchsclabel: Text = Text::new(bindstr.launch.clone());
                 let launchheaderselect = pick_list(
                     &BindKey::ALL[..], 
@@ -799,7 +862,7 @@ impl Application for Configurator {
                     )
                     .placeholder("choose");
                 let launchkey = String::as_str(&self.launch_key);
-                let mut launchkeyselect = Button::new(launchkey).on_press(Message::Capture(CaptureInput::LaunchKey)).width(50);
+                let mut launchkeyselect = Button::new(launchkey).on_press(Message::Capture(CaptureInput::LaunchKey)).width(50).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let killsclabel: Text = Text::new(bindstr.kill.clone());
                 let killheaderselect = pick_list(
                     &BindKey::ALL[..], 
@@ -808,7 +871,7 @@ impl Application for Configurator {
                     )
                     .placeholder("choose");
                 let killkey = String::as_str(&self.kill_key);
-                let mut killkeyselect = Button::new(killkey).on_press(Message::Capture(CaptureInput::KillKey)).width(50);
+                let mut killkeyselect = Button::new(killkey).on_press(Message::Capture(CaptureInput::KillKey)).width(50).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let minisclabel: Text = Text::new(bindstr.mini.clone());
                 let miniheaderselect = pick_list(
                  &BindKey::ALL[..], 
@@ -817,7 +880,7 @@ impl Application for Configurator {
                  )
                     .placeholder("choose");
                 let minikey = String::as_str(&self.minimize_key);
-                let mut minikeyselect = Button::new(minikey).on_press(Message::Capture(CaptureInput::MiniKey)).width(50);
+                let mut minikeyselect = Button::new(minikey).on_press(Message::Capture(CaptureInput::MiniKey)).width(50).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let scratchsclabel: Text = Text::new(bindstr.scratch.clone());
                 let scratchheaderselect = pick_list(
                     &BindKey::ALL[..], 
@@ -826,25 +889,25 @@ impl Application for Configurator {
                     )
                     .placeholder("choose");
                 let scratchkey = String::as_str(&self.scratch_key);
-                let mut scratchkeyselect = Button::new(scratchkey).on_press(Message::Capture(CaptureInput::ScratchKey)).width(50);
+                let mut scratchkeyselect = Button::new(scratchkey).on_press(Message::Capture(CaptureInput::ScratchKey)).width(50).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 
                 match self.capturenext.as_ref().unwrap() {
                     CaptureInput::NoKey => {
                     }
                     CaptureInput::ExitKey => {
-                        exitkeyselect = exitkeyselect.style(theme::Button::Secondary);
+                        exitkeyselect = exitkeyselect.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
                     }
                     CaptureInput::KillKey => {
-                        killkeyselect = killkeyselect.style(theme::Button::Secondary);
+                        killkeyselect = killkeyselect.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
                     }
                     CaptureInput::LaunchKey => {
-                        launchkeyselect = launchkeyselect.style(theme::Button::Secondary);
+                        launchkeyselect = launchkeyselect.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
                     }
                     CaptureInput::MiniKey => {
-                        minikeyselect = minikeyselect.style(theme::Button::Secondary);
+                        minikeyselect = minikeyselect.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
                     }
                     CaptureInput::ScratchKey => {
-                        scratchkeyselect = scratchkeyselect.style(theme::Button::Secondary);
+                        scratchkeyselect = scratchkeyselect.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
                     }
                 }
                 let mut primaryrow = Row::new();
@@ -919,22 +982,22 @@ impl Application for Configurator {
             }
             Page::Anim => {
 
-                let widthincr = Button::new("+").on_press(Message::Incr(IncrVal::WidthVal)).width(30);
-                let mut widthdecr = Button::new("-").on_press(Message::Decr(IncrVal::WidthVal)).width(30);
+                let widthincr = Button::new("+").on_press(Message::Incr(IncrVal::WidthVal)).width(30).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut widthdecr = Button::new("-").on_press(Message::Decr(IncrVal::WidthVal)).width(30).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let widthvaluepeek = Text::new(format!("{}", self.border.width));
                 let widthlabel = Text::new(animstr.width.clone());
 
                 let mut widthrow = Row::new().spacing(10);
 
-                let gapsincr = Button::new("+").on_press(Message::Incr(IncrVal::GapsVal)).width(30);
-                let mut gapsdecr = Button::new("-").on_press(Message::Decr(IncrVal::GapsVal)).width(30);
+                let gapsincr = Button::new("+").on_press(Message::Incr(IncrVal::GapsVal)).width(30).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut gapsdecr = Button::new("-").on_press(Message::Decr(IncrVal::GapsVal)).width(30).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let gapsvaluepeek = Text::new(format!("{}", self.border.gaps));
                 let gapslabel = Text::new(animstr.gaps.clone());
 
                 let mut gapsrow = Row::new().spacing(10);
 
-                let radincr = Button::new("+").on_press(Message::Incr(IncrVal::RadiusVal)).width(30);
-                let mut raddecr = Button::new("-").on_press(Message::Decr(IncrVal::RadiusVal)).width(30);
+                let radincr = Button::new("+").on_press(Message::Incr(IncrVal::RadiusVal)).width(30).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut raddecr = Button::new("-").on_press(Message::Decr(IncrVal::RadiusVal)).width(30).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let radvaluepeek = Text::new(format!("{}", self.border.radius));
                 let radlabel = Text::new(animstr.radius.clone());
 
@@ -965,23 +1028,23 @@ impl Application for Configurator {
                 let enabled = String::as_str(&animstr.enabledblur);
                 let disabled = String::as_str(&animstr.disabledblur);
                 let blurlabel = Text::new(animstr.blur.clone());
-                let mut bluron = Button::new(enable).on_press(Message::BlurToggled(true));
-                let mut bluroff = Button::new(disable).on_press(Message::BlurToggled(false));
+                let mut bluron = Button::new(enable).on_press(Message::BlurToggled(true)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut bluroff = Button::new(disable).on_press(Message::BlurToggled(false)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 if self.blur {
-                    bluron = Button::new(enabled).on_press(Message::BlurToggled(true)).style(theme::Button::Secondary);
+                    bluron = Button::new(enabled).on_press(Message::BlurToggled(true)).style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
                 } else {
-                    bluroff = Button::new(disabled).on_press(Message::BlurToggled(false)).style(theme::Button::Secondary);
+                    bluroff = Button::new(disabled).on_press(Message::BlurToggled(false)).style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
                 }
                 let mut blurrow = Row::new().spacing(10);
 
                 if self.border.width == 0 {
-                    widthdecr = widthdecr.style(theme::Button::Secondary);
+                    widthdecr = widthdecr.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
                 }
                 if self.border.gaps == 0 {
-                    gapsdecr = gapsdecr.style(theme::Button::Secondary);
+                    gapsdecr = gapsdecr.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
                 }
                 if self.border.radius == 0 {
-                    raddecr = raddecr.style(theme::Button::Secondary);
+                    raddecr = raddecr.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
                 }
 
                 if self.index == 0 {
@@ -1061,6 +1124,24 @@ impl Application for Configurator {
         )
     }
     fn theme(&self) -> Theme {
-        self.theme.clone()
+        let colors = match self.theme {
+            Theme::Light => iced::theme::Palette{
+                background: Color::from_rgb8(0xE0, 0xF5, 0xFF),
+                text: Color::from_rgb8(0x00, 0x19, 0x36),
+                primary: Color::from_rgb8(0x00, 0x19, 0x36),
+                success: Color::from_rgb8(1, 1, 1),
+                danger: Color::from_rgb8(1, 1, 1),
+                },
+            Theme::Dark => iced::theme::Palette{
+                background: Color::from_rgb8(0x00, 0x19, 0x36),
+                text: Color::from_rgb8(0xE0, 0xF5, 0xFF),
+                primary: Color::from_rgb8(0xE0, 0xF5, 0xFF),
+                success: Color::from_rgb8(1, 1, 1),
+                danger: Color::from_rgb8(1, 1, 1),
+                },
+            Theme::Custom(_) => panic!(),
+        };
+        let cust = Theme::Custom(std::boxed::Box::new(iced::theme::Custom::new(colors)));
+        cust
     }
 }
