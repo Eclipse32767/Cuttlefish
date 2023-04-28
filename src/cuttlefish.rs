@@ -7,7 +7,7 @@ use libcfg::{getcfgdata, BindKey, ShortcutKey, WindowAnimation, WorkAnimation, B
 mod libcfg;
 use langswaycfg::{get_lang, Translation};
 mod langswaycfg;
-use libstyle::ButtonStyle;
+use libstyle::{ButtonStyle, ListStyle, MenuStyle};
 mod libstyle;
 mod liblocale;
 
@@ -678,6 +678,47 @@ impl Application for Configurator {
             }
         };
 
+        let picklist_style = match self.theme {
+            Theme::Custom(..) => panic!(),
+            Theme::Light => ListStyle {
+                txt_color: Color::from_rgb8(0x00, 0x20, 0x46),
+                bg_color: Color::from_rgb8(0xC6, 0xEC, 0xFF),
+                handle_color: Color::from_rgb8(0x00, 0x20, 0x46),
+                border_radius: 10.0,
+                border_width: 2.0,
+                border_color: Color::from_rgb8(0x00, 0x20, 0x46)
+            },
+            Theme::Dark => ListStyle {
+                txt_color: Color::from_rgb8(0xD2, 0xF0, 0xFF),
+                bg_color: Color::from_rgb8(0x00, 0x29, 0x58),
+                handle_color: Color::from_rgb8(0xD2, 0xF0, 0xFF),
+                border_radius: 10.0,
+                border_width: 2.0,
+                border_color: Color::from_rgb8(0xD2, 0xF0, 0xFF)
+            },
+        };
+        let menu_style = match self.theme {
+            Theme::Custom(..) => panic!(),
+            Theme::Light => MenuStyle {
+                txt_color: Color::from_rgb8(0x00, 0x20, 0x46),
+                bg_color: Color::from_rgb8(0xC6, 0xEC, 0xFF),
+                border_width: 2.0,
+                border_radius: 10.0,
+                border_color: Color::from_rgb8(0x00, 0x20, 0x46),
+                sel_txt_color: Color::from_rgb8(0x00, 0x20, 0x46),
+                sel_bg_color: Color::from_rgb8(0x00, 0xF1, 0xD6),
+            },
+            Theme::Dark => MenuStyle {
+                txt_color: Color::from_rgb8(0xD2, 0xF0, 0xFF),
+                bg_color: Color::from_rgb8(0x00, 0x29, 0x58),
+                border_width: 2.0,
+                border_radius: 10.0,
+                border_color: Color::from_rgb8(0xD2, 0xF0, 0xFF),
+                sel_txt_color: Color::from_rgb8(0xD2, 0xF0, 0xFF),
+                sel_bg_color: Color::from_rgb8(0x00, 0xCD, 0xB6),
+            }
+        };
+
         let selectionmarker: Text = Text::new("=>");
         let globalstr = self.locale.global.as_ref().unwrap();
         let mainstr = self.locale.mainpage.as_ref().unwrap();
@@ -766,13 +807,15 @@ impl Application for Configurator {
                     self.primary_key, 
                     Message::PrimaryKeyChanged,
                     )
-                    .placeholder("choose");
+                    .placeholder("choose")
+                    .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
                 let secondarypick = pick_list(
                     &ShortcutKey::ALL[..], 
                     self.secondary_key, 
                     Message::SecondaryKeyChanged,
                     )
-                    .placeholder("choose");
+                    .placeholder("choose")
+                    .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
                 let primarytxt = String::as_str(&globalstr.primary);
                 let secondarytxt = String::as_str(&globalstr.secondary);
                 let primarylabel: Text = Text::new(primarytxt);
@@ -832,13 +875,15 @@ impl Application for Configurator {
                     self.primary_key, 
                     Message::PrimaryKeyChanged,
                     )
-                    .placeholder("choose");
+                    .placeholder("choose")
+                    .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
                 let secondarypick = pick_list(
                     &ShortcutKey::ALL[..], 
                     self.secondary_key, 
                     Message::SecondaryKeyChanged,
                     )
-                    .placeholder("choose");
+                    .placeholder("choose")
+                    .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
                 let primarytxt = String::as_str(&globalstr.primary);
                 let secondarytxt = String::as_str(&globalstr.secondary);
                 let primarylabel: Text = Text::new(primarytxt);
@@ -851,7 +896,8 @@ impl Application for Configurator {
                 self.exit_header, 
                 Message::ExitHeaderChanged,
                 )
-                .placeholder("choose");
+                .placeholder("choose")
+                .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
                 let exitkey = String::as_str(&self.exit_key);
                 let mut exitkeyselect = Button::new(exitkey).on_press(Message::Capture(CaptureInput::ExitKey)).width(50).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let launchsclabel: Text = Text::new(bindstr.launch.clone());
@@ -860,7 +906,8 @@ impl Application for Configurator {
                     self.launch_header, 
                     Message::LaunchHeaderChanged,
                     )
-                    .placeholder("choose");
+                    .placeholder("choose")
+                    .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
                 let launchkey = String::as_str(&self.launch_key);
                 let mut launchkeyselect = Button::new(launchkey).on_press(Message::Capture(CaptureInput::LaunchKey)).width(50).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let killsclabel: Text = Text::new(bindstr.kill.clone());
@@ -869,7 +916,8 @@ impl Application for Configurator {
                     self.kill_header, 
                     Message::KillHeaderChanged,
                     )
-                    .placeholder("choose");
+                    .placeholder("choose")
+                    .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
                 let killkey = String::as_str(&self.kill_key);
                 let mut killkeyselect = Button::new(killkey).on_press(Message::Capture(CaptureInput::KillKey)).width(50).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let minisclabel: Text = Text::new(bindstr.mini.clone());
@@ -878,7 +926,8 @@ impl Application for Configurator {
                  self.minimize_header, 
                  Message::MiniHeaderChanged,
                  )
-                    .placeholder("choose");
+                    .placeholder("choose")
+                    .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
                 let minikey = String::as_str(&self.minimize_key);
                 let mut minikeyselect = Button::new(minikey).on_press(Message::Capture(CaptureInput::MiniKey)).width(50).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let scratchsclabel: Text = Text::new(bindstr.scratch.clone());
@@ -887,7 +936,8 @@ impl Application for Configurator {
                     self.scratch_header, 
                     Message::ScratchHeaderChanged,
                     )
-                    .placeholder("choose");
+                    .placeholder("choose")
+                    .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
                 let scratchkey = String::as_str(&self.scratch_key);
                 let mut scratchkeyselect = Button::new(scratchkey).on_press(Message::Capture(CaptureInput::ScratchKey)).width(50).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 
@@ -1008,7 +1058,8 @@ impl Application for Configurator {
                     self.window_anim, 
                     Message::ChangeWindowAnim,
                     )
-                    .placeholder("choose");
+                    .placeholder("choose")
+                    .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
                 let winlabel = Text::new(animstr.winanim.clone());
 
                 let mut winrow = Row::new().spacing(10);
@@ -1018,7 +1069,8 @@ impl Application for Configurator {
                     self.work_anim,
                     Message::ChangeWorkAnim,
                     )
-                    .placeholder("choose");
+                    .placeholder("choose")
+                    .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
                 let worklabel = Text::new(animstr.workanim.clone());
 
                 let mut workrow = Row::new().spacing(10);

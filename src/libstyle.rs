@@ -1,4 +1,4 @@
-use iced_style::{Color, button, pick_list, Background};
+use iced_style::{Color, button, pick_list, menu, Background};
 use iced::Theme;
 
 #[derive(Clone)]
@@ -55,6 +55,30 @@ impl pick_list::StyleSheet for ListStyle {
             border_radius: self.border_radius, 
             border_width: self.border_width, 
             border_color: self.border_color.clone() 
+        }
+    }
+}
+#[derive(Clone)]
+pub struct MenuStyle {
+    pub txt_color: Color,
+    pub bg_color: Color,
+    pub border_width: f32,
+    pub border_radius: f32,
+    pub border_color: Color,
+    pub sel_txt_color: Color,
+    pub sel_bg_color: Color
+}
+impl menu::StyleSheet for MenuStyle {
+    type Style = Theme;
+    fn appearance(&self, _style: &Theme) -> menu::Appearance {
+        menu::Appearance { 
+            text_color: self.txt_color.clone(), 
+            background: Background::Color(self.bg_color.clone()), 
+            border_width: self.border_width, 
+            border_radius: self.border_radius, 
+            border_color: self.border_color.clone(), 
+            selected_text_color: self.sel_txt_color.clone(), 
+            selected_background: Background::Color(self.sel_bg_color.clone())
         }
     }
 }
