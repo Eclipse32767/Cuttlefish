@@ -1,8 +1,8 @@
-#Welcome to the SwayCfg Project!
+# Welcome to the SwayCfg Project!
 
 This is a project developed in rust that seeks to provide a feature-complete configuration GUI for sway and waybar, for the purposes of making them easier to begin using for the average user.
 
-#Goals of the Project
+## Goals of the Project
 
 1. Sway configs for the masses
 
