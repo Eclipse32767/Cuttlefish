@@ -2,13 +2,13 @@ use iced::theme::{self, Theme};
 use iced::{Result, Settings, alignment, Alignment, Length, Application, Command, executor};
 use iced::widget::{Button, Row, Column, Container, Text, Scrollable};
 use iced_style::{Color};
-use libcfg::{getcfgdata, decodetheme};
+use libcfg::{getcfgdata, decodetheme, OurTheme};
 mod libcfg;
 use langswayman::{get_lang, Translation};
 mod langswayman;
 mod langswaycfg;
 mod liblocale;
-use libstyle::{ButtonStyle};
+use libstyle::{ButtonStyle, ThemeCustom, make_custom_theme};
 mod libstyle;
 
 
@@ -17,7 +17,7 @@ fn main() -> Result {
 }
 
 struct Manual {
-    theme:Theme,
+    theme:OurTheme,
     locale: Translation,
     current_page:u8,
     primary_key: String,
@@ -31,7 +31,8 @@ struct Manual {
     minimize_header: String,
     minimize_key: String,
     scratch_header: String,
-    scratch_key: String
+    scratch_key: String,
+    cust_theme: ThemeCustom
 }
 pub fn prettypri(x: &str) -> &'static str {
     match x {
@@ -59,7 +60,7 @@ impl Default for Manual {
         let pri = prettypri(&data.primary);
         let sec = prettypri(&data.secondary);
         Manual {
-            theme: decodetheme(&data.theme, Theme::Light),
+            theme: decodetheme(&data.theme, OurTheme::Light),
             locale: get_lang(),
             current_page: 0,
             primary_key: pri.to_string(),
@@ -74,6 +75,7 @@ impl Default for Manual {
             minimize_key: data.minik,
             scratch_header: prettyheader(&data.scratchh, pri, sec).to_string(),
             scratch_key: data.scratchk,
+            cust_theme: make_custom_theme()
         }
     }
 }
@@ -131,17 +133,54 @@ impl Application for Manual {
         }
     }
     fn view(&self) -> iced::Element<'_, Self::Message> {
+
+        let active_btn = match self.theme {
+            OurTheme::Custom => self.cust_theme.sidebar.active.clone(),
+            OurTheme::Light => ButtonStyle{
+                border_radius: 10.0,
+                txt_color: Color::from_rgb8(0x00, 0x20, 0x46),
+                bg_color: Color::from_rgb8(0x00, 0xF1, 0xD6),
+                border_color: Color::from_rgb8(0, 0, 0),
+                border_width: 0.0,
+                shadow_offset: iced::Vector {x: 0.0, y: 0.0}
+            },
+            OurTheme::Dark => ButtonStyle{
+                border_radius: 10.0,
+                txt_color: Color::from_rgb8(0x00, 0x20, 0x46),
+                bg_color: Color::from_rgb8(0x00, 0xCD, 0xB6),
+                border_color: Color::from_rgb8(0, 0, 0),
+                border_width: 0.0,
+                shadow_offset: iced::Vector {x: 0.0, y: 0.0}
+            }
+        };
+        let inactive_btn = match self.theme {
+            OurTheme::Custom => self.cust_theme.sidebar.inactive.clone(),
+            OurTheme::Light => ButtonStyle{
+                border_radius: 10.0,
+                txt_color: Color::from_rgb8(0x00, 0x20, 0x46),
+                bg_color: Color::from_rgb8(0xC6, 0xEC, 0xFF),
+                border_color: Color::from_rgb8(0, 0, 0),
+                border_width: 0.0,
+                shadow_offset: iced::Vector {x: 0.0, y: 0.0}
+            },
+            OurTheme::Dark => ButtonStyle{
+                border_radius: 10.0,
+                txt_color: Color::from_rgb8(0xD2, 0xF0, 0xFF),
+                bg_color: Color::from_rgb8(0x00, 0x29, 0x58),
+                border_color: Color::from_rgb8(0, 0, 0),
+                border_width: 0.0,
+                shadow_offset: iced::Vector {x: 0.0, y: 0.0}
+            }
+        };
         let globalstr = self.locale.globals.as_ref().unwrap();
         let backtxt = String::as_str(&globalstr.backtxt);
         let forwardtxt = String::as_str(&globalstr.forwardtxt);
-        let activebtn = ButtonStyle{ border_radius: 10.0, txt_color: Color::from_rgb(0.0, 0.0, 255.0), bg_color: Color::from_rgb(255.0, 255.0, 255.0), border_color: Color::from_rgb(0.0, 0.0, 0.0), border_width: 5.0, shadow_offset: iced::Vector {x: 0.0, y: 0.0}};
-        let inactivebtn = ButtonStyle{ border_radius: 10.0, txt_color: Color::from_rgb(0.0, 0.0, 255.0), bg_color: Color::from_rgb(255.0, 255.0, 255.0), border_color: Color::from_rgb(0.0, 0.0, 0.0), border_width: 0.0, shadow_offset: iced::Vector {x: 0.0, y: 0.0}};
         let mut pageleft = Button::new(backtxt)
             .on_press(Message::PageDecr)
-            .style(theme::Button::Custom(std::boxed::Box::new(activebtn.clone())));
+            .style(theme::Button::Custom(std::boxed::Box::new(active_btn.clone())));
         let mut pageright = Button::new(forwardtxt)
             .on_press(Message::PageIncr)
-            .style(theme::Button::Custom(std::boxed::Box::new(activebtn.clone())));
+            .style(theme::Button::Custom(std::boxed::Box::new(active_btn.clone())));
 
 
         let mut settings = Column::new().spacing(10);
@@ -150,7 +189,7 @@ impl Application for Manual {
         let mut pgtitle = Text::new("Page Title").horizontal_alignment(alignment::Horizontal::Center);
         if self.current_page == 0 {
             let navstr = self.locale.navigation.as_ref().unwrap();
-            pageleft = pageleft.style(theme::Button::Custom(std::boxed::Box::new(inactivebtn.clone())));
+            pageleft = pageleft.style(theme::Button::Custom(std::boxed::Box::new(inactive_btn.clone())));
             let title = navstr.title.clone();
             pgtitle = Text::new(format!("{title}"));
             let primary_key = self.primary_key.clone();
@@ -203,7 +242,7 @@ impl Application for Manual {
             settings = settings.push(text);
         } else if self.current_page == 3 {
             let ministr = self.locale.minimization.as_ref().unwrap();
-            pageright = pageright.style(theme::Button::Custom(std::boxed::Box::new(inactivebtn.clone())));
+            pageright = pageright.style(theme::Button::Custom(std::boxed::Box::new(inactive_btn.clone())));
             let title = ministr.title.clone();
             pgtitle = Text::new(title);
             let minih = self.minimize_header.clone();
@@ -247,6 +286,30 @@ impl Application for Manual {
         )
     }
     fn theme(&self) -> Theme {
-        self.theme.clone()
+        let colors = match self.theme {
+            OurTheme::Light => iced::theme::Palette{
+                background: Color::from_rgb8(0xE0, 0xF5, 0xFF),
+                text: Color::from_rgb8(0x00, 0x19, 0x36),
+                primary: Color::from_rgb8(0x00, 0x19, 0x36),
+                success: Color::from_rgb8(1, 1, 1),
+                danger: Color::from_rgb8(1, 1, 1),
+                },
+            OurTheme::Dark => iced::theme::Palette{
+                background: Color::from_rgb8(0x00, 0x19, 0x36),
+                text: Color::from_rgb8(0xE0, 0xF5, 0xFF),
+                primary: Color::from_rgb8(0xE0, 0xF5, 0xFF),
+                success: Color::from_rgb8(1, 1, 1),
+                danger: Color::from_rgb8(1, 1, 1),
+                },
+            OurTheme::Custom => iced::theme::Palette{
+                background: self.cust_theme.bg,
+                text: self.cust_theme.text,
+                primary: Color::from_rgb8(1, 1, 1),
+                success: Color::from_rgb8(1, 1, 1),
+                danger: Color::from_rgb8(1, 1, 1),
+            },
+        };
+        let cust = Theme::Custom(std::boxed::Box::new(iced::theme::Custom::new(colors)));
+        cust
     }
 }

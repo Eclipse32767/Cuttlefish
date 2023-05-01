@@ -8,6 +8,14 @@ use std::fs;
 use langswaycfg::get_lang;
 use crate::langswaycfg;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum OurTheme {
+    Light,
+    #[default]
+    Dark,
+    Custom
+}
+
 #[derive(Deserialize, Debug, Serialize)]
 pub struct FileData {
     pub theme: String,
@@ -185,10 +193,11 @@ pub fn getcfgdata() -> FileData {
     let decoded: FileData = from_str(&file).unwrap();
     decoded
 }
-pub fn decodetheme(x: &str, default: iced::Theme) -> iced::Theme {
+pub fn decodetheme(x: &str, default: OurTheme) -> OurTheme {
     match x {
-        "dark" => iced::Theme::Dark,
-        "light" => iced::Theme::Light,
+        "dark" => OurTheme::Dark,
+        "light" => OurTheme::Light,
+        "custom" => OurTheme::Custom,
         &_ => default
     }
 }
@@ -233,11 +242,11 @@ pub fn decodeheader(x: &str, default: BindKey) -> Option<BindKey> {
         &_ => default
     })
 }
-pub fn encodetheme(x: iced::Theme) -> &'static str {
+pub fn encodetheme(x: OurTheme) -> &'static str {
     match x {
-        iced::Theme::Dark => "dark",
-        iced::Theme::Light => "light",
-        iced::Theme::Custom(..) => "light"
+        OurTheme::Dark => "dark",
+        OurTheme::Light => "light",
+        OurTheme::Custom => "custom"
     }
 }
 pub fn encodepri(x: Option<ShortcutKey>) -> &'static str {
@@ -317,7 +326,7 @@ pub fn mkwmcfg(primary_key: Option<ShortcutKey>, secondary_key: Option<ShortcutK
         .spawn()
         .expect("oops, swaymsg failed, do you have sway installed?");
 }
-pub fn mkselfcfg(primary_key: Option<ShortcutKey>, secondary_key: Option<ShortcutKey>, exit_header: Option<BindKey>, exit_key: String, launch_header: Option<BindKey>, launch_key: String, kill_header: Option<BindKey>, kill_key: String, mini_header: Option<BindKey>, mini_key: String, scratch_header: Option<BindKey>, scratch_key: String, theme: iced::Theme, border: Option<Border>, winanim: Option<WindowAnimation>, workanim: Option<WorkAnimation>, blur: bool) {
+pub fn mkselfcfg(primary_key: Option<ShortcutKey>, secondary_key: Option<ShortcutKey>, exit_header: Option<BindKey>, exit_key: String, launch_header: Option<BindKey>, launch_key: String, kill_header: Option<BindKey>, kill_key: String, mini_header: Option<BindKey>, mini_key: String, scratch_header: Option<BindKey>, scratch_key: String, theme: OurTheme, border: Option<Border>, winanim: Option<WindowAnimation>, workanim: Option<WorkAnimation>, blur: bool) {
     let home = get_home();
     let path = format!("{home}/swaycfg/swaycfg.toml");
     let data = FileData{

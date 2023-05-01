@@ -3,11 +3,11 @@ use iced::{Result, Application, Settings, Alignment, Length, executor};
 use iced::widget::{Button, Row, Column, Container, pick_list, Text, Scrollable};
 use iced::keyboard::KeyCode;
 use iced_style::Color;
-use libcfg::{getcfgdata, BindKey, ShortcutKey, WindowAnimation, WorkAnimation, Border, decodeheader, decodepri, decodetheme, mkwmcfg, mkselfcfg, decodewinanim, decodeworkanim, decodeblur};
+use libcfg::{getcfgdata, BindKey, ShortcutKey, OurTheme, WindowAnimation, WorkAnimation, Border, decodeheader, decodepri, decodetheme, mkwmcfg, mkselfcfg, decodewinanim, decodeworkanim, decodeblur};
 mod libcfg;
 use langswaycfg::{get_lang, Translation};
 mod langswaycfg;
-use libstyle::{ButtonStyle, ListStyle, MenuStyle};
+use libstyle::{ButtonStyle, ListStyle, MenuStyle, ThemeCustom, make_custom_theme};
 mod libstyle;
 mod liblocale;
 
@@ -20,7 +20,7 @@ fn main() -> Result {
 
 
 struct Configurator { //The basic configurator struct, contains most program state
-    theme: Theme,
+    theme: OurTheme,
     locale: Translation,
     current_page: Page,
     primary_key: Option<ShortcutKey>,
@@ -42,9 +42,9 @@ struct Configurator { //The basic configurator struct, contains most program sta
     border: Border,
     window_anim: Option<WindowAnimation>,
     work_anim: Option<WorkAnimation>,
-    blur: bool
+    blur: bool,
+    cust_theme: ThemeCustom
 }
-
 #[derive(PartialEq, Debug, Clone)]
 enum CaptureInput { //enum used to store what binding should be captured into
     NoKey,
@@ -59,7 +59,7 @@ impl Default for Configurator {
     fn default() -> Self {
         let data = getcfgdata();
         Configurator { //here we extract all of the data from the config file
-            theme: decodetheme(&data.theme, Theme::Light),
+            theme: decodetheme(&data.theme, OurTheme::Light),
             locale: get_lang(),
             current_page: Page::Main,
             primary_key: decodepri(&data.primary, ShortcutKey::Super),
@@ -81,7 +81,8 @@ impl Default for Configurator {
             border: data.border.clone().unwrap(),
             window_anim: decodewinanim(&data.winanim, WindowAnimation::None),
             work_anim: decodeworkanim(&data.workanim, WorkAnimation::None),
-            blur: decodeblur(&data.blur)
+            blur: decodeblur(&data.blur),
+            cust_theme: make_custom_theme()
         }
     }
 }
@@ -89,8 +90,7 @@ impl Default for Configurator {
 #[derive(Debug, Clone)]
 enum Message { // The Message enum, used to send data to the configurator's update function
     Save,
-    ThemeLight,
-    ThemeDark,
+    ThemeChanged(OurTheme),
     PageChanged(Page),
     PrimaryKeyChanged(ShortcutKey),
     SecondaryKeyChanged(ShortcutKey),
@@ -168,13 +168,8 @@ impl Application for Configurator {
                 self.unsaved = false;
                 iced::Command::none()
             }
-            Message::ThemeLight => {
-                self.theme = Theme::Light;
-                self.unsaved = true;
-                iced::Command::none()
-            }
-            Message::ThemeDark => {
-                self.theme = Theme::Dark;
+            Message::ThemeChanged(x) => {
+                self.theme = x;
                 self.unsaved = true;
                 iced::Command::none()
             }
@@ -313,11 +308,11 @@ impl Application for Configurator {
                                     match self.current_page {
                                         Page::Main => {
                                             if self.index == 0 { // if theme selector block is marked
-                                                if self.theme == Theme::Dark { // set the theme to light
-                                                    self.theme = Theme::Light;
-                                                } else { // set the theme to dark
-                                                    self.theme = Theme::Dark;
-                                                }
+                                                self.theme = match self.theme {
+                                                    OurTheme::Light => OurTheme::Dark,
+                                                    OurTheme::Dark => OurTheme::Custom,
+                                                    OurTheme::Custom => OurTheme::Light,
+                                                };
                                                 self.unsaved = true;
                                             }
                                         }
@@ -600,9 +595,10 @@ impl Application for Configurator {
         }
     }
     fn view(&self) -> iced::Element<'_, Self::Message> {
+
         //define button styles
         let sidebar_active_btn = match self.theme {
-            Theme::Light => ButtonStyle{
+            OurTheme::Light => ButtonStyle{
                 border_radius: 10.0,
                 txt_color: Color::from_rgb8( 0x00, 0x19, 0x36),
                 bg_color: Color::from_rgb8(0xD2, 0xF0, 0xFF),
@@ -610,7 +606,7 @@ impl Application for Configurator {
                 border_width: 0.0,
                 shadow_offset: iced::Vector {x: 0.0, y: 0.0}
             },
-            Theme::Dark => ButtonStyle{
+            OurTheme::Dark => ButtonStyle{
                 border_radius: 10.0,
                 txt_color: Color::from_rgb8( 0xD2, 0xF0, 0xFF),
                 bg_color: Color::from_rgb8(0x00, 0x20, 0x46),
@@ -618,11 +614,11 @@ impl Application for Configurator {
                 border_width: 0.0,
                 shadow_offset: iced::Vector {x: 0.0, y: 0.0}
             },
-            Theme::Custom(..) => panic!()
+            OurTheme::Custom => self.cust_theme.sidebar.active.clone()
         };
         let sidebar_inactive_btn = match self.theme {
-            Theme::Custom(..) => panic!(),
-            Theme::Light => ButtonStyle{
+            OurTheme::Custom => self.cust_theme.sidebar.inactive.clone(),
+            OurTheme::Light => ButtonStyle{
                 border_radius: 10.0,
                 txt_color: Color::from_rgb8(0x00, 0x19, 0x36),
                 bg_color: Color::from_rgb8(0xC6, 0xEC, 0xFF),
@@ -630,7 +626,7 @@ impl Application for Configurator {
                 border_width: 0.0,
                 shadow_offset: iced::Vector {x: 0.0, y: 0.0}
             },
-            Theme::Dark => ButtonStyle{
+            OurTheme::Dark => ButtonStyle{
                 border_radius: 10.0,
                 txt_color: Color::from_rgb8(0xD2, 0xF0, 0xFF),
                 bg_color: Color::from_rgb8(0x00, 0x29, 0x58),
@@ -640,8 +636,8 @@ impl Application for Configurator {
             }
         };
         let body_active_btn = match self.theme {
-            Theme::Custom(..) => panic!(),
-            Theme::Light => ButtonStyle{
+            OurTheme::Custom => self.cust_theme.body.active.clone(),
+            OurTheme::Light => ButtonStyle{
                 border_radius: 10.0,
                 txt_color: Color::from_rgb8(0x00, 0x20, 0x46),
                 bg_color: Color::from_rgb8(0x00, 0xF1, 0xD6),
@@ -649,7 +645,7 @@ impl Application for Configurator {
                 border_width: 0.0,
                 shadow_offset: iced::Vector {x: 0.0, y: 0.0}
             },
-            Theme::Dark => ButtonStyle{
+            OurTheme::Dark => ButtonStyle{
                 border_radius: 10.0,
                 txt_color: Color::from_rgb8(0x00, 0x20, 0x46),
                 bg_color: Color::from_rgb8(0x00, 0xCD, 0xB6),
@@ -659,8 +655,8 @@ impl Application for Configurator {
             }
         };
         let body_inactive_btn = match self.theme {
-            Theme::Custom(..) => panic!(),
-            Theme::Light => ButtonStyle{
+            OurTheme::Custom => self.cust_theme.body.inactive.clone(),
+            OurTheme::Light => ButtonStyle{
                 border_radius: 10.0,
                 txt_color: Color::from_rgb8(0x00, 0x20, 0x46),
                 bg_color: Color::from_rgb8(0xC6, 0xEC, 0xFF),
@@ -668,7 +664,7 @@ impl Application for Configurator {
                 border_width: 0.0,
                 shadow_offset: iced::Vector {x: 0.0, y: 0.0}
             },
-            Theme::Dark => ButtonStyle{
+            OurTheme::Dark => ButtonStyle{
                 border_radius: 10.0,
                 txt_color: Color::from_rgb8(0xD2, 0xF0, 0xFF),
                 bg_color: Color::from_rgb8(0x00, 0x29, 0x58),
@@ -679,8 +675,8 @@ impl Application for Configurator {
         };
 
         let picklist_style = match self.theme {
-            Theme::Custom(..) => panic!(),
-            Theme::Light => ListStyle {
+            OurTheme::Custom => self.cust_theme.list.clone(),
+            OurTheme::Light => ListStyle {
                 txt_color: Color::from_rgb8(0x00, 0x20, 0x46),
                 bg_color: Color::from_rgb8(0xC6, 0xEC, 0xFF),
                 handle_color: Color::from_rgb8(0x00, 0x20, 0x46),
@@ -688,7 +684,7 @@ impl Application for Configurator {
                 border_width: 2.0,
                 border_color: Color::from_rgb8(0x00, 0x20, 0x46)
             },
-            Theme::Dark => ListStyle {
+            OurTheme::Dark => ListStyle {
                 txt_color: Color::from_rgb8(0xD2, 0xF0, 0xFF),
                 bg_color: Color::from_rgb8(0x00, 0x29, 0x58),
                 handle_color: Color::from_rgb8(0xD2, 0xF0, 0xFF),
@@ -698,8 +694,8 @@ impl Application for Configurator {
             },
         };
         let menu_style = match self.theme {
-            Theme::Custom(..) => panic!(),
-            Theme::Light => MenuStyle {
+            OurTheme::Custom => self.cust_theme.menu.clone(),
+            OurTheme::Light => MenuStyle {
                 txt_color: Color::from_rgb8(0x00, 0x20, 0x46),
                 bg_color: Color::from_rgb8(0xC6, 0xEC, 0xFF),
                 border_width: 2.0,
@@ -708,7 +704,7 @@ impl Application for Configurator {
                 sel_txt_color: Color::from_rgb8(0x00, 0x20, 0x46),
                 sel_bg_color: Color::from_rgb8(0x00, 0xF1, 0xD6),
             },
-            Theme::Dark => MenuStyle {
+            OurTheme::Dark => MenuStyle {
                 txt_color: Color::from_rgb8(0xD2, 0xF0, 0xFF),
                 bg_color: Color::from_rgb8(0x00, 0x29, 0x58),
                 border_width: 2.0,
@@ -824,22 +820,26 @@ impl Application for Configurator {
                 let lighttxt = String::as_str(&mainstr.light);
                 let darktxt = String::as_str(&mainstr.dark);
                 let themetxt = String::as_str(&mainstr.theme);
+                let customtxt = String::as_str(&mainstr.custom);
                 let mut light = Button::new(lighttxt)
-                    .on_press(Message::ThemeLight)
+                    .on_press(Message::ThemeChanged(OurTheme::Light))
                     .style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let mut dark = Button::new(darktxt)
-                    .on_press(Message::ThemeDark)
+                    .on_press(Message::ThemeChanged(OurTheme::Dark))
+                    .style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut custom = Button::new(customtxt)
+                    .on_press(Message::ThemeChanged(OurTheme::Custom))
                     .style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let themelabel = Text::new(themetxt);
                 match self.theme {
-                    Theme::Light => {
+                    OurTheme::Light => {
                         light = light.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
                     }
-                    Theme::Dark => {
+                    OurTheme::Dark => {
                         dark = dark.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
                     }
-                    Theme::Custom(..) => {
-                        panic!("oops");
+                    OurTheme::Custom => {
+                        custom = custom.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
                     }
                 }
                 let mut themerow = Row::new().spacing(10);
@@ -856,7 +856,8 @@ impl Application for Configurator {
                 themerow = themerow
                     .push(themelabel)
                     .push(light)
-                    .push(dark);
+                    .push(dark)
+                    .push(custom);
                 primaryrow = primaryrow
                     .push(primarylabel)
                     .push(primarypick);
@@ -1177,21 +1178,27 @@ impl Application for Configurator {
     }
     fn theme(&self) -> Theme {
         let colors = match self.theme {
-            Theme::Light => iced::theme::Palette{
+            OurTheme::Light => iced::theme::Palette{
                 background: Color::from_rgb8(0xE0, 0xF5, 0xFF),
                 text: Color::from_rgb8(0x00, 0x19, 0x36),
                 primary: Color::from_rgb8(0x00, 0x19, 0x36),
                 success: Color::from_rgb8(1, 1, 1),
                 danger: Color::from_rgb8(1, 1, 1),
                 },
-            Theme::Dark => iced::theme::Palette{
+            OurTheme::Dark => iced::theme::Palette{
                 background: Color::from_rgb8(0x00, 0x19, 0x36),
                 text: Color::from_rgb8(0xE0, 0xF5, 0xFF),
                 primary: Color::from_rgb8(0xE0, 0xF5, 0xFF),
                 success: Color::from_rgb8(1, 1, 1),
                 danger: Color::from_rgb8(1, 1, 1),
                 },
-            Theme::Custom(_) => panic!(),
+            OurTheme::Custom => iced::theme::Palette{
+                background: self.cust_theme.bg,
+                text: self.cust_theme.text,
+                primary: Color::from_rgb8(1, 1, 1),
+                success: Color::from_rgb8(1, 1, 1),
+                danger: Color::from_rgb8(1, 1, 1),
+            },
         };
         let cust = Theme::Custom(std::boxed::Box::new(iced::theme::Custom::new(colors)));
         cust

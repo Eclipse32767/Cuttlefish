@@ -17,6 +17,7 @@ width = "Width: "
 theme = "UI Theme for Configurator"
 light = "Light"
 dark = "Dark"
+custom = "Custom"
 
 [bindpage]
 exit = "Exit the Desktop Session"

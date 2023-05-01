@@ -19,7 +19,8 @@ pub struct MainPage {
     pub(crate) width: String,
     pub(crate) theme: String,
     pub(crate) light: String,
-    pub(crate) dark: String
+    pub(crate) dark: String,
+    pub(crate) custom: String
 }
 #[derive(Deserialize, Debug, Serialize)]
 pub struct BindPage {
