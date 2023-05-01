@@ -356,6 +356,8 @@ pub fn mkwmcfg(primary_key: Option<ShortcutKey>, secondary_key: Option<ShortcutK
 pub fn mkselfcfg(primary_key: Option<ShortcutKey>, secondary_key: Option<ShortcutKey>, exit_header: Option<BindKey>, exit_key: String, launch_header: Option<BindKey>, launch_key: String, kill_header: Option<BindKey>, kill_key: String, mini_header: Option<BindKey>, mini_key: String, scratch_header: Option<BindKey>, scratch_key: String, theme: OurTheme, border: Option<Border>, winanim: Option<WindowAnimation>, workanim: Option<WorkAnimation>, blur: bool) {
     let home = get_home();
     let path = format!("{home}/swaycfg/swaycfg.toml");
+    let backup_path = format!("{home}/swaycfg");
+    std::process::Command::new("mkdir").arg("-p").arg(backup_path).output().expect("uh oh");
     let data = FileData{
         theme: encodetheme(theme.clone()).to_string(),
         primary: encodepri(primary_key).to_string(),
