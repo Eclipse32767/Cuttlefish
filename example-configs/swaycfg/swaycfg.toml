@@ -1,15 +1,21 @@
 theme = "dark"
-border = "pixel"
-width = 5
 primary = "super"
 secondary = "shift"
 exith = "both"
-exitk = "e"
+exitk = "E"
 launchh = "pri"
-launchk = "tab"
+launchk = "Tab"
 killh = "both"
-killk = "c"
+killk = "Q"
 minih = "both"
-minik = "z"
+minik = "Z"
 scratchh = "pri"
-scratchk = "z"
+scratchk = "Z"
+winanim = "popin"
+workanim = "slidev"
+blur = "y"
+
+[border]
+width = 5
+radius = 15
+gaps = 10
