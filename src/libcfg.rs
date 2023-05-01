@@ -187,7 +187,28 @@ pub fn getcfgdata() -> FileData {
         Ok(var) => var,
         Err(..) => match read_to_string("/etc/swaycfg/swaycfg.toml") {
             Ok(var) => var,
-            Err(..) => panic!("Failed to find swaycfg.toml in any valid directory")
+            Err(..) => String::from(r#"
+            theme = "light"
+            primary = "super"
+            secondary = "shift"
+            exith = "both"
+            exitk = "E"
+            launchh = "pri"
+            launchk = "Tab"
+            killh = "both"
+            killk = "Q"
+            minih = "both"
+            minik = "Z"
+            scratchh = "pri"
+            scratchk = "Z"
+            winanim = "popin"
+            workanim = "slidev"
+            blur = "y"
+            
+            [border]
+            width = 5
+            radius = 15
+            gaps = 10"#)
         }
     };
     let decoded: FileData = from_str(&file).unwrap();
