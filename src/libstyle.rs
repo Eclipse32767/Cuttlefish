@@ -159,55 +159,61 @@ pub fn string_to_color(x: String) -> Color {
 pub fn make_custom_theme() -> ThemeCustom {
     let home = get_home();
     let path = format!("{home}/swaycfg/theme.toml");
-    let file = match read_to_string(path) {
+    let backup_path = format!("{home}/swaycfg");
+    let placeholder = String::from(r#"
+    [app_style]
+    background = "24273A"
+    text = "CAD3F5"
+    
+    [sidebar_style]
+    border_radius = 10
+    txt_color = "CAD3F5"
+    bg_color = "24273A"
+    border_color = "CAD3F5"
+    border_width = 0
+    de_border_radius = 10
+    de_txt_color = "CAD3F5"
+    de_bg_color = "1E2030"
+    de_border_color = "CAD3F5"
+    de_border_width = 0
+    
+    [body_style]
+    border_radius = 10
+    txt_color = "CAD3F5"
+    bg_color = "8AADF4"
+    border_color = "CAD3F5"
+    border_width = 0
+    de_border_radius = 10
+    de_txt_color = "CAD3F5"
+    de_bg_color = "1E2030"
+    de_border_color = "CAD3F5"
+    de_border_width = 0
+    
+    [menu_style]
+    txt_color = "CAD3F5"
+    bg_color = "24273A"
+    border_width = 2
+    border_radius = 10
+    border_color = "CAD3F5"
+    sel_txt_color = "24273A"
+    sel_bg_color = "8AADF4"
+    
+    [list_style]
+    txt_color = "CAD3F5"
+    bg_color = "24273A"
+    handle_color = "CAD3F5"
+    border_radius = 10
+    border_width = 2
+    border_color = "CAD3F5""#);
+    let file = match read_to_string(path.clone()) {
         Ok(var) => var,
         Err(..) => match read_to_string("/etc/swaycfg/theme.toml") {
             Ok(var) => var,
-            Err(..) => String::from(r#"
-            [app_style]
-            background = "24273A"
-            text = "CAD3F5"
-            
-            [sidebar_style]
-            border_radius = 10
-            txt_color = "CAD3F5"
-            bg_color = "24273A"
-            border_color = "CAD3F5"
-            border_width = 0
-            de_border_radius = 10
-            de_txt_color = "CAD3F5"
-            de_bg_color = "1E2030"
-            de_border_color = "CAD3F5"
-            de_border_width = 0
-            
-            [body_style]
-            border_radius = 10
-            txt_color = "CAD3F5"
-            bg_color = "8AADF4"
-            border_color = "CAD3F5"
-            border_width = 0
-            de_border_radius = 10
-            de_txt_color = "CAD3F5"
-            de_bg_color = "1E2030"
-            de_border_color = "CAD3F5"
-            de_border_width = 0
-            
-            [menu_style]
-            txt_color = "CAD3F5"
-            bg_color = "24273A"
-            border_width = 2
-            border_radius = 10
-            border_color = "CAD3F5"
-            sel_txt_color = "24273A"
-            sel_bg_color = "8AADF4"
-            
-            [list_style]
-            txt_color = "CAD3F5"
-            bg_color = "24273A"
-            handle_color = "CAD3F5"
-            border_radius = 10
-            border_width = 2
-            border_color = "CAD3F5""#)
+            Err(..) => {
+                std::process::Command::new("mkdir").arg("-p").arg(backup_path).output().expect("uh oh");
+                std::fs::write(path, placeholder.clone()).expect("failed to write backup file");
+                placeholder
+            }
         }
     };
     let decoded: ThemeFile = from_str(&file).unwrap();

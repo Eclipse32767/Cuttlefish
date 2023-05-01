@@ -183,32 +183,38 @@ pub fn get_home() -> String {
 pub fn getcfgdata() -> FileData {
     let home = get_home();
     let path = format!("{home}/swaycfg/swaycfg.toml");
-    let file = match read_to_string(path) {
+    let backup_path = format!("{home}/swaycfg");
+    let placeholder = String::from(r#"
+    theme = "light"
+    primary = "super"
+    secondary = "shift"
+    exith = "both"
+    exitk = "E"
+    launchh = "pri"
+    launchk = "Tab"
+    killh = "both"
+    killk = "Q"
+    minih = "both"
+    minik = "Z"
+    scratchh = "pri"
+    scratchk = "Z"
+    winanim = "popin"
+    workanim = "slidev"
+    blur = "y"
+    
+    [border]
+    width = 5
+    radius = 15
+    gaps = 10"#);
+    let file = match read_to_string(path.clone()) {
         Ok(var) => var,
         Err(..) => match read_to_string("/etc/swaycfg/swaycfg.toml") {
             Ok(var) => var,
-            Err(..) => String::from(r#"
-            theme = "light"
-            primary = "super"
-            secondary = "shift"
-            exith = "both"
-            exitk = "E"
-            launchh = "pri"
-            launchk = "Tab"
-            killh = "both"
-            killk = "Q"
-            minih = "both"
-            minik = "Z"
-            scratchh = "pri"
-            scratchk = "Z"
-            winanim = "popin"
-            workanim = "slidev"
-            blur = "y"
-            
-            [border]
-            width = 5
-            radius = 15
-            gaps = 10"#)
+            Err(..) => {
+                std::process::Command::new("mkdir").arg("-p").arg(backup_path).output().expect("uh oh");
+                fs::write(path, placeholder.clone()).expect("failed to write backup file");
+                placeholder
+            }
         }
     };
     let decoded: FileData = from_str(&file).unwrap();
