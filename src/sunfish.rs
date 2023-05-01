@@ -135,7 +135,7 @@ impl Application for Manual {
     fn view(&self) -> iced::Element<'_, Self::Message> {
 
         let active_btn = match self.theme {
-            OurTheme::Custom => self.cust_theme.sidebar.active.clone(),
+            OurTheme::Custom => self.cust_theme.body.active.clone(),
             OurTheme::Light => ButtonStyle{
                 border_radius: 10.0,
                 txt_color: Color::from_rgb8(0x00, 0x20, 0x46),
@@ -154,7 +154,7 @@ impl Application for Manual {
             }
         };
         let inactive_btn = match self.theme {
-            OurTheme::Custom => self.cust_theme.sidebar.inactive.clone(),
+            OurTheme::Custom => self.cust_theme.body.inactive.clone(),
             OurTheme::Light => ButtonStyle{
                 border_radius: 10.0,
                 txt_color: Color::from_rgb8(0x00, 0x20, 0x46),
