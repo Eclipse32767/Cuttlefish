@@ -40,7 +40,7 @@ pub fn prettypri(x: &str) -> &'static str {
         "alt" => "Alt",
         "control" => "Control",
         "shift" => "Shift",
-        &_ => panic!()
+        &_ => "Error"
     }
 }
 pub fn prettyheader(x: &str, pri: &str, sec: &str) -> String {
@@ -50,7 +50,7 @@ pub fn prettyheader(x: &str, pri: &str, sec: &str) -> String {
         "pri" => primary,
         "sec" => secondary,
         "both" => format!("{primary}+{secondary}"),
-        &_ => panic!()
+        &_ => "Error".to_string()
     }
 }
 
