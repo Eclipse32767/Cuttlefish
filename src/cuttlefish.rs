@@ -335,14 +335,14 @@ impl Application for Configurator {
                                         Page::Init => {
 
                                         }
-                                        Page::Anim => {
+                                        Page::Anim => {//toggle blur if relevant
                                             if self.index == 5 {
                                                 self.blur = !self.blur;
                                                 self.unsaved = true;
                                             }
                                         }
                                     }
-                                } else if key_code == KeyCode::Key1 {
+                                } else if key_code == KeyCode::Key1 {//dropdown management with number keys
                                     if self.current_page == Page::Main {
                                         if self.index == 1 {
                                             self.primary_key = Some(ShortcutKey::Super);
@@ -488,7 +488,7 @@ impl Application for Configurator {
                                             self.unsaved = true;
                                         }
                                     }
-                                } else if key_code == KeyCode::Right {
+                                } else if key_code == KeyCode::Right {//increment values with right presses
                                     if self.current_page == Page::Anim {
                                         if self.index == 0 {
                                             self.border.width = self.border.width + 1;
@@ -501,7 +501,7 @@ impl Application for Configurator {
                                             self.unsaved = true;
                                         }
                                     }
-                                } else if key_code == KeyCode::Left {
+                                } else if key_code == KeyCode::Left { // decrement values with left presses
                                     if self.current_page == Page::Anim {
                                         if self.index == 0 && self.border.width > 0 {
                                             self.border.width = self.border.width - 1;
