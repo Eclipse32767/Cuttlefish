@@ -614,7 +614,6 @@ impl Application for Configurator {
                         } else {
                             self.width = ShrinkValue::Medium;
                         }
-                        println!("{}", width);
                     },
                     iced::window::Event::RedrawRequested(_) => {
 
@@ -943,10 +942,19 @@ impl Application for Configurator {
                     )
                     .placeholder("choose")
                     .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
-                let primarytxt = String::as_str(&globalstr.primary);
-                let secondarytxt = String::as_str(&globalstr.secondary);
-                let primarylabel: Text = Text::new(primarytxt);
-                let secondarylabel: Text = Text::new(secondarytxt);
+                let primarytxt;
+                let temp_primary = format!("{}{}", globalstr.primary, globalstr.primary_addendum);
+                let secondarytxt;
+                let temp_secondary = format!("{}{}", globalstr.secondary, globalstr.secondary_addendum);
+                if self.width == ShrinkValue::Full {
+                    primarytxt = String::as_str(&temp_primary);
+                    secondarytxt = String::as_str(&temp_secondary);
+                } else {
+                    primarytxt = String::as_str(&globalstr.primary);
+                    secondarytxt = String::as_str(&globalstr.secondary);
+                }
+                let primarylabel: Text = Text::new(primarytxt.to_owned());
+                let secondarylabel: Text = Text::new(secondarytxt.to_owned());
 
 
                 let exitsclabel = Text::new(bindstr.exit.clone());
