@@ -91,7 +91,9 @@ pub struct PageGlobals {
     pub(crate) save: String,
     pub(crate) saved: String,
     pub(crate) primary: String,
+    pub(crate) primary_addendum: String,
     pub(crate) secondary: String,
+    pub(crate) secondary_addendum: String
 }
 
 pub fn get_lang() -> Translation {
@@ -105,8 +107,10 @@ pub fn get_lang() -> Translation {
     anim = "Animations Page"
     save = "Save"
     saved = "Saved!"
-    primary = "Primary Shortcut Key-- Control and shift not recommended"
-    secondary = "Secondary Shortcut Key-- used for more advanced shortcuts"
+    primary = "Primary Shortcut Key"
+    primary_addendum = "-- Control and shift not recommended"
+    secondary = "Secondary Shortcut Key"
+    secondary_addendum = "-- used for more advanced shortcuts"
     
     [mainpage]
     borders = "Window Borders"

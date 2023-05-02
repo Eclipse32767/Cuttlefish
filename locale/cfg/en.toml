@@ -8,8 +8,10 @@ init = "Autostart Page"
 anim = "Animations Page"
 save = "Save"
 saved = "Saved!"
-primary = "Primary Shortcut Key-- Control and shift not recommended"
-secondary = "Secondary Shortcut Key-- used for more advanced shortcuts"
+primary = "Primary Shortcut Key"
+primary_addendum = "-- Control and shift not recommended"
+secondary = "Secondary Shortcut Key"
+secondary_addendum = "-- used for more advanced shortcuts"
 
 [mainpage]
 borders = "Window Borders"

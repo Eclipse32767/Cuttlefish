@@ -43,7 +43,8 @@ struct Configurator { //The basic configurator struct, contains most program sta
     window_anim: Option<WindowAnimation>,
     work_anim: Option<WorkAnimation>,
     blur: bool,
-    cust_theme: ThemeCustom
+    cust_theme: ThemeCustom,
+    width: ShrinkValue
 }
 #[derive(PartialEq, Debug, Clone)]
 enum CaptureInput { //enum used to store what binding should be captured into
@@ -53,6 +54,12 @@ enum CaptureInput { //enum used to store what binding should be captured into
     KillKey,
     MiniKey,
     ScratchKey
+}
+#[derive(PartialEq, Debug, Clone)]
+enum ShrinkValue {
+    Full,
+    Medium,
+    Tiny
 }
 
 impl Default for Configurator {
@@ -82,7 +89,8 @@ impl Default for Configurator {
             window_anim: decodewinanim(&data.winanim, WindowAnimation::None),
             work_anim: decodeworkanim(&data.workanim, WorkAnimation::None),
             blur: decodeblur(&data.blur),
-            cust_theme: make_custom_theme()
+            cust_theme: make_custom_theme(),
+            width: ShrinkValue::Full
         }
     }
 }
@@ -106,6 +114,7 @@ enum Message { // The Message enum, used to send data to the configurator's upda
     ChangeWindowAnim(WindowAnimation),
     ChangeWorkAnim(WorkAnimation),
     BlurToggled(bool),
+    WindowUpdate(iced::window::Event),
 }
 #[derive(Debug, Clone)]
 enum IncrVal {
@@ -592,6 +601,45 @@ impl Application for Configurator {
                 self.unsaved = true;
                 iced::Command::none()
             }
+            Message::WindowUpdate(x) => {
+                match x {
+                    iced::window::Event::Moved { x: _, y: _ } => {
+
+                    },
+                    iced::window::Event::Resized { width, height: _ } => {
+                        if width > 800 {
+                            self.width = ShrinkValue::Full;
+                        } else if width < 250 {
+                            self.width = ShrinkValue::Tiny;
+                        } else {
+                            self.width = ShrinkValue::Medium;
+                        }
+                        println!("{}", width);
+                    },
+                    iced::window::Event::RedrawRequested(_) => {
+
+                    },
+                    iced::window::Event::CloseRequested => {
+
+                    },
+                    iced::window::Event::Focused => {
+
+                    },
+                    iced::window::Event::Unfocused => {
+
+                    },
+                    iced::window::Event::FileHovered(_) => {
+
+                    },
+                    iced::window::Event::FileDropped(_) => {
+
+                    },
+                    iced::window::Event::FilesHoveredLeft => {
+
+                    },
+                }
+                iced::Command::none()
+            }
         }
     }
     fn view(&self) -> iced::Element<'_, Self::Message> {
@@ -812,10 +860,20 @@ impl Application for Configurator {
                     )
                     .placeholder("choose")
                     .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
-                let primarytxt = String::as_str(&globalstr.primary);
-                let secondarytxt = String::as_str(&globalstr.secondary);
-                let primarylabel: Text = Text::new(primarytxt);
-                let secondarylabel: Text = Text::new(secondarytxt);
+                let primarytxt;
+                let temp_primary = format!("{}{}", globalstr.primary, globalstr.primary_addendum);
+                let secondarytxt;
+                let temp_secondary = format!("{}{}", globalstr.secondary, globalstr.secondary_addendum);
+                if self.width == ShrinkValue::Full {
+                    primarytxt = String::as_str(&temp_primary);
+                    secondarytxt = String::as_str(&temp_secondary);
+                } else {
+                    primarytxt = String::as_str(&globalstr.primary);
+                    secondarytxt = String::as_str(&globalstr.secondary);
+                }
+                
+                let primarylabel: Text = Text::new(primarytxt.to_owned());
+                let secondarylabel: Text = Text::new(secondarytxt.to_owned());
 
                 let lighttxt = String::as_str(&mainstr.light);
                 let darktxt = String::as_str(&mainstr.dark);
@@ -1170,6 +1228,8 @@ impl Application for Configurator {
             |event, _| {
                 if let iced::Event::Keyboard(keyboard_event) = event {
                     Some(Message::KeyboardUpdate(keyboard_event))
+                } else if let iced::Event::Window(window_event) = event{
+                    Some(Message::WindowUpdate(window_event))
                 } else {
                     None
                 }
