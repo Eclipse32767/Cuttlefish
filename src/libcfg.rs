@@ -5,8 +5,8 @@ use std::fs::read_to_string;
 use std::{env};
 use std::process::Command;
 use std::fs;
-use langswaycfg::get_lang;
-use crate::langswaycfg;
+use langcfg::get_lang;
+use crate::langcfg;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum OurTheme {
@@ -182,8 +182,8 @@ pub fn get_home() -> String {
 }
 pub fn getcfgdata() -> FileData {
     let home = get_home();
-    let path = format!("{home}/swaycfg/swaycfg.toml");
-    let backup_path = format!("{home}/swaycfg");
+    let path = format!("{home}/Oceania/cfg.toml");
+    let backup_path = format!("{home}/Oceania");
     let placeholder = String::from(r#"
     theme = "light"
     primary = "super"
@@ -208,7 +208,7 @@ pub fn getcfgdata() -> FileData {
     gaps = 10"#);
     let file = match read_to_string(path.clone()) {
         Ok(var) => var,
-        Err(..) => match read_to_string("/etc/swaycfg/swaycfg.toml") {
+        Err(..) => match read_to_string("/etc/Oceania/cfg.toml") {
             Ok(var) => var,
             Err(..) => {
                 std::process::Command::new("mkdir").arg("-p").arg(backup_path).output().expect("uh oh");
@@ -441,15 +441,15 @@ pub fn mkwmcfg(primary_key: Option<ShortcutKey>, secondary_key: Option<ShortcutK
 
     fs::write(path, data).expect("failed to write file");
 
-    Command::new("swaymsg")
+    Command::new("hyprctl")
         .arg("reload")
         .spawn()
-        .expect("oops, swaymsg failed, do you have sway installed?");
+        .expect("oops, hyprctl failed, do you have sway installed?");
 }
 pub fn mkselfcfg(primary_key: Option<ShortcutKey>, secondary_key: Option<ShortcutKey>, exit_header: Option<BindKey>, exit_key: String, launch_header: Option<BindKey>, launch_key: String, kill_header: Option<BindKey>, kill_key: String, mini_header: Option<BindKey>, mini_key: String, scratch_header: Option<BindKey>, scratch_key: String, theme: OurTheme, border: Option<Border>, winanim: Option<WindowAnimation>, workanim: Option<WorkAnimation>, blur: bool) {
     let home = get_home();
-    let path = format!("{home}/swaycfg/swaycfg.toml");
-    let backup_path = format!("{home}/swaycfg");
+    let path = format!("{home}/Oceania/cfg.toml");
+    let backup_path = format!("{home}/Oceania");
     std::process::Command::new("mkdir").arg("-p").arg(backup_path).output().expect("uh oh");
     let data = FileData{
         theme: encodetheme(theme.clone()).to_string(),
@@ -471,5 +471,5 @@ pub fn mkselfcfg(primary_key: Option<ShortcutKey>, secondary_key: Option<Shortcu
         blur: encodeblur(blur).to_string(),
     };
     let toml = to_string(&data).expect("failed to generate toml");
-    fs::write(path, toml).expect("failed to write swaycfg.toml");
+    fs::write(path, toml).expect("failed to write cfg.toml");
 }
