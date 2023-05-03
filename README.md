@@ -27,3 +27,7 @@ This is a project developed in rust that seeks to provide a feature-complete con
 6. Keep localization data in toml files as well
 
     This keeps the dependency tree small, reducing build times.
+
+7. Support full keyboard navigation
+
+    Hyprland is built with a keyboard-based workflow, so for the sake of usability, we should comply with that and support navigation of this interface without moving your hands off of the keyboard
