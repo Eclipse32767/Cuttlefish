@@ -315,36 +315,129 @@ pub fn encodeblur(x: bool) -> &'static str {
 }
 pub fn rip_shortcut(opt: Option<ShortcutKey>) -> &'static str {
     match opt.unwrap() {
-        ShortcutKey::Alt => "Mod1",
-        ShortcutKey::Ctrl => "Control",
-        ShortcutKey::Shift => "Shift",
-        ShortcutKey::Super => "Mod4"
+        ShortcutKey::Alt => "ALT",
+        ShortcutKey::Ctrl => "CONTROL",
+        ShortcutKey::Shift => "SHIFT",
+        ShortcutKey::Super => "SUPER"
     }
 }
-pub fn rip_bind(opt: Option<BindKey>) -> &'static str {
+pub fn rip_bind(opt: Option<BindKey>, pri: Option<ShortcutKey>, sec: Option<ShortcutKey>) -> String {
+    let pristr = match pri.unwrap() {
+        ShortcutKey::Super => "SUPER",
+        ShortcutKey::Alt => "ALT",
+        ShortcutKey::Ctrl => "CONTROL",
+        ShortcutKey::Shift => "SHIFT"
+    };
+    let secstr = match sec.unwrap() {
+        ShortcutKey::Super => "SUPER",
+        ShortcutKey::Alt => "ALT",
+        ShortcutKey::Ctrl => "CONTROL",
+        ShortcutKey::Shift => "SHIFT"
+    };
     match opt.unwrap() {
-        BindKey::PrimaryKey => "$pri",
-        BindKey::SecondaryKey => "$sec",
-        BindKey::BothKey => "$pri+$sec"
+        BindKey::PrimaryKey => pristr.to_string(),
+        BindKey::SecondaryKey => secstr.to_string(),
+        BindKey::BothKey => format!("{pristr}_{secstr}")
     }
 }
-pub fn mkwmcfg(primary_key: Option<ShortcutKey>, secondary_key: Option<ShortcutKey>, exit_header: Option<BindKey>, exit_key: String, launch_header: Option<BindKey>, launch_key: String, kill_header: Option<BindKey>, kill_key: String, mini_header: Option<BindKey>, mini_key: String, scratch_header: Option<BindKey>, scratch_key: String) {
+pub fn rip_win_anim(opt: Option<WindowAnimation>) -> String{
+    match opt.unwrap() {
+        WindowAnimation::None => "0,1,default".to_string(),
+        WindowAnimation::Popin => "1,8,default,popin".to_string(),
+        WindowAnimation::Slide => "1,8,default,slide".to_string()
+    }
+}
+pub fn rip_work_anim(opt: Option<WorkAnimation>) -> String {
+    match opt.unwrap() {
+        WorkAnimation::None => "0,8,default".to_string(),
+        WorkAnimation::Fade => "1,8,default,fade".to_string(),
+        WorkAnimation::Slide => "1,8,default,slide".to_string(),
+        WorkAnimation::SlideVert => "1,8,default,slidevert".to_string()
+    }
+}
+pub fn mkwmcfg(primary_key: Option<ShortcutKey>, secondary_key: Option<ShortcutKey>, exit_header: Option<BindKey>, exit_key: String, launch_header: Option<BindKey>, launch_key: String, kill_header: Option<BindKey>, kill_key: String, mini_header: Option<BindKey>, mini_key: String, scratch_header: Option<BindKey>, scratch_key: String, border: Option<Border>, winanim: Option<WindowAnimation>, workanim: Option<WorkAnimation>, blur: bool) {
     let home = get_home();
     let data;
-    let primary = rip_shortcut(primary_key);
-    let secondary = rip_shortcut(secondary_key);
-    let exith = rip_bind(exit_header);
+    let prik = rip_shortcut(primary_key);
+    let seck = rip_shortcut(secondary_key);
+    let exith = rip_bind(exit_header, primary_key, secondary_key);
     let exitk = &exit_key;
-    let launchh = rip_bind(launch_header);
+    let launchh = rip_bind(launch_header, primary_key, secondary_key);
     let launchk = &launch_key;
-    let killh = rip_bind(kill_header);
+    let killh = rip_bind(kill_header, primary_key, secondary_key);
     let killk = &kill_key;
-    let minih = rip_bind(mini_header);
+    let minih = rip_bind(mini_header, primary_key, secondary_key);
     let minik = &mini_key;
-    let scratchh = rip_bind(scratch_header);
+    let scratchh = rip_bind(scratch_header, primary_key, secondary_key);
     let scratchk = &scratch_key;
-    let path = format!("{home}/sway/cfgvars");
-    data = format!("#AUTO-GENERATED CONFIG, do not edit, any changed will be overwritten\nset $pri {primary}\nset $sec {secondary}\n \nset $exit {exith}+{exitk}\nset $launch {launchh}+{launchk}\nset $kill {killh}+{killk}\nset $mini {minih}+{minik}\nset $scratch {scratchh}+{scratchk}");
+    let gaps = border.unwrap().gaps;
+    let width = border.unwrap().width;
+    let radius = border.unwrap().radius;
+    let win_anim = rip_win_anim(winanim);
+    let work_anim = rip_work_anim(workanim);
+    let sector_head = r#"{"#;
+    let sector_tail = r#"}"#;
+    let path = format!("{home}/hypr/hyprland.conf");
+    data = format!("#AUTO-GENERATED CONFIG, DO NOT EDIT, CHANGES WILL BE OVERWRITTEN \n \
+    source {home}/hypr/usercfg.conf\n \
+    exec_once={home}/hypr/autostart\n \
+    bind={exith},{exitk},exec,killall Hyprland\n \
+    bind={launchh},{launchk},exec,rofi\n \
+    bind={killh},{killk},killactive\n \
+    bind={minih},{minik},movetoworkspace,special\n \
+    bind={scratchh},{scratchk},togglespecialworkspace\n \
+    bind = {prik}, left, movefocus, l\n \
+    bind = {prik}, right, movefocus, r\n \
+    bind = {prik}, up, movefocus, u\n \
+    bind = {prik}, down, movefocus, d\n \
+    bind = {prik}_{seck}, left, movewindow, l\n \
+    bind = {prik}_{seck}, right, movewindow, r\n \
+    bind = {prik}_{seck}, up, movewindow, u\n \
+    bind = {prik}_{seck}, down, movewindow, d\n \
+    bind = {prik},1, workspace, 1 \n \
+    bind = {prik},2, workspace, 2 \n \
+    bind = {prik},3, workspace, 3 \n \
+    bind = {prik},4, workspace, 4 \n \
+    bind = {prik},5, workspace, 5 \n \
+    bind = {prik},6, workspace, 6 \n \
+    bind = {prik},7, workspace, 7 \n \
+    bind = {prik},8, workspace, 8 \n \
+    bind = {prik},9, workspace, 9 \n \
+    bind = {prik},0, workspace, 10 \n \
+    bind = {prik}_{seck},1,movetoworkspacesilent,1 \n \
+    bind = {prik}_{seck},2,movetoworkspacesilent,2 \n \
+    bind = {prik}_{seck},3,movetoworkspacesilent,3 \n \
+    bind = {prik}_{seck},4,movetoworkspacesilent,4 \n \
+    bind = {prik}_{seck},5,movetoworkspacesilent,5 \n \
+    bind = {prik}_{seck},6,movetoworkspacesilent,6 \n \
+    bind = {prik}_{seck},7,movetoworkspacesilent,7 \n \
+    bind = {prik}_{seck},8,movetoworkspacesilent,8 \n \
+    bind = {prik}_{seck},9,movetoworkspacesilent,9 \n \
+    bind = {prik}_{seck},0,movetoworkspacesilent,10 \n \
+    general {sector_head}\n \
+    gaps_in = {gaps}\n \
+    gaps_out = {gaps}\n \
+    border_size = {width}\n \
+    {sector_tail}\n \
+    decoration {sector_head}\n \
+    rounding = {radius}\n \
+    blur = {blur}\n \
+    blur_size = 3\n \
+    blur_passes = 3\n \
+    blur_new_optimizations = true\n \
+    drop_shadow = false\n \
+    shadow_ignore_window = true\n \
+    shadow_offset = 0\n \
+    shadow_range = 0\n \
+    shadow_render_power = 0\n \
+    col.shadow = rgba(00000099)\n \
+    {sector_tail}\n \
+    animations {sector_head}\n \
+    enabled = true\n \
+    animation = windows,{win_anim}\n \
+    animation = workspaces,{work_anim}\n \
+    {sector_tail}\n \
+    ");
 
     fs::write(path, data).expect("failed to write file");
 

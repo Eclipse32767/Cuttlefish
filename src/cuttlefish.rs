@@ -171,7 +171,7 @@ impl Application for Configurator {
         match message {
             Message::Save => {
                 if self.unsaved {
-                    mkwmcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone());
+                    mkwmcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), Some(self.border), self.window_anim, self.work_anim, self.blur);
                     mkselfcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), self.theme.clone(), Some(self.border), self.window_anim, self.work_anim, self.blur);
                 }
                 self.unsaved = false;
@@ -309,7 +309,7 @@ impl Application for Configurator {
                                     }
                                 } else if key_code == KeyCode::S { //save
                                     if self.unsaved {
-                                        mkwmcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone());
+                                        mkwmcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), Some(self.border), self.window_anim, self.work_anim, self.blur);
                                         mkselfcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), self.theme.clone(), Some(self.border), self.window_anim, self.work_anim, self.blur);
                                     }
                                     self.unsaved = false;
@@ -1252,14 +1252,14 @@ impl Application for Configurator {
                 primary: Color::from_rgb8(0x00, 0x19, 0x36),
                 success: Color::from_rgb8(1, 1, 1),
                 danger: Color::from_rgb8(1, 1, 1),
-                },
+            },
             OurTheme::Dark => iced::theme::Palette{
                 background: Color::from_rgb8(0x00, 0x19, 0x36),
                 text: Color::from_rgb8(0xE0, 0xF5, 0xFF),
                 primary: Color::from_rgb8(0xE0, 0xF5, 0xFF),
                 success: Color::from_rgb8(1, 1, 1),
                 danger: Color::from_rgb8(1, 1, 1),
-                },
+            },
             OurTheme::Custom => iced::theme::Palette{
                 background: self.cust_theme.bg,
                 text: self.cust_theme.text,
