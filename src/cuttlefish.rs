@@ -1,9 +1,9 @@
 use iced::theme::{self, Theme};
-use iced::{Result, Application, Settings, Alignment, Length, executor};
+use iced::{Result, Application, Settings, Alignment, Length, executor, widget};
 use iced::widget::{Button, Row, Column, Container, pick_list, Text, Scrollable};
 use iced::keyboard::KeyCode;
 use iced_style::Color;
-use libcfg::{getcfgdata, BindKey, ShortcutKey, OurTheme, WindowAnimation, WorkAnimation, Border, decodeheader, decodepri, decodetheme, mkwmcfg, mkselfcfg, decodewinanim, decodeworkanim, decodeblur};
+use libcfg::{getcfgdata, BindKey, ShortcutKey, OurTheme, BarWidget, WindowAnimation, WorkAnimation, Border, decodeheader, decodepri, decodetheme, mkwmcfg, mkselfcfg, decodewinanim, decodeworkanim, decodeblur};
 mod libcfg;
 use langcfg::{get_lang, Translation};
 mod langcfg;
@@ -44,7 +44,11 @@ struct Configurator { //The basic configurator struct, contains most program sta
     work_anim: Option<WorkAnimation>,
     blur: bool,
     cust_theme: ThemeCustom,
-    width: ShrinkValue
+    width: ShrinkValue,
+    bar_left: Vec<BarWidget>,
+    bar_center: Vec<BarWidget>,
+    bar_right: Vec<BarWidget>,
+    next_widget: BarWidget,
 }
 #[derive(PartialEq, Debug, Clone)]
 enum CaptureInput { //enum used to store what binding should be captured into
@@ -54,6 +58,12 @@ enum CaptureInput { //enum used to store what binding should be captured into
     KillKey,
     MiniKey,
     ScratchKey
+}
+#[derive(PartialEq, Debug, Clone)]
+enum WidgetBank {
+    Left,
+    Center,
+    Right
 }
 #[derive(PartialEq, Debug, Clone)]
 enum ShrinkValue {
@@ -90,7 +100,11 @@ impl Default for Configurator {
             work_anim: decodeworkanim(&data.workanim, WorkAnimation::None),
             blur: decodeblur(&data.blur),
             cust_theme: make_custom_theme(),
-            width: ShrinkValue::Full
+            width: ShrinkValue::Full,
+            bar_left: vec![],
+            bar_center: vec![],
+            bar_right: vec![],
+            next_widget: BarWidget::None,
         }
     }
 }
@@ -115,6 +129,9 @@ enum Message { // The Message enum, used to send data to the configurator's upda
     ChangeWorkAnim(WorkAnimation),
     BlurToggled(bool),
     WindowUpdate(iced::window::Event),
+    AwaitDestination(BarWidget),
+    PushWidget(WidgetBank),
+    RemoveWidget(WidgetBank, i32)
 }
 #[derive(Debug, Clone)]
 enum IncrVal {
@@ -639,6 +656,31 @@ impl Application for Configurator {
                 }
                 iced::Command::none()
             }
+            Message::PushWidget(bank) => {
+                match bank {
+                    WidgetBank::Left => {
+                        self.bar_left.push(self.next_widget);
+                    }
+                    WidgetBank::Center => {
+                        self.bar_center.push(self.next_widget);
+                    }
+                    WidgetBank::Right => {
+                        self.bar_right.push(self.next_widget);
+                    }
+                }
+                println!("{:?}", self.bar_left);
+                println!("{}", self.bar_center.len());
+                self.next_widget = BarWidget::None;
+                iced::Command::none()
+            }
+            Message::RemoveWidget(bank, index) => {
+                iced::Command::none()
+            }
+            Message::AwaitDestination(x) => {
+                self.next_widget = x;
+                iced::Command::none()
+            }
+
         }
     }
     fn view(&self) -> iced::Element<'_, Self::Message> {
@@ -1092,7 +1134,17 @@ impl Application for Configurator {
                     .push(scratchscrow);
             }
             Page::Bar => {
-
+                let barleft = Button::new("left").on_press(Message::PushWidget(WidgetBank::Left));
+                let barcenter = Button::new("center").on_press(Message::PushWidget(WidgetBank::Center));
+                let barright = Button::new("right").on_press(Message::PushWidget(WidgetBank::Right));
+                let audio = Button::new("Audio").on_press(Message::AwaitDestination(BarWidget::Audio));
+                let workspaces = Button::new("Workspaces").on_press(Message::AwaitDestination(BarWidget::Workspaces));
+                settings = settings
+                    .push(barleft)
+                    .push(barcenter)
+                    .push(barright)
+                    .push(audio)
+                    .push(workspaces);
             }
             Page::Init => {
                 

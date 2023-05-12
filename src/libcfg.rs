@@ -62,6 +62,28 @@ pub enum WorkAnimation {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+
+pub enum BarWidget {
+    #[default]
+    None,
+    Audio,
+    Backlight,
+    Battery,
+    Bluetooth,
+    Clock,
+    CPU,
+    Disk,
+    KeyboardState,
+    RAM,
+    Network,
+    Temperature,
+    Tray,
+    Taskbar,
+    Workspaces,
+    User
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum ShortcutKey {
     #[default]
     Super,
