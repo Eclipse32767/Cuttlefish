@@ -1,5 +1,5 @@
 use iced::theme::{self, Theme};
-use iced::{Result, Application, Settings, Alignment, Length, executor, widget};
+use iced::{Result, Application, Settings, Alignment, Length, executor};
 use iced::widget::{Button, Row, Column, Container, pick_list, Text, Scrollable};
 use iced::keyboard::KeyCode;
 use iced_style::Color;
@@ -131,7 +131,7 @@ enum Message { // The Message enum, used to send data to the configurator's upda
     WindowUpdate(iced::window::Event),
     AwaitDestination(BarWidget),
     PushWidget(WidgetBank),
-    RemoveWidget(WidgetBank, i32)
+    RemoveWidget(WidgetBank)
 }
 #[derive(Debug, Clone)]
 enum IncrVal {
@@ -657,23 +657,58 @@ impl Application for Configurator {
                 iced::Command::none()
             }
             Message::PushWidget(bank) => {
-                match bank {
-                    WidgetBank::Left => {
-                        self.bar_left.push(self.next_widget);
+                if self.next_widget != BarWidget::None {
+                    match bank {
+                        WidgetBank::Left => {
+                            self.bar_left.push(self.next_widget);
+                        }
+                        WidgetBank::Center => {
+                            self.bar_center.push(self.next_widget);
+                        }
+                        WidgetBank::Right => {
+                            self.bar_right.push(self.next_widget);
+                        }
                     }
-                    WidgetBank::Center => {
-                        self.bar_center.push(self.next_widget);
-                    }
-                    WidgetBank::Right => {
-                        self.bar_right.push(self.next_widget);
-                    }
-                }
+                };
                 println!("{:?}", self.bar_left);
                 println!("{}", self.bar_center.len());
                 self.next_widget = BarWidget::None;
                 iced::Command::none()
             }
-            Message::RemoveWidget(bank, index) => {
+            Message::RemoveWidget(bank) => {
+                let left = self.bar_left.len();
+                let right = self.bar_right.len();
+                let center = self.bar_center.len();
+                let pulled = match bank {
+                    WidgetBank::Left => {
+                        let val;
+                        if left > 0 {
+                            val = left - 1;
+                            self.bar_left.remove(val)
+                        } else {
+                            BarWidget::None
+                        }
+                    },
+                    WidgetBank::Center => {
+                        let val;
+                        if left > 0 {
+                            val = center - 1;
+                            self.bar_center.remove(val)
+                        } else {
+                            BarWidget::None
+                        }
+                    },
+                    WidgetBank::Right => {
+                        let val;
+                        if left > 0 {
+                            val = right - 1;
+                            self.bar_right.remove(val)
+                        } else {
+                            BarWidget::None
+                        }
+                    },
+                };
+                println!("{:?}", pulled);
                 iced::Command::none()
             }
             Message::AwaitDestination(x) => {
@@ -1134,16 +1169,69 @@ impl Application for Configurator {
                     .push(scratchscrow);
             }
             Page::Bar => {
+                let mut left_contents = String::from("");
+                if self.bar_left.len() > 0 {
+                    for i in 0..self.bar_left.len() {
+                        left_contents = format!("{left_contents}  {:#?}", self.bar_left[i]);
+                    }
+                }
+                let mut right_contents = String::from("");
+                if self.bar_right.len() > 0 {
+                    for i in 0..self.bar_right.len() {
+                        right_contents = format!("{right_contents}  {:#?}", self.bar_right[i]);
+                    }
+                }
+                let mut center_contents = String::from("");
+                if self.bar_center.len() > 0 {
+                    for i in 0..self.bar_center.len() {
+                        center_contents = format!("{center_contents}  {:#?}", self.bar_center[i]);
+                    }
+                }
                 let barleft = Button::new("left").on_press(Message::PushWidget(WidgetBank::Left));
                 let barcenter = Button::new("center").on_press(Message::PushWidget(WidgetBank::Center));
                 let barright = Button::new("right").on_press(Message::PushWidget(WidgetBank::Right));
                 let audio = Button::new("Audio").on_press(Message::AwaitDestination(BarWidget::Audio));
+                let backlight = Button::new("Backlight").on_press(Message::AwaitDestination(BarWidget::Backlight));
+                let battery = Button::new("Battery").on_press(Message::AwaitDestination(BarWidget::Battery));
+                let bluetooth = Button::new("Bluetooth").on_press(Message::AwaitDestination(BarWidget::Bluetooth));
+                let cpu = Button::new("CPU").on_press(Message::AwaitDestination(BarWidget::CPU));
+                let clock = Button::new("Clock").on_press(Message::AwaitDestination(BarWidget::Clock));
+                let disk = Button::new("Disk").on_press(Message::AwaitDestination(BarWidget::Disk));
+                let keyboard = Button::new("Keyboard State").on_press(Message::AwaitDestination(BarWidget::KeyboardState));
+                let network = Button::new("Network").on_press(Message::AwaitDestination(BarWidget::Network));
+                let ram = Button::new("RAM").on_press(Message::AwaitDestination(BarWidget::RAM));
+                let taskbar = Button::new("Taskbar").on_press(Message::AwaitDestination(BarWidget::Taskbar));
+                let temperature = Button::new("Temperature").on_press(Message::AwaitDestination(BarWidget::Temperature));
+                let tray = Button::new("System Tray").on_press(Message::AwaitDestination(BarWidget::Tray));
+                let user = Button::new("Current User").on_press(Message::AwaitDestination(BarWidget::User));
                 let workspaces = Button::new("Workspaces").on_press(Message::AwaitDestination(BarWidget::Workspaces));
+                let removeleft = Button::new("remove").on_press(Message::RemoveWidget(WidgetBank::Left));
+                let removecenter = Button::new("remove").on_press(Message::RemoveWidget(WidgetBank::Center));
+                let removeright = Button::new("remove").on_press(Message::RemoveWidget(WidgetBank::Right));
+                let labelleft = Text::new(left_contents);
+                let labelright = Text::new(right_contents);
+                let labelcenter = Text::new(center_contents);
+                let left_row = Row::new().push(barleft).push(labelleft).push(removeleft).spacing(10);
+                let center_row = Row::new().push(barcenter).push(labelcenter).push(removecenter).spacing(10);
+                let right_row = Row::new().push(barright).push(labelright).push(removeright).spacing(10);
                 settings = settings
-                    .push(barleft)
-                    .push(barcenter)
-                    .push(barright)
+                    .push(left_row)
+                    .push(center_row)
+                    .push(right_row)
                     .push(audio)
+                    .push(backlight)
+                    .push(battery)
+                    .push(bluetooth)
+                    .push(cpu)
+                    .push(clock)
+                    .push(disk)
+                    .push(keyboard)
+                    .push(network)
+                    .push(ram)
+                    .push(taskbar)
+                    .push(temperature)
+                    .push(tray)
+                    .push(user)
                     .push(workspaces);
             }
             Page::Init => {
