@@ -209,7 +209,7 @@ impl Application for Configurator {
                         self.indexmax = 6;
                     }
                     Page::Bar => {
-                        self.indexmax = 0;
+                        self.indexmax = 7;
                     }
                     Page::Init => {
                         self.indexmax = 0;
@@ -283,7 +283,7 @@ impl Application for Configurator {
                                                 Page::Anim
                                             }
                                             Page::Init => {
-                                                self.indexmax = 0;
+                                                self.indexmax = 7;
                                                 Page::Bar
                                             }
                                         };
@@ -307,7 +307,7 @@ impl Application for Configurator {
                                                 Page::Anim
                                             }
                                             Page::Anim => {
-                                                self.indexmax = 0;
+                                                self.indexmax = 7;
                                                 Page::Bar
                                             }
                                             Page::Bar => {
@@ -356,7 +356,21 @@ impl Application for Configurator {
                                             }
                                         }
                                         Page::Bar => {
-
+                                            if self.index >= 5 {
+                                                if self.next_widget != BarWidget::None {
+                                                    if self.index == 5 {
+                                                        self.bar_left.push(self.next_widget);
+                                                    } else if self.index == 6 {
+                                                        self.bar_center.push(self.next_widget);
+                                                    } else if self.index == 7 {
+                                                        self.bar_right.push(self.next_widget);
+                                                    }
+                                                };
+                                                println!("{:?}", self.bar_left);
+                                                println!("{}", self.bar_center.len());
+                                                self.next_widget = BarWidget::None;
+                                                self.unsaved = true;
+                                            }
                                         }
                                         Page::Init => {
 
@@ -408,6 +422,18 @@ impl Application for Configurator {
                                             self.work_anim = Some(WorkAnimation::None);
                                             self.unsaved = true;
                                         }
+                                    } else if self.current_page == Page::Bar {
+                                        if self.index == 0 {
+                                            self.next_widget = BarWidget::Audio;
+                                        } else if self.index == 1 {
+                                            self.next_widget = BarWidget::Bluetooth;
+                                        } else if self.index == 2 {
+                                            self.next_widget = BarWidget::Disk;
+                                        } else if self.index == 3 {
+                                            self.next_widget = BarWidget::RAM;
+                                        } else if self.index == 4 {
+                                            self.next_widget = BarWidget::Tray;
+                                        }
                                     }
                                 } else if key_code == KeyCode::Key2 {
                                     if self.current_page == Page::Main {
@@ -449,6 +475,18 @@ impl Application for Configurator {
                                             self.work_anim = Some(WorkAnimation::Slide);
                                             self.unsaved = true;
                                         }
+                                    } else if self.current_page == Page::Bar {
+                                        if self.index == 0 {
+                                            self.next_widget = BarWidget::Backlight;
+                                        } else if self.index == 1 {
+                                            self.next_widget = BarWidget::CPU;
+                                        } else if self.index == 2 {
+                                            self.next_widget = BarWidget::KeyboardState;
+                                        } else if self.index == 3 {
+                                            self.next_widget = BarWidget::Taskbar;
+                                        } else if self.index == 4 {
+                                            self.next_widget = BarWidget::User;
+                                        }
                                     }
                                 } else if key_code == KeyCode::Key3 {
                                     if self.current_page == Page::Main {
@@ -489,6 +527,18 @@ impl Application for Configurator {
                                         } else if self.index == 4 {
                                             self.work_anim = Some(WorkAnimation::SlideVert);
                                             self.unsaved = true;
+                                        }
+                                    } else if self.current_page == Page::Bar {
+                                        if self.index == 0 {
+                                            self.next_widget = BarWidget::Battery;
+                                        } else if self.index == 1 {
+                                            self.next_widget = BarWidget::Clock;
+                                        } else if self.index == 2 {
+                                            self.next_widget = BarWidget::Network;
+                                        } else if self.index == 3 {
+                                            self.next_widget = BarWidget::Temperature;
+                                        } else if self.index == 4 {
+                                            self.next_widget = BarWidget::Workspaces;
                                         }
                                     }
                                 } else if key_code == KeyCode::Key4 {
@@ -537,6 +587,25 @@ impl Application for Configurator {
                                             self.unsaved = true;
                                         } else if self.index == 2 && self.border.radius > 0 {
                                             self.border.radius = self.border.radius - 1;
+                                            self.unsaved = true;
+                                        }
+                                    }
+                                } else if key_code == KeyCode::Backspace {
+                                    if self.current_page == Page::Bar {
+                                        if self.index >= 5 {
+                                            let left = self.bar_left.len();
+                                            let right = self.bar_right.len();
+                                            let center = self.bar_center.len();
+                                            if self.index == 5 && left > 0{
+                                                let val = left - 1;
+                                                self.bar_left.remove(val);
+                                            } else if self.index == 6 && center > 0 {
+                                                let val = center - 1;
+                                                self.bar_center.remove(val);
+                                            } else if self.index == 7 && right > 0 {
+                                                let val = right - 1;
+                                                self.bar_right.remove(val);
+                                            }
                                             self.unsaved = true;
                                         }
                                     }
@@ -1211,14 +1280,42 @@ impl Application for Configurator {
                 let labelleft = Text::new(left_contents);
                 let labelright = Text::new(right_contents);
                 let labelcenter = Text::new(center_contents);
-                let left_row = Row::new().push(barleft).push(labelleft).push(removeleft).spacing(10);
-                let center_row = Row::new().push(barcenter).push(labelcenter).push(removecenter).spacing(10);
-                let right_row = Row::new().push(barright).push(labelright).push(removeright).spacing(10);
-                let widget_row_i = Row::new().push(audio).push(backlight).push(battery).spacing(10);
-                let widget_row_ii = Row::new().push(bluetooth).push(cpu).push(clock).spacing(10);
-                let widget_row_iii = Row::new().push(disk).push(keyboard).push(network).spacing(10);
-                let widget_row_iv = Row::new().push(ram).push(taskbar).push(temperature).spacing(10);
-                let widget_row_v = Row::new().push(tray).push(user).push(workspaces).spacing(10);
+                
+                let mut left_row = Row::new();
+                let mut center_row = Row::new();
+                let mut right_row = Row::new();
+                let mut widget_row_i = Row::new();
+                let mut widget_row_ii = Row::new();
+                let mut widget_row_iii = Row::new();
+                let mut widget_row_iv = Row::new();
+                let mut widget_row_v = Row::new();
+
+                if self.index == 0 {
+                    widget_row_i = widget_row_i.push(selectionmarker)
+                } else if self.index == 1 {
+                    widget_row_ii = widget_row_ii.push(selectionmarker)
+                } else if self.index == 2 {
+                    widget_row_iii = widget_row_iii.push(selectionmarker)
+                } else if self.index == 3 {
+                    widget_row_iv = widget_row_iv.push(selectionmarker)
+                } else if self.index == 4 {
+                    widget_row_v = widget_row_v.push(selectionmarker)
+                } else if self.index == 5 {
+                    left_row = left_row.push(selectionmarker) 
+                } else if self.index == 6 {
+                    center_row = center_row.push(selectionmarker)
+                } else if self.index == 7 {
+                    right_row = right_row.push(selectionmarker)
+                }
+                
+                left_row = left_row.push(barleft).push(labelleft).push(removeleft).spacing(10);
+                center_row = center_row.push(barcenter).push(labelcenter).push(removecenter).spacing(10);
+                right_row = right_row.push(barright).push(labelright).push(removeright).spacing(10);
+                widget_row_i = widget_row_i.push(audio).push(backlight).push(battery).spacing(10);
+                widget_row_ii = widget_row_ii.push(bluetooth).push(cpu).push(clock).spacing(10);
+                widget_row_iii = widget_row_iii.push(disk).push(keyboard).push(network).spacing(10);
+                widget_row_iv = widget_row_iv.push(ram).push(taskbar).push(temperature).spacing(10);
+                widget_row_v = widget_row_v.push(tray).push(user).push(workspaces).spacing(10);
 
                 settings = settings
                     .push(widget_row_i)
