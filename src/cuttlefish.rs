@@ -738,6 +738,7 @@ impl Application for Configurator {
                             self.bar_right.push(self.next_widget);
                         }
                     }
+                    self.unsaved = true;
                 };
                 println!("{:?}", self.bar_left);
                 println!("{}", self.bar_center.len());
@@ -777,6 +778,7 @@ impl Application for Configurator {
                         }
                     },
                 };
+                self.unsaved = true;
                 println!("{:?}", pulled);
                 iced::Command::none()
             }
