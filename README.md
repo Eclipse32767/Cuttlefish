@@ -1,5 +1,7 @@
 # Welcome to the Cuttlefish Project!
 
+[![Please Don't ship WIP](https://img.shields.io/badge/Please-Don't%20Ship%20WIP-yellow)](https://dont-ship.it/)
+
 This is a project developed in rust that seeks to provide a feature-complete configuration GUI and manual for Hyprland and waybar, for the purposes of making them easier to begin using for the average user.
 
 ## Goals of the Project
