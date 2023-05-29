@@ -1261,27 +1261,48 @@ impl Application for Configurator {
                 let barleft = Button::new("left").on_press(Message::PushWidget(WidgetBank::Left)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let barcenter = Button::new("center").on_press(Message::PushWidget(WidgetBank::Center)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let barright = Button::new("right").on_press(Message::PushWidget(WidgetBank::Right)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let audio = Button::new("Audio").on_press(Message::AwaitDestination(BarWidget::Audio)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let backlight = Button::new("Backlight").on_press(Message::AwaitDestination(BarWidget::Backlight)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let battery = Button::new("Battery").on_press(Message::AwaitDestination(BarWidget::Battery)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let bluetooth = Button::new("Bluetooth").on_press(Message::AwaitDestination(BarWidget::Bluetooth)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let cpu = Button::new("CPU").on_press(Message::AwaitDestination(BarWidget::CPU)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let clock = Button::new("Clock").on_press(Message::AwaitDestination(BarWidget::Clock)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let disk = Button::new("Disk").on_press(Message::AwaitDestination(BarWidget::Disk)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let keyboard = Button::new("Keyboard State").on_press(Message::AwaitDestination(BarWidget::KeyboardState)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let network = Button::new("Network").on_press(Message::AwaitDestination(BarWidget::Network)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let ram = Button::new("RAM").on_press(Message::AwaitDestination(BarWidget::RAM)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let taskbar = Button::new("Taskbar").on_press(Message::AwaitDestination(BarWidget::Taskbar)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let temperature = Button::new("Temperature").on_press(Message::AwaitDestination(BarWidget::Temperature)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let tray = Button::new("System Tray").on_press(Message::AwaitDestination(BarWidget::Tray)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let user = Button::new("Current User").on_press(Message::AwaitDestination(BarWidget::User)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let workspaces = Button::new("Workspaces").on_press(Message::AwaitDestination(BarWidget::Workspaces)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut audio = Button::new("Audio").on_press(Message::AwaitDestination(BarWidget::Audio)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut backlight = Button::new("Backlight").on_press(Message::AwaitDestination(BarWidget::Backlight)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut battery = Button::new("Battery").on_press(Message::AwaitDestination(BarWidget::Battery)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut bluetooth = Button::new("Bluetooth").on_press(Message::AwaitDestination(BarWidget::Bluetooth)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut cpu = Button::new("CPU").on_press(Message::AwaitDestination(BarWidget::CPU)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut clock = Button::new("Clock").on_press(Message::AwaitDestination(BarWidget::Clock)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut disk = Button::new("Disk").on_press(Message::AwaitDestination(BarWidget::Disk)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut keyboard = Button::new("Keyboard State").on_press(Message::AwaitDestination(BarWidget::KeyboardState)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut network = Button::new("Network").on_press(Message::AwaitDestination(BarWidget::Network)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut ram = Button::new("RAM").on_press(Message::AwaitDestination(BarWidget::RAM)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut taskbar = Button::new("Taskbar").on_press(Message::AwaitDestination(BarWidget::Taskbar)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut temperature = Button::new("Temperature").on_press(Message::AwaitDestination(BarWidget::Temperature)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut tray = Button::new("System Tray").on_press(Message::AwaitDestination(BarWidget::Tray)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut user = Button::new("Current User").on_press(Message::AwaitDestination(BarWidget::User)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut workspaces = Button::new("Workspaces").on_press(Message::AwaitDestination(BarWidget::Workspaces)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let removeleft = Button::new("remove").on_press(Message::RemoveWidget(WidgetBank::Left)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let removecenter = Button::new("remove").on_press(Message::RemoveWidget(WidgetBank::Center)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let removeright = Button::new("remove").on_press(Message::RemoveWidget(WidgetBank::Right)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let labelleft = Text::new(left_contents);
                 let labelright = Text::new(right_contents);
                 let labelcenter = Text::new(center_contents);
+
+                match self.next_widget {
+                    BarWidget::None => {
+
+                    },
+                    BarWidget::Audio => audio = audio.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
+                    BarWidget::Backlight => backlight = backlight.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
+                    BarWidget::Battery => battery = battery.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
+                    BarWidget::Bluetooth => bluetooth = bluetooth.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
+                    BarWidget::Clock => clock = clock.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
+                    BarWidget::CPU => cpu = cpu.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
+                    BarWidget::Disk => disk = disk.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
+                    BarWidget::KeyboardState => keyboard = keyboard.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
+                    BarWidget::RAM => ram = ram.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
+                    BarWidget::Network => network = network.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
+                    BarWidget::Temperature => temperature = temperature.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
+                    BarWidget::Tray => tray = tray.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
+                    BarWidget::Taskbar => taskbar = taskbar.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
+                    BarWidget::Workspaces => workspaces = workspaces.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
+                    BarWidget::User => user = user.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
+                }
                 
                 let mut left_row = Row::new();
                 let mut center_row = Row::new();
