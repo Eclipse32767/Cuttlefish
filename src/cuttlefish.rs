@@ -153,7 +153,7 @@ pub enum Page { //page enum, used to store the currently focused page
 impl std::fmt::Display for Page {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let locale = get_lang();
-        let pretty = locale.prettyprint.unwrap();
+        let pretty = locale.prettyprint;
         write!(
             f,
             "{}",
@@ -180,8 +180,7 @@ impl Application for Configurator {
         )
     }
     fn title(&self) -> String { //code that sets the app title
-        let globalstr = self.locale.global.as_ref().unwrap();
-        let title = globalstr.title.clone();
+        let title = self.locale.global.title.clone();
         format!("{title}{}", self.current_page.to_string())
     }
     fn update(&mut self, message: Self::Message) -> iced::Command<Message> { //update function, parses messages
@@ -911,17 +910,12 @@ impl Application for Configurator {
         };
 
         let selectionmarker: Text = Text::new("=>");
-        let globalstr = self.locale.global.as_ref().unwrap();
-        let mainstr = self.locale.mainpage.as_ref().unwrap();
-        let bindstr = self.locale.bindpage.as_ref().unwrap();
-        let animstr = self.locale.animpage.as_ref().unwrap();
 
-        let maintxt = String::as_str(&globalstr.main);
-        let bindtxt = String::as_str(&globalstr.bind);
-        let bartxt = String::as_str(&globalstr.bar);
-        let inittxt = String::as_str(&globalstr.init);
-        let animtxt = String::as_str(&globalstr.anim);
-        let pagetxt = String::as_str(&globalstr.label);
+        let maintxt = Text::new(self.locale.global.main.clone());
+        let bindtxt = Text::new(self.locale.global.bind.clone());
+        let bartxt = Text::new(self.locale.global.bar.clone());
+        let inittxt = Text::new(self.locale.global.init.clone());
+        let animtxt = Text::new(self.locale.global.anim.clone());
         let mut pagemain = Button::new(maintxt)
             .on_press(Message::PageChanged(Page::Main))
             .width(150)
@@ -942,7 +936,7 @@ impl Application for Configurator {
             .on_press(Message::PageChanged(Page::Anim))
             .width(150)
             .style(theme::Button::Custom(std::boxed::Box::new(sidebar_active_btn.clone())));
-        let pagelabel = Text::new(pagetxt);
+        let pagelabel = Text::new(self.locale.global.label.clone());
         match self.current_page {
             Page::Main => {
                 pagemain = pagemain.style(theme::Button::Custom(std::boxed::Box::new(sidebar_inactive_btn.clone())));
@@ -971,8 +965,8 @@ impl Application for Configurator {
             .align_items(Alignment::Start);
 
         let save;
-        let savetxt = String::as_str(&globalstr.save);
-        let savedtxt = String::as_str(&globalstr.saved);
+        let savetxt = Text::new(self.locale.global.save.clone());
+        let savedtxt = Text::new(self.locale.global.saved.clone());
         if self.unsaved {
             save = Button::new(savetxt)
             .on_press(Message::Save)
@@ -1008,24 +1002,23 @@ impl Application for Configurator {
                     .placeholder("choose")
                     .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
                 let primarytxt;
-                let temp_primary = format!("{}{}", globalstr.primary, globalstr.primary_addendum);
+                let temp_primary = format!("{}{}", self.locale.global.primary, self.locale.global.primary_addendum);
                 let secondarytxt;
-                let temp_secondary = format!("{}{}", globalstr.secondary, globalstr.secondary_addendum);
+                let temp_secondary = format!("{}{}", self.locale.global.secondary, self.locale.global.secondary_addendum);
                 if self.width == ShrinkValue::Full {
-                    primarytxt = String::as_str(&temp_primary);
-                    secondarytxt = String::as_str(&temp_secondary);
+                    primarytxt = temp_primary;
+                    secondarytxt = temp_secondary;
                 } else {
-                    primarytxt = String::as_str(&globalstr.primary);
-                    secondarytxt = String::as_str(&globalstr.secondary);
+                    primarytxt = self.locale.global.primary.clone();
+                    secondarytxt = self.locale.global.secondary.clone();
                 }
                 
-                let primarylabel: Text = Text::new(primarytxt.to_owned());
-                let secondarylabel: Text = Text::new(secondarytxt.to_owned());
+                let primarylabel: Text = Text::new(primarytxt);
+                let secondarylabel: Text = Text::new(secondarytxt);
 
-                let lighttxt = String::as_str(&mainstr.light);
-                let darktxt = String::as_str(&mainstr.dark);
-                let themetxt = String::as_str(&mainstr.theme);
-                let customtxt = String::as_str(&mainstr.custom);
+                let lighttxt = Text::new(self.locale.mainpage.light.clone());
+                let darktxt = Text::new(self.locale.mainpage.dark.clone());
+                let customtxt = Text::new(self.locale.mainpage.custom.clone());
                 let mut light = Button::new(lighttxt)
                     .on_press(Message::ThemeChanged(OurTheme::Light))
                     .style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
@@ -1035,7 +1028,7 @@ impl Application for Configurator {
                 let mut custom = Button::new(customtxt)
                     .on_press(Message::ThemeChanged(OurTheme::Custom))
                     .style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let themelabel = Text::new(themetxt);
+                let themelabel = Text::new(self.locale.mainpage.theme.clone());
                 match self.theme {
                     OurTheme::Light => {
                         light = light.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
@@ -1091,21 +1084,21 @@ impl Application for Configurator {
                     .placeholder("choose")
                     .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
                 let primarytxt;
-                let temp_primary = format!("{}{}", globalstr.primary, globalstr.primary_addendum);
+                let temp_primary = format!("{}{}", self.locale.global.primary, self.locale.global.primary_addendum);
                 let secondarytxt;
-                let temp_secondary = format!("{}{}", globalstr.secondary, globalstr.secondary_addendum);
+                let temp_secondary = format!("{}{}", self.locale.global.secondary, self.locale.global.secondary_addendum);
                 if self.width == ShrinkValue::Full {
-                    primarytxt = String::as_str(&temp_primary);
-                    secondarytxt = String::as_str(&temp_secondary);
+                    primarytxt = temp_primary;
+                    secondarytxt = temp_secondary;
                 } else {
-                    primarytxt = String::as_str(&globalstr.primary);
-                    secondarytxt = String::as_str(&globalstr.secondary);
+                    primarytxt = self.locale.global.primary.clone();
+                    secondarytxt = self.locale.global.secondary.clone();
                 }
-                let primarylabel: Text = Text::new(primarytxt.to_owned());
-                let secondarylabel: Text = Text::new(secondarytxt.to_owned());
+                let primarylabel: Text = Text::new(primarytxt);
+                let secondarylabel: Text = Text::new(secondarytxt);
 
 
-                let exitsclabel = Text::new(bindstr.exit.clone());
+                let exitsclabel = Text::new(self.locale.bindpage.exit.clone());
                 let exitheaderselect = pick_list(
                 &BindKey::ALL[..], 
                 self.exit_header, 
@@ -1113,9 +1106,9 @@ impl Application for Configurator {
                 )
                 .placeholder("choose")
                 .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
-                let exitkey = String::as_str(&self.exit_key);
+                let exitkey = Text::new(self.exit_key.clone());
                 let mut exitkeyselect = Button::new(exitkey).on_press(Message::Capture(CaptureInput::ExitKey)).width(50).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let launchsclabel: Text = Text::new(bindstr.launch.clone());
+                let launchsclabel: Text = Text::new(self.locale.bindpage.launch.clone());
                 let launchheaderselect = pick_list(
                     &BindKey::ALL[..], 
                     self.launch_header, 
@@ -1123,9 +1116,9 @@ impl Application for Configurator {
                     )
                     .placeholder("choose")
                     .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
-                let launchkey = String::as_str(&self.launch_key);
+                let launchkey = Text::new(self.launch_key.clone());
                 let mut launchkeyselect = Button::new(launchkey).on_press(Message::Capture(CaptureInput::LaunchKey)).width(50).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let killsclabel: Text = Text::new(bindstr.kill.clone());
+                let killsclabel: Text = Text::new(self.locale.bindpage.kill.clone());
                 let killheaderselect = pick_list(
                     &BindKey::ALL[..], 
                     self.kill_header, 
@@ -1133,9 +1126,9 @@ impl Application for Configurator {
                     )
                     .placeholder("choose")
                     .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
-                let killkey = String::as_str(&self.kill_key);
+                let killkey = Text::new(self.kill_key.clone());
                 let mut killkeyselect = Button::new(killkey).on_press(Message::Capture(CaptureInput::KillKey)).width(50).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let minisclabel: Text = Text::new(bindstr.mini.clone());
+                let minisclabel: Text = Text::new(self.locale.bindpage.mini.clone());
                 let miniheaderselect = pick_list(
                  &BindKey::ALL[..], 
                  self.minimize_header, 
@@ -1143,9 +1136,9 @@ impl Application for Configurator {
                  )
                     .placeholder("choose")
                     .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
-                let minikey = String::as_str(&self.minimize_key);
+                let minikey = Text::new(self.minimize_key.clone());
                 let mut minikeyselect = Button::new(minikey).on_press(Message::Capture(CaptureInput::MiniKey)).width(50).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let scratchsclabel: Text = Text::new(bindstr.scratch.clone());
+                let scratchsclabel: Text = Text::new(self.locale.bindpage.scratch.clone());
                 let scratchheaderselect = pick_list(
                     &BindKey::ALL[..], 
                     self.scratch_header, 
@@ -1153,7 +1146,7 @@ impl Application for Configurator {
                     )
                     .placeholder("choose")
                     .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
-                let scratchkey = String::as_str(&self.scratch_key);
+                let scratchkey = Text::new(self.scratch_key.clone());
                 let mut scratchkeyselect = Button::new(scratchkey).on_press(Message::Capture(CaptureInput::ScratchKey)).width(50).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 
                 match self.capturenext.as_ref().unwrap() {
@@ -1358,21 +1351,21 @@ impl Application for Configurator {
                 let widthincr = Button::new("+").on_press(Message::Incr(IncrVal::WidthVal)).width(30).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let mut widthdecr = Button::new("-").on_press(Message::Decr(IncrVal::WidthVal)).width(30).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let widthvaluepeek = Text::new(format!("{}", self.border.width));
-                let widthlabel = Text::new(animstr.width.clone());
+                let widthlabel = Text::new(self.locale.animpage.width.clone());
 
                 let mut widthrow = Row::new().spacing(10);
 
                 let gapsincr = Button::new("+").on_press(Message::Incr(IncrVal::GapsVal)).width(30).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let mut gapsdecr = Button::new("-").on_press(Message::Decr(IncrVal::GapsVal)).width(30).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let gapsvaluepeek = Text::new(format!("{}", self.border.gaps));
-                let gapslabel = Text::new(animstr.gaps.clone());
+                let gapslabel = Text::new(self.locale.animpage.gaps.clone());
 
                 let mut gapsrow = Row::new().spacing(10);
 
                 let radincr = Button::new("+").on_press(Message::Incr(IncrVal::RadiusVal)).width(30).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let mut raddecr = Button::new("-").on_press(Message::Decr(IncrVal::RadiusVal)).width(30).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let radvaluepeek = Text::new(format!("{}", self.border.radius));
-                let radlabel = Text::new(animstr.radius.clone());
+                let radlabel = Text::new(self.locale.animpage.radius.clone());
 
                 let mut radrow = Row::new().spacing(10);
 
@@ -1383,7 +1376,7 @@ impl Application for Configurator {
                     )
                     .placeholder("choose")
                     .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
-                let winlabel = Text::new(animstr.winanim.clone());
+                let winlabel = Text::new(self.locale.animpage.winanim.clone());
 
                 let mut winrow = Row::new().spacing(10);
 
@@ -1394,15 +1387,15 @@ impl Application for Configurator {
                     )
                     .placeholder("choose")
                     .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
-                let worklabel = Text::new(animstr.workanim.clone());
+                let worklabel = Text::new(self.locale.animpage.workanim.clone());
 
                 let mut workrow = Row::new().spacing(10);
 
-                let enable = String::as_str(&animstr.enableblur);
-                let disable = String::as_str(&animstr.disableblur);
-                let enabled = String::as_str(&animstr.enabledblur);
-                let disabled = String::as_str(&animstr.disabledblur);
-                let blurlabel = Text::new(animstr.blur.clone());
+                let enable = Text::new(self.locale.animpage.enableblur.clone());
+                let disable = Text::new(self.locale.animpage.disableblur.clone());
+                let enabled = Text::new(self.locale.animpage.enabledblur.clone());
+                let disabled = Text::new(self.locale.animpage.disabledblur.clone());
+                let blurlabel = Text::new(self.locale.animpage.blur.clone());
                 let mut bluron = Button::new(enable).on_press(Message::BlurToggled(true)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 let mut bluroff = Button::new(disable).on_press(Message::BlurToggled(false)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
                 if self.blur {

@@ -5,13 +5,13 @@ use crate::liblocale;
 
 #[derive(Deserialize, Debug, Serialize)]
 pub struct Translation {
-    pub(crate) global: Option<PageGlobals>,
-    pub(crate) mainpage: Option<MainPage>,
-    pub(crate) bindpage: Option<BindPage>,
-    pub(crate) autopage: Option<AutoPage>,
-    pub(crate) barpage: Option<BarPage>,
-    pub(crate) prettyprint: Option<PrettyPrint>,
-    pub(crate) animpage: Option<AnimPage>,
+    pub(crate) global: PageGlobals,
+    pub(crate) mainpage: MainPage,
+    pub(crate) bindpage: BindPage,
+    pub(crate) autopage: AutoPage,
+    pub(crate) barpage: BarPage,
+    pub(crate) prettyprint: PrettyPrint,
+    pub(crate) animpage: AnimPage,
 }
 #[derive(Deserialize, Debug, Serialize)]
 pub struct MainPage {

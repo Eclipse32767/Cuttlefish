@@ -2,7 +2,7 @@
 use serde_derive::{Deserialize, Serialize};
 use toml::{self, from_str, to_string};
 use std::fs::read_to_string;
-use std::{env};
+use std::env;
 use std::process::Command;
 use std::fs;
 use langcfg::get_lang;
@@ -133,7 +133,7 @@ impl WorkAnimation {
 impl std::fmt::Display for ShortcutKey {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let locale = get_lang();
-        let pretty = locale.prettyprint.unwrap();
+        let pretty = locale.prettyprint;
         write!(
             f,
             "{}",
@@ -149,7 +149,7 @@ impl std::fmt::Display for ShortcutKey {
 impl std::fmt::Display for BindKey {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let locale = get_lang();
-        let pretty = locale.prettyprint.unwrap();
+        let pretty = locale.prettyprint;
         write!(
             f,
             "{}",
@@ -164,7 +164,7 @@ impl std::fmt::Display for BindKey {
 impl std::fmt::Display for WindowAnimation {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let locale = get_lang();
-        let pretty = locale.prettyprint.unwrap();
+        let pretty = locale.prettyprint;
         write!(
             f,
             "{}",
@@ -179,7 +179,7 @@ impl std::fmt::Display for WindowAnimation {
 impl std::fmt::Display for WorkAnimation {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let locale = get_lang();
-        let pretty = locale.prettyprint.unwrap();
+        let pretty = locale.prettyprint;
         write!(
             f,
             "{}",

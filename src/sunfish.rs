@@ -1,7 +1,7 @@
 use iced::theme::{self, Theme};
 use iced::{Result, Settings, alignment, Alignment, Length, Application, Command, executor};
 use iced::widget::{Button, Row, Column, Container, Text, Scrollable};
-use iced_style::{Color};
+use iced_style::Color;
 use libcfg::{getcfgdata, decodetheme, OurTheme};
 mod libcfg;
 use langman::{get_lang, Translation};
@@ -172,9 +172,8 @@ impl Application for Manual {
                 shadow_offset: iced::Vector {x: 0.0, y: 0.0}
             }
         };
-        let globalstr = self.locale.globals.as_ref().unwrap();
-        let backtxt = String::as_str(&globalstr.backtxt);
-        let forwardtxt = String::as_str(&globalstr.forwardtxt);
+        let backtxt = String::as_str(&self.locale.globals.backtxt);
+        let forwardtxt = String::as_str(&self.locale.globals.forwardtxt);
         let mut pageleft = Button::new(backtxt)
             .on_press(Message::PageDecr)
             .style(theme::Button::Custom(std::boxed::Box::new(active_btn.clone())));
@@ -188,24 +187,22 @@ impl Application for Manual {
         let pgnum = Text::new(format!("{humanpg}"));
         let mut pgtitle = Text::new("Page Title").horizontal_alignment(alignment::Horizontal::Center);
         if self.current_page == 0 {
-            let navstr = self.locale.navigation.as_ref().unwrap();
             pageleft = pageleft.style(theme::Button::Custom(std::boxed::Box::new(inactive_btn.clone())));
-            let title = navstr.title.clone();
+            let title = self.locale.navigation.title.clone();
             pgtitle = Text::new(format!("{title}"));
             let primary_key = self.primary_key.clone();
             let secondary_key = self.secondary_key.clone();
-            let prefocus = navstr.prefocus.clone();
-            let focus = navstr.focus.clone();
-            let postfocus = navstr.postfocus.clone();
-            let premove = navstr.premove.clone();
-            let movestr = navstr.movetxt.clone();
-            let postmove = navstr.postmove.clone();
-            let immutable = navstr.immutable.clone();
+            let prefocus = self.locale.navigation.prefocus.clone();
+            let focus = self.locale.navigation.focus.clone();
+            let postfocus = self.locale.navigation.postfocus.clone();
+            let premove = self.locale.navigation.premove.clone();
+            let movestr = self.locale.navigation.movetxt.clone();
+            let postmove = self.locale.navigation.postmove.clone();
+            let immutable = self.locale.navigation.immutable.clone();
             let text = Text::new(format!("{prefocus}{primary_key}{focus}{postfocus}{premove}{primary_key}+{secondary_key}{movestr}{postmove}{immutable}")).horizontal_alignment(alignment::Horizontal::Center);
             settings = settings.push(text);
         } else if self.current_page == 1 {
-            let advstr = self.locale.advanced.as_ref().unwrap();
-            let title = advstr.title.clone();
+            let title = self.locale.advanced.title.clone();
             pgtitle = Text::new(format!("{title}"));
             let launchh = self.launch_header.clone();
             let launchk = self.launch_key.clone();
@@ -213,48 +210,46 @@ impl Application for Manual {
             let killk = self.kill_key.clone();
             let exith = self.exit_header.clone();
             let exitk = self.exit_key.clone();
-            let presearch = advstr.presearch.clone();
-            let search = advstr.search.clone();
-            let postsearch = advstr.postsearch.clone();
-            let prekill = advstr.prekill.clone();
-            let kill = advstr.kill.clone();
-            let postkill = advstr.postkill.clone();
-            let preexit = advstr.preexit.clone();
-            let exit = advstr.exit.clone();
-            let postexit = advstr.postexit.clone();
+            let presearch = self.locale.advanced.presearch.clone();
+            let search = self.locale.advanced.search.clone();
+            let postsearch = self.locale.advanced.postsearch.clone();
+            let prekill = self.locale.advanced.prekill.clone();
+            let kill = self.locale.advanced.kill.clone();
+            let postkill = self.locale.advanced.postkill.clone();
+            let preexit = self.locale.advanced.preexit.clone();
+            let exit = self.locale.advanced.exit.clone();
+            let postexit = self.locale.advanced.postexit.clone();
             let text = Text::new(format!("{presearch}{launchh}+{launchk}{search}{postsearch}{prekill}{killh}+{killk}{kill}{postkill}{preexit}{exith}+{exitk}{exit}{postexit}")).horizontal_alignment(alignment::Horizontal::Center);
             settings = settings.push(text);
         } else if self.current_page == 2 {
-            let workstr = self.locale.workspaces.as_ref().unwrap();
-            let title = workstr.title.clone();
+            let title = self.locale.workspaces.title.clone();
             pgtitle = Text::new(title);
             let primary_key = self.primary_key.clone();
             let secondary_key = self.secondary_key.clone();
-            let head = workstr.head.clone();
-            let prefocus = workstr.prefocus.clone();
-            let focus = workstr.focus.clone();
-            let postfocus = workstr.postfocus.clone();
-            let premove = workstr.premove.clone();
-            let movetxt = workstr.movetxt.clone();
-            let postmove = workstr.postmove.clone();
-            let immutable = workstr.immutable.clone();
+            let head = self.locale.workspaces.head.clone();
+            let prefocus = self.locale.workspaces.prefocus.clone();
+            let focus = self.locale.workspaces.focus.clone();
+            let postfocus = self.locale.workspaces.postfocus.clone();
+            let premove = self.locale.workspaces.premove.clone();
+            let movetxt = self.locale.workspaces.movetxt.clone();
+            let postmove = self.locale.workspaces.postmove.clone();
+            let immutable = self.locale.workspaces.immutable.clone();
             let text = Text::new(format!("{head}{prefocus}{primary_key}{focus}{postfocus}{premove}{primary_key}+{secondary_key}{movetxt}{postmove}{immutable}")).horizontal_alignment(alignment::Horizontal::Center);
             settings = settings.push(text);
         } else if self.current_page == 3 {
-            let ministr = self.locale.minimization.as_ref().unwrap();
             pageright = pageright.style(theme::Button::Custom(std::boxed::Box::new(inactive_btn.clone())));
-            let title = ministr.title.clone();
+            let title = self.locale.minimization.title.clone();
             pgtitle = Text::new(title);
             let minih = self.minimize_header.clone();
             let minik = self.minimize_key.clone();
             let scratchh = self.scratch_header.clone();
             let scratchk = self.scratch_key.clone();
-            let premove = ministr.premove.clone();
-            let movetxt = ministr.movetxt.clone();
-            let postmove = ministr.postmove.clone();
-            let prefocus = ministr.prefocus.clone();
-            let focus = ministr.focus.clone();
-            let postfocus = ministr.postfocus.clone();
+            let premove = self.locale.minimization.premove.clone();
+            let movetxt = self.locale.minimization.movetxt.clone();
+            let postmove = self.locale.minimization.postmove.clone();
+            let prefocus = self.locale.minimization.prefocus.clone();
+            let focus = self.locale.minimization.focus.clone();
+            let postfocus = self.locale.minimization.postfocus.clone();
             let text = Text::new(format!("{premove}{minih}+{minik}{movetxt}{postmove}{prefocus}{scratchh}+{scratchk}{focus}{postfocus}")).horizontal_alignment(alignment::Horizontal::Center);
             settings = settings.push(text);
         }

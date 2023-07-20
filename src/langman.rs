@@ -6,11 +6,11 @@ use crate::liblocale;
 
 #[derive(Deserialize, Debug, Serialize)]
 pub struct Translation {
-    pub(crate) globals: Option<GlobalStrings>,
-    pub(crate) navigation: Option<NavStrings>,
-    pub(crate) advanced: Option<AdvStrings>,
-    pub(crate) workspaces: Option<WorkStrings>,
-    pub(crate) minimization: Option<MiniStrings>
+    pub(crate) globals: GlobalStrings,
+    pub(crate) navigation: NavStrings,
+    pub(crate) advanced: AdvStrings,
+    pub(crate) workspaces: WorkStrings,
+    pub(crate) minimization: MiniStrings
 }
 #[derive(Deserialize, Debug, Serialize)]
 pub struct GlobalStrings {
