@@ -1,6 +1,6 @@
 #![allow(dead_code)]
-use iced_style::{Color, button, pick_list, menu, Background};
-use iced::Theme;
+use iced_style::{Color, button, pick_list, menu, Background, theme::Palette};
+use iced::theme::{self, Theme};
 use serde_derive::{Deserialize, Serialize};
 use toml::{self, from_str};
 use std::fs::read_to_string;
@@ -29,6 +29,14 @@ impl button::StyleSheet for ButtonStyle {
         }
     }
 }
+impl ButtonStyle {
+    pub fn mk_theme(&self) -> theme::Button {
+        theme::Button::Custom(std::boxed::Box::new(self.clone()))
+    }
+}
+pub fn mk_app_theme(palette: iced::theme::Palette) -> iced::Theme {
+    Theme::Custom(std::boxed::Box::new(iced::theme::Custom::new(palette)))
+}
 
 #[derive(Clone)]
 pub struct ListStyle {
@@ -37,7 +45,8 @@ pub struct ListStyle {
     pub handle_color: Color,
     pub border_radius: f32,
     pub border_width: f32,
-    pub border_color: Color
+    pub border_color: Color,
+    pub menu: MenuStyle,
 }
 impl pick_list::StyleSheet for ListStyle {
     type Style = Theme;
@@ -78,72 +87,28 @@ pub struct ButtonPair {
     pub active: ButtonStyle,
     pub inactive: ButtonStyle
 }
+#[derive(Clone)]
 pub struct ThemeCustom {
-    pub sidebar: ButtonPair,
-    pub body: ButtonPair,
-    pub menu: MenuStyle,
+    pub application: Palette,
+    pub secondary: ButtonStyle,
+    pub sidebar: ButtonStyle,
     pub list: ListStyle,
-    pub text: Color,
-    pub bg: Color
 }
 #[derive(Deserialize, Debug, Serialize)]
 pub struct ThemeFile {
-    pub app_style: Option<FileAppStyle>,
-    pub sidebar_style: Option<SidebarStyle>,
-    pub body_style: Option<BodyStyle>,
-    pub menu_style: Option<FileMenuStyle>,
-    pub list_style: Option<FileListStyle>,
-}
-#[derive(Deserialize, Debug, Serialize)]
-pub struct SidebarStyle {
-    pub border_radius: f32,
+    pub bg_color1: String,
+    pub bg_color2: String,
+    pub bg_color3: String,
     pub txt_color: String,
-    pub bg_color: String,
-    pub border_color: String,
-    pub border_width: f32,
-    pub de_border_radius: f32,
-    pub de_txt_color: String,
-    pub de_bg_color: String,
-    pub de_border_color: String,
-    pub de_border_width: f32
+    pub red: String,
+    pub orange: String,
+    pub yellow: String,
+    pub green: String,
+    pub blue: String,
+    pub purple: String,
+    pub pink: String
 }
-#[derive(Deserialize, Debug, Serialize)]
-pub struct BodyStyle {
-    pub border_radius: f32,
-    pub txt_color: String,
-    pub bg_color: String,
-    pub border_color: String,
-    pub border_width: f32,
-    pub de_border_radius: f32,
-    pub de_txt_color: String,
-    pub de_bg_color: String,
-    pub de_border_color: String,
-    pub de_border_width: f32
-}
-#[derive(Deserialize, Debug, Serialize)]
-pub struct FileMenuStyle {
-    pub txt_color: String,
-    pub bg_color: String,
-    pub border_width: f32,
-    pub border_radius: f32,
-    pub border_color: String,
-    pub sel_txt_color: String,
-    pub sel_bg_color: String
-}
-#[derive(Deserialize, Debug, Serialize)]
-pub struct FileAppStyle {
-    pub background: String,
-    pub text: String
-}
-#[derive(Deserialize, Debug, Serialize)]
-pub struct FileListStyle {
-    pub txt_color: String,
-    pub bg_color: String,
-    pub handle_color: String,
-    pub border_radius: f32,
-    pub border_width: f32,
-    pub border_color: String
-}
+
 pub fn string_to_color(x: String) -> Color {
     let splitstr = x.split_at(2);
     let redstr = splitstr.0;
@@ -158,127 +123,73 @@ pub fn string_to_color(x: String) -> Color {
 }
 pub fn make_custom_theme() -> ThemeCustom {
     let home = get_home();
-    let path = format!("{home}/swaycfg/theme.toml");
-    let backup_path = format!("{home}/swaycfg");
-    let placeholder = String::from(r#"
-    [app_style]
-    background = "24273A"
-    text = "CAD3F5"
-    
-    [sidebar_style]
-    border_radius = 10
-    txt_color = "CAD3F5"
-    bg_color = "24273A"
-    border_color = "CAD3F5"
-    border_width = 0
-    de_border_radius = 10
-    de_txt_color = "CAD3F5"
-    de_bg_color = "1E2030"
-    de_border_color = "CAD3F5"
-    de_border_width = 0
-    
-    [body_style]
-    border_radius = 10
-    txt_color = "CAD3F5"
-    bg_color = "8AADF4"
-    border_color = "CAD3F5"
-    border_width = 0
-    de_border_radius = 10
-    de_txt_color = "CAD3F5"
-    de_bg_color = "1E2030"
-    de_border_color = "CAD3F5"
-    de_border_width = 0
-    
-    [menu_style]
-    txt_color = "CAD3F5"
-    bg_color = "24273A"
-    border_width = 2
-    border_radius = 10
-    border_color = "CAD3F5"
-    sel_txt_color = "24273A"
-    sel_bg_color = "8AADF4"
-    
-    [list_style]
-    txt_color = "CAD3F5"
-    bg_color = "24273A"
-    handle_color = "CAD3F5"
-    border_radius = 10
-    border_width = 2
-    border_color = "CAD3F5""#);
+    let path = format!("{home}/Oceania/theme.toml");
+    let backup_path = format!("{home}/Oceania");
+    let placeholder = r#"bg_color1 = "181926"
+    bg_color2 = "1e2030"
+    bg_color3 = "24273a"
+    txt_color = "cad3f5"
+    red = "ed8796"
+    orange = "f5a97f"
+    yellow = "eed49f"
+    green = "a6da95"
+    blue = "8aadf4"
+    purple = "c6a0f6"
+    pink = "f5bde6""#;
     let file = match read_to_string(path.clone()) {
         Ok(var) => var,
-        Err(..) => match read_to_string("/etc/swaycfg/theme.toml") {
+        Err(..) => match read_to_string("/etc/Oceania/theme.toml") {
             Ok(var) => var,
             Err(..) => {
                 std::process::Command::new("mkdir").arg("-p").arg(backup_path).output().expect("uh oh");
                 std::fs::write(path, placeholder.clone()).expect("failed to write backup file");
-                placeholder
+                placeholder.to_string()
             }
         }
     };
     let decoded: ThemeFile = from_str(&file).unwrap();
-    let appstyle = decoded.app_style.unwrap();
-    let sidebarstyle = decoded.sidebar_style.unwrap();
-    let bodystyle = decoded.body_style.unwrap();
-    let liststyle = decoded.list_style.unwrap();
-    let menustyle = decoded.menu_style.unwrap();
 
-    ThemeCustom { 
-        sidebar: ButtonPair { 
-            active: ButtonStyle {
-                border_radius: sidebarstyle.border_radius,
-                txt_color: string_to_color(sidebarstyle.txt_color),
-                bg_color: string_to_color(sidebarstyle.bg_color),
-                border_color: string_to_color(sidebarstyle.border_color),
-                border_width: sidebarstyle.border_width,
-                shadow_offset: iced::Vector { x: 0.0, y: 0.0 },
-            }, 
-            inactive: ButtonStyle {
-                border_radius: sidebarstyle.de_border_radius,
-                txt_color: string_to_color(sidebarstyle.de_txt_color),
-                bg_color: string_to_color(sidebarstyle.de_bg_color),
-                border_color: string_to_color(sidebarstyle.de_border_color),
-                border_width: sidebarstyle.de_border_width,
-                shadow_offset: iced::Vector { x: 0.0, y: 0.0 },
-            }
-        }, 
-        body: ButtonPair { 
-            active: ButtonStyle {
-                border_radius: bodystyle.border_radius,
-                txt_color: string_to_color(bodystyle.txt_color),
-                bg_color: string_to_color(bodystyle.bg_color),
-                border_color: string_to_color(bodystyle.border_color),
-                border_width: bodystyle.border_width,
-                shadow_offset: iced::Vector { x: 0.0, y: 0.0 },
-            }, 
-            inactive: ButtonStyle {
-                border_radius: bodystyle.de_border_radius,
-                txt_color: string_to_color(bodystyle.de_txt_color),
-                bg_color: string_to_color(bodystyle.de_bg_color),
-                border_color: string_to_color(bodystyle.de_border_color),
-                border_width: bodystyle.de_border_width,
-                shadow_offset: iced::Vector { x: 0.0, y: 0.0 },
-            }, 
+    ThemeCustom {
+        application: Palette {
+            background: string_to_color(decoded.bg_color1.clone()),
+            text: string_to_color(decoded.txt_color.clone()),
+            primary: string_to_color(decoded.blue.clone()),
+            success: string_to_color(decoded.green.clone()),
+            danger: string_to_color(decoded.red.clone())
         },
-        menu: MenuStyle { 
-            txt_color: string_to_color(menustyle.txt_color), 
-            bg_color: string_to_color(menustyle.bg_color), 
-            border_width: menustyle.border_width, 
-            border_radius: menustyle.border_radius, 
-            border_color: string_to_color(menustyle.border_color), 
-            sel_txt_color: string_to_color(menustyle.sel_txt_color), 
-            sel_bg_color: string_to_color(menustyle.sel_bg_color) 
-        }, 
-        list: ListStyle { 
-            txt_color: string_to_color(liststyle.txt_color), 
-            bg_color: string_to_color(liststyle.bg_color), 
-            handle_color: string_to_color(liststyle.handle_color), 
-            border_radius: liststyle.border_radius, 
-            border_width: liststyle.border_width, 
-            border_color: string_to_color(liststyle.border_color) 
-        }, 
-        text: string_to_color(appstyle.text), 
-        bg: string_to_color(appstyle.background) 
+        secondary: ButtonStyle {
+            border_radius: 2.0,
+            txt_color: string_to_color(decoded.txt_color.clone()),
+            bg_color: string_to_color(decoded.bg_color3.clone()),
+            border_color: Color::from_rgb8(0, 0, 0),
+            border_width: 0.0,
+            shadow_offset: iced::Vector { x: 0.0, y: 0.0 }
+        },
+        sidebar: ButtonStyle {
+            border_radius: 2.0,
+            txt_color: string_to_color(decoded.txt_color.clone()),
+            bg_color: string_to_color(decoded.bg_color2.clone()),
+            border_color: Color::from_rgb8(0, 0, 0),
+            border_width: 0.0,
+            shadow_offset: iced::Vector { x: 0.0, y: 0.0 }
+        },
+        list: ListStyle {
+            txt_color: string_to_color(decoded.txt_color.clone()),
+            bg_color: string_to_color(decoded.bg_color3.clone()),
+            handle_color: string_to_color(decoded.txt_color.clone()),
+            border_radius: 5.0,
+            border_width: 2.0,
+            border_color: string_to_color(decoded.txt_color.clone()),
+            menu: MenuStyle {
+                txt_color: string_to_color(decoded.txt_color.clone()),
+                bg_color: string_to_color(decoded.bg_color3.clone()),
+                border_width: 2.0,
+                border_radius: 5.0,
+                border_color: string_to_color(decoded.txt_color.clone()),
+                sel_txt_color: string_to_color(decoded.txt_color.clone()),
+                sel_bg_color: string_to_color(decoded.blue.clone())
+            },
+        },
     }
 }
 
@@ -295,4 +206,14 @@ impl menu::StyleSheet for MenuStyle {
             selected_background: Background::Color(self.sel_bg_color.clone())
         }
     }
+}
+impl ListStyle {
+    pub fn mk_theme(&self) -> theme::PickList {
+        theme::PickList::Custom(std::rc::Rc::new(self.clone()),std::rc::Rc::new(self.menu.clone()))
+    }
+}
+pub struct ThemeSet {
+    pub light: ThemeCustom,
+    pub dark: ThemeCustom,
+    pub custom: ThemeCustom
 }

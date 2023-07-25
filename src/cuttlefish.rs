@@ -1,4 +1,4 @@
-use iced::theme::{self, Theme};
+use iced::theme::Theme;
 use iced::{Result, Application, Settings, Alignment, Length, executor};
 use iced::widget::{Button, Row, Column, Container, pick_list, Text, Scrollable};
 use iced::keyboard::KeyCode;
@@ -7,7 +7,7 @@ use libcfg::{getcfgdata, BindKey, ShortcutKey, OurTheme, BarWidget, WindowAnimat
 mod libcfg;
 use langcfg::{get_lang, Translation};
 mod langcfg;
-use libstyle::{ButtonStyle, ListStyle, MenuStyle, ThemeCustom, make_custom_theme};
+use libstyle::{ButtonStyle, ListStyle, MenuStyle, ThemeCustom, make_custom_theme, ThemeSet};
 mod libstyle;
 mod liblocale;
 
@@ -43,7 +43,7 @@ struct Configurator { //The basic configurator struct, contains most program sta
     window_anim: Option<WindowAnimation>,
     work_anim: Option<WorkAnimation>,
     blur: bool,
-    cust_theme: ThemeCustom,
+    theme_set: ThemeSet,
     width: ShrinkValue,
     bar_left: Vec<BarWidget>,
     bar_center: Vec<BarWidget>,
@@ -99,7 +99,93 @@ impl Default for Configurator {
             window_anim: decodewinanim(&data.winanim, WindowAnimation::None),
             work_anim: decodeworkanim(&data.workanim, WorkAnimation::None),
             blur: decodeblur(&data.blur),
-            cust_theme: make_custom_theme(),
+            theme_set: ThemeSet {
+                light: ThemeCustom {
+                    application: iced::theme::Palette {
+                        background: Color::from_rgb8(0xE0, 0xF5, 0xFF),
+                        text: Color::from_rgb8(0x00, 0x19, 0x36),
+                        primary: Color::from_rgb8(0x00, 0xF1, 0xD6),
+                        success: Color::from_rgb8(0xFF, 0x4C, 0x00),
+                        danger: Color::from_rgb8(0xFF, 0x4C, 0x00),
+                    },
+                    sidebar: ButtonStyle { 
+                        border_radius: 2.0,
+                        txt_color: Color::from_rgb8( 0x00, 0x19, 0x36),
+                        bg_color: Color::from_rgb8(0xD2, 0xF0, 0xFF),
+                        border_color: Color::from_rgb8(0, 0, 0),
+                        border_width: 0.0,
+                        shadow_offset: iced::Vector {x: 0.0, y: 0.0}
+                    },
+                    secondary: ButtonStyle {
+                        border_radius: 2.0,
+                        txt_color: Color::from_rgb8(0x00, 0x20, 0x46),
+                        bg_color: Color::from_rgb8(0xC6, 0xEC, 0xFF),
+                        border_color: Color::from_rgb8(0, 0, 0),
+                        border_width: 0.0,
+                        shadow_offset: iced::Vector {x: 0.0, y: 0.0}
+                    },
+                    list: ListStyle {
+                        txt_color: Color::from_rgb8( 0x00, 0x19, 0x36),
+                        bg_color: Color::from_rgb8(0xE0, 0xF5, 0xFF),
+                        handle_color: Color::from_rgb8( 0x00, 0x19, 0x36),
+                        border_radius: 10.0,
+                        border_width: 5.0,
+                        border_color: Color::from_rgb8( 0x00, 0x19, 0x36),
+                        menu: MenuStyle {
+                            txt_color: Color::from_rgb8( 0x00, 0x19, 0x36),
+                            bg_color: Color::from_rgb8(0xE0, 0xF5, 0xFF),
+                            border_radius: 10.0,
+                            border_width: 5.0,
+                            border_color: Color::from_rgb8( 0x00, 0x19, 0x36),
+                            sel_txt_color: Color::from_rgb8( 0x00, 0x19, 0x36),
+                            sel_bg_color: Color::from_rgb8(0x00, 0xF1, 0xD6),
+                        }
+                    }
+                },
+                dark: ThemeCustom { // TODO: set dark theme properly
+                    application: iced::theme::Palette {
+                        background: Color::from_rgb8(0x00, 0x19, 0x36),
+                        text: Color::from_rgb8(0xE0, 0xF5, 0xFF),
+                        primary: Color::from_rgb8(0x00, 0xCD, 0xB6),
+                        success: Color::from_rgb8(1, 1, 1),
+                        danger: Color::from_rgb8(0xC5, 0x3A, 0x00),
+                    },
+                    sidebar: ButtonStyle { 
+                        border_radius: 2.0,
+                        txt_color: Color::from_rgb8( 0xE0, 0xF5, 0xFF),
+                        bg_color: Color::from_rgb8(0x00, 0x20, 0x46),
+                        border_color: Color::from_rgb8(0, 0, 0),
+                        border_width: 0.0,
+                        shadow_offset: iced::Vector {x: 0.0, y: 0.0}
+                    },
+                    secondary: ButtonStyle {
+                        border_radius: 2.0,
+                        txt_color: Color::from_rgb8(0xE0, 0xF5, 0xFF),
+                        bg_color: Color::from_rgb8(0x00, 0x29, 0x58),
+                        border_color: Color::from_rgb8(0, 0, 0),
+                        border_width: 0.0,
+                        shadow_offset: iced::Vector {x: 0.0, y: 0.0}
+                    },
+                    list: ListStyle {
+                        txt_color: Color::from_rgb8(0xE0, 0xF5, 0xFF),
+                        bg_color: Color::from_rgb8(0x00, 0x29, 0x58),
+                        handle_color: Color::from_rgb8(0xE0, 0xF5, 0xFF),
+                        border_radius: 5.0,
+                        border_width: 2.0,
+                        border_color: Color::from_rgb8(0xE0, 0xF5, 0xFF),
+                        menu: MenuStyle {
+                            txt_color: Color::from_rgb8(0xE0, 0xF5, 0xFF),
+                            bg_color: Color::from_rgb8(0xE0, 0xF5, 0xFF),
+                            border_radius: 5.0,
+                            border_width: 2.0,
+                            border_color: Color::from_rgb8(0xE0, 0xF5, 0xFF),
+                            sel_txt_color: Color::from_rgb8(0xE0, 0xF5, 0xFF),
+                            sel_bg_color: Color::from_rgb8(0x00, 0xCD, 0xB6),
+                        }
+                    }
+                },
+                custom: make_custom_theme()
+            },
             width: ShrinkValue::Full,
             bar_left: vec![],
             bar_center: vec![],
@@ -791,122 +877,10 @@ impl Application for Configurator {
     fn view(&self) -> iced::Element<'_, Self::Message> {
 
         //define button styles
-        let sidebar_active_btn = match self.theme {
-            OurTheme::Light => ButtonStyle{
-                border_radius: 10.0,
-                txt_color: Color::from_rgb8( 0x00, 0x19, 0x36),
-                bg_color: Color::from_rgb8(0xD2, 0xF0, 0xFF),
-                border_color: Color::from_rgb8(0, 0, 0),
-                border_width: 0.0,
-                shadow_offset: iced::Vector {x: 0.0, y: 0.0}
-            },
-            OurTheme::Dark => ButtonStyle{
-                border_radius: 10.0,
-                txt_color: Color::from_rgb8( 0xD2, 0xF0, 0xFF),
-                bg_color: Color::from_rgb8(0x00, 0x20, 0x46),
-                border_color: Color::from_rgb8(0, 0, 0),
-                border_width: 0.0,
-                shadow_offset: iced::Vector {x: 0.0, y: 0.0}
-            },
-            OurTheme::Custom => self.cust_theme.sidebar.active.clone()
-        };
-        let sidebar_inactive_btn = match self.theme {
-            OurTheme::Custom => self.cust_theme.sidebar.inactive.clone(),
-            OurTheme::Light => ButtonStyle{
-                border_radius: 10.0,
-                txt_color: Color::from_rgb8(0x00, 0x19, 0x36),
-                bg_color: Color::from_rgb8(0xC6, 0xEC, 0xFF),
-                border_color: Color::from_rgb8(0, 0, 0),
-                border_width: 0.0,
-                shadow_offset: iced::Vector {x: 0.0, y: 0.0}
-            },
-            OurTheme::Dark => ButtonStyle{
-                border_radius: 10.0,
-                txt_color: Color::from_rgb8(0xD2, 0xF0, 0xFF),
-                bg_color: Color::from_rgb8(0x00, 0x29, 0x58),
-                border_color: Color::from_rgb8(0, 0, 0),
-                border_width: 0.0,
-                shadow_offset: iced::Vector {x: 0.0, y: 0.0}
-            }
-        };
-        let body_active_btn = match self.theme {
-            OurTheme::Custom => self.cust_theme.body.active.clone(),
-            OurTheme::Light => ButtonStyle{
-                border_radius: 10.0,
-                txt_color: Color::from_rgb8(0x00, 0x20, 0x46),
-                bg_color: Color::from_rgb8(0x00, 0xF1, 0xD6),
-                border_color: Color::from_rgb8(0, 0, 0),
-                border_width: 0.0,
-                shadow_offset: iced::Vector {x: 0.0, y: 0.0}
-            },
-            OurTheme::Dark => ButtonStyle{
-                border_radius: 10.0,
-                txt_color: Color::from_rgb8(0x00, 0x20, 0x46),
-                bg_color: Color::from_rgb8(0x00, 0xCD, 0xB6),
-                border_color: Color::from_rgb8(0, 0, 0),
-                border_width: 0.0,
-                shadow_offset: iced::Vector {x: 0.0, y: 0.0}
-            }
-        };
-        let body_inactive_btn = match self.theme {
-            OurTheme::Custom => self.cust_theme.body.inactive.clone(),
-            OurTheme::Light => ButtonStyle{
-                border_radius: 10.0,
-                txt_color: Color::from_rgb8(0x00, 0x20, 0x46),
-                bg_color: Color::from_rgb8(0xC6, 0xEC, 0xFF),
-                border_color: Color::from_rgb8(0, 0, 0),
-                border_width: 0.0,
-                shadow_offset: iced::Vector {x: 0.0, y: 0.0}
-            },
-            OurTheme::Dark => ButtonStyle{
-                border_radius: 10.0,
-                txt_color: Color::from_rgb8(0xD2, 0xF0, 0xFF),
-                bg_color: Color::from_rgb8(0x00, 0x29, 0x58),
-                border_color: Color::from_rgb8(0, 0, 0),
-                border_width: 0.0,
-                shadow_offset: iced::Vector {x: 0.0, y: 0.0}
-            }
-        };
-
-        let picklist_style = match self.theme {
-            OurTheme::Custom => self.cust_theme.list.clone(),
-            OurTheme::Light => ListStyle {
-                txt_color: Color::from_rgb8(0x00, 0x20, 0x46),
-                bg_color: Color::from_rgb8(0xC6, 0xEC, 0xFF),
-                handle_color: Color::from_rgb8(0x00, 0x20, 0x46),
-                border_radius: 10.0,
-                border_width: 2.0,
-                border_color: Color::from_rgb8(0x00, 0x20, 0x46)
-            },
-            OurTheme::Dark => ListStyle {
-                txt_color: Color::from_rgb8(0xD2, 0xF0, 0xFF),
-                bg_color: Color::from_rgb8(0x00, 0x29, 0x58),
-                handle_color: Color::from_rgb8(0xD2, 0xF0, 0xFF),
-                border_radius: 10.0,
-                border_width: 2.0,
-                border_color: Color::from_rgb8(0xD2, 0xF0, 0xFF)
-            },
-        };
-        let menu_style = match self.theme {
-            OurTheme::Custom => self.cust_theme.menu.clone(),
-            OurTheme::Light => MenuStyle {
-                txt_color: Color::from_rgb8(0x00, 0x20, 0x46),
-                bg_color: Color::from_rgb8(0xC6, 0xEC, 0xFF),
-                border_width: 2.0,
-                border_radius: 10.0,
-                border_color: Color::from_rgb8(0x00, 0x20, 0x46),
-                sel_txt_color: Color::from_rgb8(0x00, 0x20, 0x46),
-                sel_bg_color: Color::from_rgb8(0x00, 0xF1, 0xD6),
-            },
-            OurTheme::Dark => MenuStyle {
-                txt_color: Color::from_rgb8(0xD2, 0xF0, 0xFF),
-                bg_color: Color::from_rgb8(0x00, 0x29, 0x58),
-                border_width: 2.0,
-                border_radius: 10.0,
-                border_color: Color::from_rgb8(0xD2, 0xF0, 0xFF),
-                sel_txt_color: Color::from_rgb8(0xD2, 0xF0, 0xFF),
-                sel_bg_color: Color::from_rgb8(0x00, 0xCD, 0xB6),
-            }
+        let style = match self.theme {
+            OurTheme::Light => self.theme_set.light.clone(),
+            OurTheme::Dark => self.theme_set.dark.clone(),
+            OurTheme::Custom => self.theme_set.custom.clone(),
         };
 
         let selectionmarker: Text = Text::new("=>");
@@ -916,44 +890,27 @@ impl Application for Configurator {
         let bartxt = Text::new(self.locale.global.bar.clone());
         let inittxt = Text::new(self.locale.global.init.clone());
         let animtxt = Text::new(self.locale.global.anim.clone());
-        let mut pagemain = Button::new(maintxt)
+        let pagemain = Button::new(maintxt)
             .on_press(Message::PageChanged(Page::Main))
             .width(150)
-            .style(theme::Button::Custom(std::boxed::Box::new(sidebar_active_btn.clone())));
-        let mut pagebind = Button::new(bindtxt)
+            .style(style.sidebar.mk_theme());
+        let pagebind = Button::new(bindtxt)
             .on_press(Message::PageChanged(Page::Bind))
             .width(150)
-            .style(theme::Button::Custom(std::boxed::Box::new(sidebar_active_btn.clone())));
-        let mut pagebar = Button::new(bartxt)
+            .style(style.sidebar.mk_theme());
+        let pagebar = Button::new(bartxt)
             .on_press(Message::PageChanged(Page::Bar))
             .width(150)
-            .style(theme::Button::Custom(std::boxed::Box::new(sidebar_active_btn.clone())));
-        let mut pageinit = Button::new(inittxt)
+            .style(style.sidebar.mk_theme());
+        let pageinit = Button::new(inittxt)
             .on_press(Message::PageChanged(Page::Init))
             .width(150)
-            .style(theme::Button::Custom(std::boxed::Box::new(sidebar_active_btn.clone())));
-        let mut pageanim = Button::new(animtxt)
+            .style(style.sidebar.mk_theme());
+        let pageanim = Button::new(animtxt)
             .on_press(Message::PageChanged(Page::Anim))
             .width(150)
-            .style(theme::Button::Custom(std::boxed::Box::new(sidebar_active_btn.clone())));
+            .style(style.sidebar.mk_theme());
         let pagelabel = Text::new(self.locale.global.label.clone());
-        match self.current_page {
-            Page::Main => {
-                pagemain = pagemain.style(theme::Button::Custom(std::boxed::Box::new(sidebar_inactive_btn.clone())));
-            }
-            Page::Bind => {
-                pagebind = pagebind.style(theme::Button::Custom(std::boxed::Box::new(sidebar_inactive_btn.clone())));
-            }
-            Page::Bar => {
-                pagebar = pagebar.style(theme::Button::Custom(std::boxed::Box::new(sidebar_inactive_btn.clone())));
-            }
-            Page::Init => {
-                pageinit = pageinit.style(theme::Button::Custom(std::boxed::Box::new(sidebar_inactive_btn.clone())));
-            }
-            Page::Anim => {
-                pageanim = pageanim.style(theme::Button::Custom(std::boxed::Box::new(sidebar_inactive_btn.clone())));
-            }
-        }
         let pagecol = Column::new()
             .push(pagelabel)
             .push(pagemain)
@@ -969,12 +926,11 @@ impl Application for Configurator {
         let savedtxt = Text::new(self.locale.global.saved.clone());
         if self.unsaved {
             save = Button::new(savetxt)
-            .on_press(Message::Save)
-            .style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+            .on_press(Message::Save);
         } else {
             save = Button::new(savedtxt)
             .on_press(Message::Save)
-            .style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
+            .style(style.secondary.mk_theme());
         }
         let saverow = Row::new()
             .push(save)
@@ -993,14 +949,14 @@ impl Application for Configurator {
                     Message::PrimaryKeyChanged,
                     )
                     .placeholder("choose")
-                    .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
+                    .style(style.list.mk_theme());
                 let secondarypick = pick_list(
                     &ShortcutKey::ALL[..], 
                     self.secondary_key, 
                     Message::SecondaryKeyChanged,
                     )
                     .placeholder("choose")
-                    .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
+                    .style(style.list.mk_theme());
                 let primarytxt;
                 let temp_primary = format!("{}{}", self.locale.global.primary, self.locale.global.primary_addendum);
                 let secondarytxt;
@@ -1020,24 +976,21 @@ impl Application for Configurator {
                 let darktxt = Text::new(self.locale.mainpage.dark.clone());
                 let customtxt = Text::new(self.locale.mainpage.custom.clone());
                 let mut light = Button::new(lighttxt)
-                    .on_press(Message::ThemeChanged(OurTheme::Light))
-                    .style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                    .on_press(Message::ThemeChanged(OurTheme::Light));
                 let mut dark = Button::new(darktxt)
-                    .on_press(Message::ThemeChanged(OurTheme::Dark))
-                    .style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                    .on_press(Message::ThemeChanged(OurTheme::Dark));
                 let mut custom = Button::new(customtxt)
-                    .on_press(Message::ThemeChanged(OurTheme::Custom))
-                    .style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                    .on_press(Message::ThemeChanged(OurTheme::Custom));
                 let themelabel = Text::new(self.locale.mainpage.theme.clone());
                 match self.theme {
                     OurTheme::Light => {
-                        light = light.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
+                        light = light.style(style.secondary.mk_theme());
                     }
                     OurTheme::Dark => {
-                        dark = dark.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
+                        dark = dark.style(style.secondary.mk_theme());
                     }
                     OurTheme::Custom => {
-                        custom = custom.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
+                        custom = custom.style(style.secondary.mk_theme());
                     }
                 }
                 let mut themerow = Row::new().spacing(10);
@@ -1075,14 +1028,14 @@ impl Application for Configurator {
                     Message::PrimaryKeyChanged,
                     )
                     .placeholder("choose")
-                    .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
+                    .style(style.list.mk_theme());
                 let secondarypick = pick_list(
                     &ShortcutKey::ALL[..], 
                     self.secondary_key, 
                     Message::SecondaryKeyChanged,
                     )
                     .placeholder("choose")
-                    .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
+                    .style(style.list.mk_theme());
                 let primarytxt;
                 let temp_primary = format!("{}{}", self.locale.global.primary, self.locale.global.primary_addendum);
                 let secondarytxt;
@@ -1105,9 +1058,9 @@ impl Application for Configurator {
                 Message::ExitHeaderChanged,
                 )
                 .placeholder("choose")
-                .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
+                .style(style.list.mk_theme());
                 let exitkey = Text::new(self.exit_key.clone());
-                let mut exitkeyselect = Button::new(exitkey).on_press(Message::Capture(CaptureInput::ExitKey)).width(50).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut exitkeyselect = Button::new(exitkey).on_press(Message::Capture(CaptureInput::ExitKey)).width(50);
                 let launchsclabel: Text = Text::new(self.locale.bindpage.launch.clone());
                 let launchheaderselect = pick_list(
                     &BindKey::ALL[..], 
@@ -1115,9 +1068,9 @@ impl Application for Configurator {
                     Message::LaunchHeaderChanged,
                     )
                     .placeholder("choose")
-                    .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
+                    .style(style.list.mk_theme());
                 let launchkey = Text::new(self.launch_key.clone());
-                let mut launchkeyselect = Button::new(launchkey).on_press(Message::Capture(CaptureInput::LaunchKey)).width(50).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut launchkeyselect = Button::new(launchkey).on_press(Message::Capture(CaptureInput::LaunchKey)).width(50);
                 let killsclabel: Text = Text::new(self.locale.bindpage.kill.clone());
                 let killheaderselect = pick_list(
                     &BindKey::ALL[..], 
@@ -1125,9 +1078,9 @@ impl Application for Configurator {
                     Message::KillHeaderChanged,
                     )
                     .placeholder("choose")
-                    .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
+                    .style(style.list.mk_theme());
                 let killkey = Text::new(self.kill_key.clone());
-                let mut killkeyselect = Button::new(killkey).on_press(Message::Capture(CaptureInput::KillKey)).width(50).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut killkeyselect = Button::new(killkey).on_press(Message::Capture(CaptureInput::KillKey)).width(50);
                 let minisclabel: Text = Text::new(self.locale.bindpage.mini.clone());
                 let miniheaderselect = pick_list(
                  &BindKey::ALL[..], 
@@ -1135,9 +1088,9 @@ impl Application for Configurator {
                  Message::MiniHeaderChanged,
                  )
                     .placeholder("choose")
-                    .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
+                    .style(style.list.mk_theme());
                 let minikey = Text::new(self.minimize_key.clone());
-                let mut minikeyselect = Button::new(minikey).on_press(Message::Capture(CaptureInput::MiniKey)).width(50).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut minikeyselect = Button::new(minikey).on_press(Message::Capture(CaptureInput::MiniKey)).width(50);
                 let scratchsclabel: Text = Text::new(self.locale.bindpage.scratch.clone());
                 let scratchheaderselect = pick_list(
                     &BindKey::ALL[..], 
@@ -1145,27 +1098,27 @@ impl Application for Configurator {
                     Message::ScratchHeaderChanged,
                     )
                     .placeholder("choose")
-                    .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
+                    .style(style.list.mk_theme());
                 let scratchkey = Text::new(self.scratch_key.clone());
-                let mut scratchkeyselect = Button::new(scratchkey).on_press(Message::Capture(CaptureInput::ScratchKey)).width(50).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut scratchkeyselect = Button::new(scratchkey).on_press(Message::Capture(CaptureInput::ScratchKey)).width(50);
                 
                 match self.capturenext.as_ref().unwrap() {
                     CaptureInput::NoKey => {
                     }
                     CaptureInput::ExitKey => {
-                        exitkeyselect = exitkeyselect.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
+                        exitkeyselect = exitkeyselect.style(style.secondary.mk_theme());
                     }
                     CaptureInput::KillKey => {
-                        killkeyselect = killkeyselect.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
+                        killkeyselect = killkeyselect.style(style.secondary.mk_theme());
                     }
                     CaptureInput::LaunchKey => {
-                        launchkeyselect = launchkeyselect.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
+                        launchkeyselect = launchkeyselect.style(style.secondary.mk_theme());
                     }
                     CaptureInput::MiniKey => {
-                        minikeyselect = minikeyselect.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
+                        minikeyselect = minikeyselect.style(style.secondary.mk_theme());
                     }
                     CaptureInput::ScratchKey => {
-                        scratchkeyselect = scratchkeyselect.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
+                        scratchkeyselect = scratchkeyselect.style(style.secondary.mk_theme());
                     }
                 }
                 let mut primaryrow = Row::new();
@@ -1251,27 +1204,27 @@ impl Application for Configurator {
                         center_contents = format!("{center_contents}  {:#?}", self.bar_center[i]);
                     }
                 }
-                let barleft = Button::new("left").on_press(Message::PushWidget(WidgetBank::Left)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let barcenter = Button::new("center").on_press(Message::PushWidget(WidgetBank::Center)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let barright = Button::new("right").on_press(Message::PushWidget(WidgetBank::Right)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let mut audio = Button::new("Audio").on_press(Message::AwaitDestination(BarWidget::Audio)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let mut backlight = Button::new("Backlight").on_press(Message::AwaitDestination(BarWidget::Backlight)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let mut battery = Button::new("Battery").on_press(Message::AwaitDestination(BarWidget::Battery)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let mut bluetooth = Button::new("Bluetooth").on_press(Message::AwaitDestination(BarWidget::Bluetooth)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let mut cpu = Button::new("CPU").on_press(Message::AwaitDestination(BarWidget::CPU)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let mut clock = Button::new("Clock").on_press(Message::AwaitDestination(BarWidget::Clock)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let mut disk = Button::new("Disk").on_press(Message::AwaitDestination(BarWidget::Disk)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let mut keyboard = Button::new("Keyboard State").on_press(Message::AwaitDestination(BarWidget::KeyboardState)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let mut network = Button::new("Network").on_press(Message::AwaitDestination(BarWidget::Network)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let mut ram = Button::new("RAM").on_press(Message::AwaitDestination(BarWidget::RAM)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let mut taskbar = Button::new("Taskbar").on_press(Message::AwaitDestination(BarWidget::Taskbar)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let mut temperature = Button::new("Temperature").on_press(Message::AwaitDestination(BarWidget::Temperature)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let mut tray = Button::new("System Tray").on_press(Message::AwaitDestination(BarWidget::Tray)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let mut user = Button::new("Current User").on_press(Message::AwaitDestination(BarWidget::User)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let mut workspaces = Button::new("Workspaces").on_press(Message::AwaitDestination(BarWidget::Workspaces)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let removeleft = Button::new("remove").on_press(Message::RemoveWidget(WidgetBank::Left)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let removecenter = Button::new("remove").on_press(Message::RemoveWidget(WidgetBank::Center)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let removeright = Button::new("remove").on_press(Message::RemoveWidget(WidgetBank::Right)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let barleft = Button::new("left").on_press(Message::PushWidget(WidgetBank::Left));
+                let barcenter = Button::new("center").on_press(Message::PushWidget(WidgetBank::Center));
+                let barright = Button::new("right").on_press(Message::PushWidget(WidgetBank::Right));
+                let mut audio = Button::new("Audio").on_press(Message::AwaitDestination(BarWidget::Audio));
+                let mut backlight = Button::new("Backlight").on_press(Message::AwaitDestination(BarWidget::Backlight));
+                let mut battery = Button::new("Battery").on_press(Message::AwaitDestination(BarWidget::Battery));
+                let mut bluetooth = Button::new("Bluetooth").on_press(Message::AwaitDestination(BarWidget::Bluetooth));
+                let mut cpu = Button::new("CPU").on_press(Message::AwaitDestination(BarWidget::CPU));
+                let mut clock = Button::new("Clock").on_press(Message::AwaitDestination(BarWidget::Clock));
+                let mut disk = Button::new("Disk").on_press(Message::AwaitDestination(BarWidget::Disk));
+                let mut keyboard = Button::new("Keyboard State").on_press(Message::AwaitDestination(BarWidget::KeyboardState));
+                let mut network = Button::new("Network").on_press(Message::AwaitDestination(BarWidget::Network));
+                let mut ram = Button::new("RAM").on_press(Message::AwaitDestination(BarWidget::RAM));
+                let mut taskbar = Button::new("Taskbar").on_press(Message::AwaitDestination(BarWidget::Taskbar));
+                let mut temperature = Button::new("Temperature").on_press(Message::AwaitDestination(BarWidget::Temperature));
+                let mut tray = Button::new("System Tray").on_press(Message::AwaitDestination(BarWidget::Tray));
+                let mut user = Button::new("Current User").on_press(Message::AwaitDestination(BarWidget::User));
+                let mut workspaces = Button::new("Workspaces").on_press(Message::AwaitDestination(BarWidget::Workspaces));
+                let removeleft = Button::new("remove").on_press(Message::RemoveWidget(WidgetBank::Left));
+                let removecenter = Button::new("remove").on_press(Message::RemoveWidget(WidgetBank::Center));
+                let removeright = Button::new("remove").on_press(Message::RemoveWidget(WidgetBank::Right));
                 let labelleft = Text::new(left_contents);
                 let labelright = Text::new(right_contents);
                 let labelcenter = Text::new(center_contents);
@@ -1280,21 +1233,21 @@ impl Application for Configurator {
                     BarWidget::None => {
 
                     },
-                    BarWidget::Audio => audio = audio.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
-                    BarWidget::Backlight => backlight = backlight.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
-                    BarWidget::Battery => battery = battery.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
-                    BarWidget::Bluetooth => bluetooth = bluetooth.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
-                    BarWidget::Clock => clock = clock.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
-                    BarWidget::CPU => cpu = cpu.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
-                    BarWidget::Disk => disk = disk.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
-                    BarWidget::KeyboardState => keyboard = keyboard.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
-                    BarWidget::RAM => ram = ram.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
-                    BarWidget::Network => network = network.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
-                    BarWidget::Temperature => temperature = temperature.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
-                    BarWidget::Tray => tray = tray.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
-                    BarWidget::Taskbar => taskbar = taskbar.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
-                    BarWidget::Workspaces => workspaces = workspaces.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
-                    BarWidget::User => user = user.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone()))),
+                    BarWidget::Audio => audio = audio.style(style.secondary.mk_theme()),
+                    BarWidget::Backlight => backlight = backlight.style(style.secondary.mk_theme()),
+                    BarWidget::Battery => battery = battery.style(style.secondary.mk_theme()),
+                    BarWidget::Bluetooth => bluetooth = bluetooth.style(style.secondary.mk_theme()),
+                    BarWidget::Clock => clock = clock.style(style.secondary.mk_theme()),
+                    BarWidget::CPU => cpu = cpu.style(style.secondary.mk_theme()),
+                    BarWidget::Disk => disk = disk.style(style.secondary.mk_theme()),
+                    BarWidget::KeyboardState => keyboard = keyboard.style(style.secondary.mk_theme()),
+                    BarWidget::RAM => ram = ram.style(style.secondary.mk_theme()),
+                    BarWidget::Network => network = network.style(style.secondary.mk_theme()),
+                    BarWidget::Temperature => temperature = temperature.style(style.secondary.mk_theme()),
+                    BarWidget::Tray => tray = tray.style(style.secondary.mk_theme()),
+                    BarWidget::Taskbar => taskbar = taskbar.style(style.secondary.mk_theme()),
+                    BarWidget::Workspaces => workspaces = workspaces.style(style.secondary.mk_theme()),
+                    BarWidget::User => user = user.style(style.secondary.mk_theme()),
                 }
                 
                 let mut left_row = Row::new();
@@ -1348,22 +1301,22 @@ impl Application for Configurator {
             }
             Page::Anim => {
 
-                let widthincr = Button::new("+").on_press(Message::Incr(IncrVal::WidthVal)).width(30).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let mut widthdecr = Button::new("-").on_press(Message::Decr(IncrVal::WidthVal)).width(30).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let widthincr = Button::new("+").on_press(Message::Incr(IncrVal::WidthVal)).width(30);
+                let mut widthdecr = Button::new("-").on_press(Message::Decr(IncrVal::WidthVal)).width(30);
                 let widthvaluepeek = Text::new(format!("{}", self.border.width));
                 let widthlabel = Text::new(self.locale.animpage.width.clone());
 
                 let mut widthrow = Row::new().spacing(10);
 
-                let gapsincr = Button::new("+").on_press(Message::Incr(IncrVal::GapsVal)).width(30).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let mut gapsdecr = Button::new("-").on_press(Message::Decr(IncrVal::GapsVal)).width(30).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let gapsincr = Button::new("+").on_press(Message::Incr(IncrVal::GapsVal)).width(30);
+                let mut gapsdecr = Button::new("-").on_press(Message::Decr(IncrVal::GapsVal)).width(30);
                 let gapsvaluepeek = Text::new(format!("{}", self.border.gaps));
                 let gapslabel = Text::new(self.locale.animpage.gaps.clone());
 
                 let mut gapsrow = Row::new().spacing(10);
 
-                let radincr = Button::new("+").on_press(Message::Incr(IncrVal::RadiusVal)).width(30).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let mut raddecr = Button::new("-").on_press(Message::Decr(IncrVal::RadiusVal)).width(30).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let radincr = Button::new("+").on_press(Message::Incr(IncrVal::RadiusVal)).width(30);
+                let mut raddecr = Button::new("-").on_press(Message::Decr(IncrVal::RadiusVal)).width(30);
                 let radvaluepeek = Text::new(format!("{}", self.border.radius));
                 let radlabel = Text::new(self.locale.animpage.radius.clone());
 
@@ -1375,7 +1328,7 @@ impl Application for Configurator {
                     Message::ChangeWindowAnim,
                     )
                     .placeholder("choose")
-                    .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
+                    .style(style.list.mk_theme());
                 let winlabel = Text::new(self.locale.animpage.winanim.clone());
 
                 let mut winrow = Row::new().spacing(10);
@@ -1386,7 +1339,7 @@ impl Application for Configurator {
                     Message::ChangeWorkAnim,
                     )
                     .placeholder("choose")
-                    .style(theme::PickList::Custom(std::rc::Rc::new(picklist_style.clone()),std::rc::Rc::new(menu_style.clone())));
+                    .style(style.list.mk_theme());
                 let worklabel = Text::new(self.locale.animpage.workanim.clone());
 
                 let mut workrow = Row::new().spacing(10);
@@ -1396,23 +1349,23 @@ impl Application for Configurator {
                 let enabled = Text::new(self.locale.animpage.enabledblur.clone());
                 let disabled = Text::new(self.locale.animpage.disabledblur.clone());
                 let blurlabel = Text::new(self.locale.animpage.blur.clone());
-                let mut bluron = Button::new(enable).on_press(Message::BlurToggled(true)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
-                let mut bluroff = Button::new(disable).on_press(Message::BlurToggled(false)).style(theme::Button::Custom(std::boxed::Box::new(body_active_btn.clone())));
+                let mut bluron = Button::new(enable).on_press(Message::BlurToggled(true));
+                let mut bluroff = Button::new(disable).on_press(Message::BlurToggled(false));
                 if self.blur {
-                    bluron = Button::new(enabled).on_press(Message::BlurToggled(true)).style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
+                    bluron = Button::new(enabled).on_press(Message::BlurToggled(true)).style(style.secondary.mk_theme());
                 } else {
-                    bluroff = Button::new(disabled).on_press(Message::BlurToggled(false)).style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
+                    bluroff = Button::new(disabled).on_press(Message::BlurToggled(false)).style(style.secondary.mk_theme());
                 }
                 let mut blurrow = Row::new().spacing(10);
 
                 if self.border.width == 0 {
-                    widthdecr = widthdecr.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
+                    widthdecr = widthdecr.style(style.secondary.mk_theme());
                 }
                 if self.border.gaps == 0 {
-                    gapsdecr = gapsdecr.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
+                    gapsdecr = gapsdecr.style(style.secondary.mk_theme());
                 }
                 if self.border.radius == 0 {
-                    raddecr = raddecr.style(theme::Button::Custom(std::boxed::Box::new(body_inactive_btn.clone())));
+                    raddecr = raddecr.style(style.secondary.mk_theme());
                 }
 
                 if self.index == 0 {
@@ -1495,27 +1448,9 @@ impl Application for Configurator {
     }
     fn theme(&self) -> Theme {
         let colors = match self.theme {
-            OurTheme::Light => iced::theme::Palette{
-                background: Color::from_rgb8(0xE0, 0xF5, 0xFF),
-                text: Color::from_rgb8(0x00, 0x19, 0x36),
-                primary: Color::from_rgb8(0x00, 0x19, 0x36),
-                success: Color::from_rgb8(1, 1, 1),
-                danger: Color::from_rgb8(1, 1, 1),
-            },
-            OurTheme::Dark => iced::theme::Palette{
-                background: Color::from_rgb8(0x00, 0x19, 0x36),
-                text: Color::from_rgb8(0xE0, 0xF5, 0xFF),
-                primary: Color::from_rgb8(0xE0, 0xF5, 0xFF),
-                success: Color::from_rgb8(1, 1, 1),
-                danger: Color::from_rgb8(1, 1, 1),
-            },
-            OurTheme::Custom => iced::theme::Palette{
-                background: self.cust_theme.bg,
-                text: self.cust_theme.text,
-                primary: Color::from_rgb8(1, 1, 1),
-                success: Color::from_rgb8(1, 1, 1),
-                danger: Color::from_rgb8(1, 1, 1),
-            },
+            OurTheme::Light => self.theme_set.light.application,
+            OurTheme::Dark => self.theme_set.dark.application,
+            OurTheme::Custom => self.theme_set.custom.application,
         };
         let cust = Theme::Custom(std::boxed::Box::new(iced::theme::Custom::new(colors)));
         cust
