@@ -4,21 +4,18 @@ use iced::widget::{Button, Row, Column, Container, Text, Scrollable};
 use iced_style::Color;
 use libcfg::{getcfgdata, decodetheme, OurTheme};
 mod libcfg;
-use langman::{get_lang, Translation};
-mod langman;
-mod langcfg;
-mod liblocale;
 use libstyle::{ButtonStyle, ThemeCustom, make_custom_theme, ThemeSet, ListStyle, MenuStyle};
 mod libstyle;
-
+use gettextrs::*;
 
 fn main() -> Result {
+    let _ = textdomain("SunfishMan");
+    let _ = bind_textdomain_codeset("SunfishMan", "UTF-8");
     Manual::run(Settings::default())
 }
 
 struct Manual {
     theme:OurTheme,
-    locale: Translation,
     current_page:u8,
     primary_key: String,
     secondary_key: String,
@@ -61,7 +58,6 @@ impl Default for Manual {
         let sec = prettypri(&data.secondary);
         Manual {
             theme: decodetheme(&data.theme, OurTheme::Light),
-            locale: get_lang(),
             current_page: 0,
             primary_key: pri.to_string(),
             secondary_key: sec.to_string(),
@@ -225,8 +221,8 @@ impl Application for Manual {
             OurTheme::Custom => self.theme_set.custom.clone(),
         };
         
-        let backtxt = String::as_str(&self.locale.globals.backtxt);
-        let forwardtxt = String::as_str(&self.locale.globals.forwardtxt);
+        let backtxt = Text::new(gettext("Back"));
+        let forwardtxt = Text::new(gettext("Forwards"));
         let mut pageleft = Button::new(backtxt)
             .on_press(Message::PageDecr);
         let mut pageright = Button::new(forwardtxt)
@@ -239,21 +235,21 @@ impl Application for Manual {
         let mut pgtitle = Text::new("Page Title").horizontal_alignment(alignment::Horizontal::Center);
         if self.current_page == 0 {
             pageleft = pageleft.style(style.secondary.mk_theme());
-            let title = self.locale.navigation.title.clone();
+            let title = gettext("Basic Navigation");
             pgtitle = Text::new(format!("{title}"));
             let primary_key = self.primary_key.clone();
             let secondary_key = self.secondary_key.clone();
-            let prefocus = self.locale.navigation.prefocus.clone();
-            let focus = self.locale.navigation.focus.clone();
-            let postfocus = self.locale.navigation.postfocus.clone();
-            let premove = self.locale.navigation.premove.clone();
-            let movestr = self.locale.navigation.movetxt.clone();
-            let postmove = self.locale.navigation.postmove.clone();
-            let immutable = self.locale.navigation.immutable.clone();
+            let prefocus = gettext("To shift focus between applications, press:\n");
+            let focus = gettext("+An Arrow Key.\n");
+            let postfocus = gettext("This will shift the interface's focus in the direction you pressed.\n \n");
+            let premove = gettext("To move applications around, press:\n");
+            let movestr = gettext("+An Arrow Key.\n");
+            let postmove = gettext("This should swap applications in that direction.\n\n");
+            let immutable = gettext("As of now, these bindings are inferred and cannot be directly changed.");
             let text = Text::new(format!("{prefocus}{primary_key}{focus}{postfocus}{premove}{primary_key}+{secondary_key}{movestr}{postmove}{immutable}")).horizontal_alignment(alignment::Horizontal::Center);
             settings = settings.push(text);
         } else if self.current_page == 1 {
-            let title = self.locale.advanced.title.clone();
+            let title = gettext("Basic Navigation, Continued");
             pgtitle = Text::new(format!("{title}"));
             let launchh = self.launch_header.clone();
             let launchk = self.launch_key.clone();
@@ -261,46 +257,46 @@ impl Application for Manual {
             let killk = self.kill_key.clone();
             let exith = self.exit_header.clone();
             let exitk = self.exit_key.clone();
-            let presearch = self.locale.advanced.presearch.clone();
-            let search = self.locale.advanced.search.clone();
-            let postsearch = self.locale.advanced.postsearch.clone();
-            let prekill = self.locale.advanced.prekill.clone();
-            let kill = self.locale.advanced.kill.clone();
-            let postkill = self.locale.advanced.postkill.clone();
-            let preexit = self.locale.advanced.preexit.clone();
-            let exit = self.locale.advanced.exit.clone();
-            let postexit = self.locale.advanced.postexit.clone();
+            let presearch = gettext("To open the application search, press:\n");
+            let search = gettext(".\n");
+            let postsearch = gettext("This will open a search menu that you can use to run the apps you want.\n\n");
+            let prekill = gettext("To close the currently focused application, press:\n");
+            let kill = gettext(".\n");
+            let postkill = gettext("This will close the currently focused application, potentially destroying unsaved work. \n\n");
+            let preexit = gettext("To return to the login screen, press:\n");
+            let exit = gettext(".\n");
+            let postexit = gettext("This will close out the desktop entirely, destroying all unsaved work.");
             let text = Text::new(format!("{presearch}{launchh}+{launchk}{search}{postsearch}{prekill}{killh}+{killk}{kill}{postkill}{preexit}{exith}+{exitk}{exit}{postexit}")).horizontal_alignment(alignment::Horizontal::Center);
             settings = settings.push(text);
         } else if self.current_page == 2 {
-            let title = self.locale.workspaces.title.clone();
+            let title = gettext("Workspaces");
             pgtitle = Text::new(title);
             let primary_key = self.primary_key.clone();
             let secondary_key = self.secondary_key.clone();
-            let head = self.locale.workspaces.head.clone();
-            let prefocus = self.locale.workspaces.prefocus.clone();
-            let focus = self.locale.workspaces.focus.clone();
-            let postfocus = self.locale.workspaces.postfocus.clone();
-            let premove = self.locale.workspaces.premove.clone();
-            let movetxt = self.locale.workspaces.movetxt.clone();
-            let postmove = self.locale.workspaces.postmove.clone();
-            let immutable = self.locale.workspaces.immutable.clone();
+            let head = gettext("There are 10 workspaces in this environment-\n In effect each one is its own desktop where you can move applications to or visit the applications located there.\n\n");
+            let prefocus = gettext("To move yourself to a workspace, press:\n");
+            let focus = gettext("+A Number Key.\n");
+            let postfocus = gettext("This will move you to the workspace corresponding to the number you pressed.\n \n");
+            let premove = gettext("To move the currently focused application to a workspace, press:\n");
+            let movetxt = gettext("+A Number Key.\n");
+            let postmove = gettext("This will banish the application to the corresponding workspace.\n\n");
+            let immutable = gettext("As of now, these bindings are inferred and cannot be directly changed.");
             let text = Text::new(format!("{head}{prefocus}{primary_key}{focus}{postfocus}{premove}{primary_key}+{secondary_key}{movetxt}{postmove}{immutable}")).horizontal_alignment(alignment::Horizontal::Center);
             settings = settings.push(text);
         } else if self.current_page == 3 {
             pageright = pageright.style(style.secondary.mk_theme());
-            let title = self.locale.minimization.title.clone();
+            let title = gettext("Minimization");
             pgtitle = Text::new(title);
             let minih = self.minimize_header.clone();
             let minik = self.minimize_key.clone();
             let scratchh = self.scratch_header.clone();
             let scratchk = self.scratch_key.clone();
-            let premove = self.locale.minimization.premove.clone();
-            let movetxt = self.locale.minimization.movetxt.clone();
-            let postmove = self.locale.minimization.postmove.clone();
-            let prefocus = self.locale.minimization.prefocus.clone();
-            let focus = self.locale.minimization.focus.clone();
-            let postfocus = self.locale.minimization.postfocus.clone();
+            let premove = gettext("To minimize the focused application, press:\n");
+            let movetxt = gettext(".\n");
+            let postmove = gettext("This will minimize said application, temporarily removing it from the current workspace.\n\n");
+            let prefocus = gettext("To show the currently minimized apps, press:\n");
+            let focus = gettext(".\n");
+            let postfocus = gettext("This show all of your minimized apps.");
             let text = Text::new(format!("{premove}{minih}+{minik}{movetxt}{postmove}{prefocus}{scratchh}+{scratchk}{focus}{postfocus}")).horizontal_alignment(alignment::Horizontal::Center);
             settings = settings.push(text);
         }

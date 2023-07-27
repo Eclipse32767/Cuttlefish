@@ -1,0 +1,198 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-07-27 02:16+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/libcfg.rs:138
+msgid "Windows/Command Key"
+msgstr ""
+
+#: src/libcfg.rs:139
+msgid "Alt Key"
+msgstr ""
+
+#: src/libcfg.rs:140
+msgid "Shift Key"
+msgstr ""
+
+#: src/libcfg.rs:141
+msgid "Control Key"
+msgstr ""
+
+#: src/libcfg.rs:152
+msgid "Primary Key"
+msgstr ""
+
+#: src/libcfg.rs:153
+msgid "Secondary Key"
+msgstr ""
+
+#: src/libcfg.rs:154
+msgid "Primary + Secondary"
+msgstr ""
+
+#: src/libcfg.rs:165 src/libcfg.rs:178
+msgid "No Animation"
+msgstr ""
+
+#: src/libcfg.rs:166
+msgid "Pop-in"
+msgstr ""
+
+#: src/libcfg.rs:167
+msgid "Slide In"
+msgstr ""
+
+#: src/libcfg.rs:179
+msgid "Fade In"
+msgstr ""
+
+#: src/libcfg.rs:180
+msgid "Slide In Horizontally"
+msgstr ""
+
+#: src/libcfg.rs:181
+msgid "Slide In Vertically"
+msgstr ""
+
+#: src/cuttlefish.rs:243
+msgid "Main Page"
+msgstr ""
+
+#: src/cuttlefish.rs:244
+msgid "Keybindings Page"
+msgstr ""
+
+#: src/cuttlefish.rs:245
+msgid "Status Bar Page"
+msgstr ""
+
+#: src/cuttlefish.rs:246
+msgid "Autostart Page"
+msgstr ""
+
+#: src/cuttlefish.rs:247
+msgid "Animations Page"
+msgstr ""
+
+#: src/cuttlefish.rs:265
+msgid "Cuttlefish Configurator--"
+msgstr ""
+
+#: src/cuttlefish.rs:908
+msgid "Available Pages"
+msgstr ""
+
+#: src/cuttlefish.rs:920
+msgid "Save"
+msgstr ""
+
+#: src/cuttlefish.rs:921
+msgid "Saved!"
+msgstr ""
+
+#: src/cuttlefish.rs:956 src/cuttlefish.rs:963 src/cuttlefish.rs:1035 src/cuttlefish.rs:1042
+msgid "Primary Shortcut Key"
+msgstr ""
+
+#: src/cuttlefish.rs:956 src/cuttlefish.rs:1035
+msgid "-- Control and shift not recommended"
+msgstr ""
+
+#: src/cuttlefish.rs:958 src/cuttlefish.rs:964 src/cuttlefish.rs:1037 src/cuttlefish.rs:1043
+msgid "Secondary Shortcut Key"
+msgstr ""
+
+#: src/cuttlefish.rs:958 src/cuttlefish.rs:1037
+msgid "-- used for more advanced shortcuts"
+msgstr ""
+
+#: src/cuttlefish.rs:970
+msgid "Light"
+msgstr ""
+
+#: src/cuttlefish.rs:971
+msgid "Dark"
+msgstr ""
+
+#: src/cuttlefish.rs:972
+msgid "Custom"
+msgstr ""
+
+#: src/cuttlefish.rs:979
+msgid "UI Theme for Configurator"
+msgstr ""
+
+#: src/cuttlefish.rs:1049
+msgid "Exit the Desktop Session"
+msgstr ""
+
+#: src/cuttlefish.rs:1059
+msgid "Open the App Launcher"
+msgstr ""
+
+#: src/cuttlefish.rs:1069
+msgid "Close the Currently Focused App"
+msgstr ""
+
+#: src/cuttlefish.rs:1079
+msgid "Minimize the Focused App"
+msgstr ""
+
+#: src/cuttlefish.rs:1089
+msgid "Retrieve App from Minimization"
+msgstr ""
+
+#: src/cuttlefish.rs:1302
+msgid "The Width of The Window Borders:"
+msgstr ""
+
+#: src/cuttlefish.rs:1309
+msgid "The Size of The Standard Window Gaps:"
+msgstr ""
+
+#: src/cuttlefish.rs:1316
+msgid "The roundedness of window corners:"
+msgstr ""
+
+#: src/cuttlefish.rs:1327
+msgid "The Window Animations To Be Used:"
+msgstr ""
+
+#: src/cuttlefish.rs:1338
+msgid "The Workspace Animations To Be Used:"
+msgstr ""
+
+#: src/cuttlefish.rs:1342
+msgid "Enable"
+msgstr ""
+
+#: src/cuttlefish.rs:1343
+msgid "Disable"
+msgstr ""
+
+#: src/cuttlefish.rs:1344
+msgid "Enabled"
+msgstr ""
+
+#: src/cuttlefish.rs:1345
+msgid "Disabled"
+msgstr ""
+
+#: src/cuttlefish.rs:1346
+msgid "Whether or not to use window blur"
+msgstr ""

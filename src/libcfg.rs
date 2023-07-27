@@ -5,8 +5,7 @@ use std::fs::read_to_string;
 use std::env;
 use std::process::Command;
 use std::fs;
-use langcfg::get_lang;
-use crate::langcfg;
+use gettextrs::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum OurTheme {
@@ -132,62 +131,54 @@ impl WorkAnimation {
 }
 impl std::fmt::Display for ShortcutKey {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let locale = get_lang();
-        let pretty = locale.prettyprint;
         write!(
             f,
             "{}",
             match self {
-                ShortcutKey::Super => pretty.keysuper,
-                ShortcutKey::Alt => pretty.keyalt,
-                ShortcutKey::Shift => pretty.keyshift,
-                ShortcutKey::Ctrl => pretty.keyctrl,
+                ShortcutKey::Super => gettext("Windows/Command Key"),
+                ShortcutKey::Alt => gettext("Alt Key"),
+                ShortcutKey::Shift => gettext("Shift Key"),
+                ShortcutKey::Ctrl => gettext("Control Key"),
             }
         )
     }
 }
 impl std::fmt::Display for BindKey {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let locale = get_lang();
-        let pretty = locale.prettyprint;
         write!(
             f,
             "{}",
             match self {
-                BindKey::PrimaryKey => pretty.bindpri,
-                BindKey::SecondaryKey => pretty.bindsec,
-                BindKey::BothKey => pretty.bindboth
+                BindKey::PrimaryKey => gettext("Primary Key"),
+                BindKey::SecondaryKey => gettext("Secondary Key"),
+                BindKey::BothKey => gettext("Primary + Secondary")
             }
         )
     }
 }
 impl std::fmt::Display for WindowAnimation {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let locale = get_lang();
-        let pretty = locale.prettyprint;
         write!(
             f,
             "{}",
             match self {
-                WindowAnimation::None => pretty.winnone,
-                WindowAnimation::Popin => pretty.winpop,
-                WindowAnimation::Slide => pretty.winslide
+                WindowAnimation::None => gettext("No Animation"),
+                WindowAnimation::Popin => gettext("Pop-in"),
+                WindowAnimation::Slide => gettext("Slide In")
             }
         )
     }
 }
 impl std::fmt::Display for WorkAnimation {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let locale = get_lang();
-        let pretty = locale.prettyprint;
         write!(
             f,
             "{}",
             match self {
-                WorkAnimation::None => pretty.worknone,
-                WorkAnimation::Fade => pretty.workfade,
-                WorkAnimation::Slide => pretty.workslide,
-                WorkAnimation::SlideVert => pretty.workslidev
+                WorkAnimation::None => gettext("No Animation"),
+                WorkAnimation::Fade => gettext("Fade In"),
+                WorkAnimation::Slide => gettext("Slide In Horizontally"),
+                WorkAnimation::SlideVert => gettext("Slide In Vertically")
             }
         )
     }

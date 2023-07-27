@@ -5,23 +5,22 @@ use iced::keyboard::KeyCode;
 use iced_style::Color;
 use libcfg::{getcfgdata, BindKey, ShortcutKey, OurTheme, BarWidget, WindowAnimation, WorkAnimation, Border, decodeheader, decodepri, decodetheme, mkwmcfg, mkselfcfg, decodewinanim, decodeworkanim, decodeblur};
 mod libcfg;
-use langcfg::{get_lang, Translation};
-mod langcfg;
 use libstyle::{ButtonStyle, ListStyle, MenuStyle, ThemeCustom, make_custom_theme, ThemeSet};
 mod libstyle;
-mod liblocale;
+use gettextrs::*;
 
 
 //This is Cuttlefish, Our Configuration Tool
 
 fn main() -> Result {
+    let _ = textdomain("CuttlefishCfg");
+    let _ = bind_textdomain_codeset("CuttlefishCfg", "UTF-8");
     Configurator::run(Settings::default())
 }
 
 
 struct Configurator { //The basic configurator struct, contains most program state
     theme: OurTheme,
-    locale: Translation,
     current_page: Page,
     primary_key: Option<ShortcutKey>,
     secondary_key: Option<ShortcutKey>,
@@ -77,7 +76,6 @@ impl Default for Configurator {
         let data = getcfgdata();
         Configurator { //here we extract all of the data from the config file
             theme: decodetheme(&data.theme, OurTheme::Light),
-            locale: get_lang(),
             current_page: Page::Main,
             primary_key: decodepri(&data.primary, ShortcutKey::Super),
             secondary_key: decodepri(&data.secondary, ShortcutKey::Shift),
@@ -238,17 +236,15 @@ pub enum Page { //page enum, used to store the currently focused page
 
 impl std::fmt::Display for Page {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let locale = get_lang();
-        let pretty = locale.prettyprint;
         write!(
             f,
             "{}",
             match self { //respect locale preferences when prettyprinting
-                Page::Main => pretty.pagemain,
-                Page::Bind => pretty.pagebind,
-                Page::Bar => pretty.pagebar,
-                Page::Init => pretty.pageinit,
-                Page::Anim => pretty.pageanim,
+                Page::Main => gettext("Main Page"),
+                Page::Bind => gettext("Keybindings Page"),
+                Page::Bar => gettext("Status Bar Page"),
+                Page::Init => gettext("Autostart Page"),
+                Page::Anim => gettext("Animations Page"),
             }
         )
     }
@@ -266,8 +262,7 @@ impl Application for Configurator {
         )
     }
     fn title(&self) -> String { //code that sets the app title
-        let title = self.locale.global.title.clone();
-        format!("{title}{}", self.current_page.to_string())
+        format!("{}{}", gettext("Cuttlefish Configurator--"), self.current_page.to_string())
     }
     fn update(&mut self, message: Self::Message) -> iced::Command<Message> { //update function, parses messages
         match message {
@@ -885,11 +880,11 @@ impl Application for Configurator {
 
         let selectionmarker: Text = Text::new("=>");
 
-        let maintxt = Text::new(self.locale.global.main.clone());
-        let bindtxt = Text::new(self.locale.global.bind.clone());
-        let bartxt = Text::new(self.locale.global.bar.clone());
-        let inittxt = Text::new(self.locale.global.init.clone());
-        let animtxt = Text::new(self.locale.global.anim.clone());
+        let maintxt = Text::new(Page::Main.to_string());
+        let bindtxt = Text::new(Page::Bind.to_string());
+        let bartxt = Text::new(Page::Bar.to_string());
+        let inittxt = Text::new(Page::Init.to_string());
+        let animtxt = Text::new(Page::Anim.to_string());
         let pagemain = Button::new(maintxt)
             .on_press(Message::PageChanged(Page::Main))
             .width(150)
@@ -910,7 +905,7 @@ impl Application for Configurator {
             .on_press(Message::PageChanged(Page::Anim))
             .width(150)
             .style(style.sidebar.mk_theme());
-        let pagelabel = Text::new(self.locale.global.label.clone());
+        let pagelabel = Text::new(gettext("Available Pages"));
         let pagecol = Column::new()
             .push(pagelabel)
             .push(pagemain)
@@ -922,8 +917,8 @@ impl Application for Configurator {
             .align_items(Alignment::Start);
 
         let save;
-        let savetxt = Text::new(self.locale.global.save.clone());
-        let savedtxt = Text::new(self.locale.global.saved.clone());
+        let savetxt = Text::new(gettext("Save"));
+        let savedtxt = Text::new(gettext("Saved!"));
         if self.unsaved {
             save = Button::new(savetxt)
             .on_press(Message::Save);
@@ -958,30 +953,30 @@ impl Application for Configurator {
                     .placeholder("choose")
                     .style(style.list.mk_theme());
                 let primarytxt;
-                let temp_primary = format!("{}{}", self.locale.global.primary, self.locale.global.primary_addendum);
+                let temp_primary = format!("{}{}", gettext("Primary Shortcut Key"), gettext("-- Control and shift not recommended"));
                 let secondarytxt;
-                let temp_secondary = format!("{}{}", self.locale.global.secondary, self.locale.global.secondary_addendum);
+                let temp_secondary = format!("{}{}", gettext("Secondary Shortcut Key"), gettext("-- used for more advanced shortcuts"));
                 if self.width == ShrinkValue::Full {
                     primarytxt = temp_primary;
                     secondarytxt = temp_secondary;
                 } else {
-                    primarytxt = self.locale.global.primary.clone();
-                    secondarytxt = self.locale.global.secondary.clone();
+                    primarytxt = gettext("Primary Shortcut Key");
+                    secondarytxt = gettext("Secondary Shortcut Key");
                 }
                 
                 let primarylabel: Text = Text::new(primarytxt);
                 let secondarylabel: Text = Text::new(secondarytxt);
 
-                let lighttxt = Text::new(self.locale.mainpage.light.clone());
-                let darktxt = Text::new(self.locale.mainpage.dark.clone());
-                let customtxt = Text::new(self.locale.mainpage.custom.clone());
+                let lighttxt = Text::new(gettext("Light"));
+                let darktxt = Text::new(gettext("Dark"));
+                let customtxt = Text::new(gettext("Custom"));
                 let mut light = Button::new(lighttxt)
                     .on_press(Message::ThemeChanged(OurTheme::Light));
                 let mut dark = Button::new(darktxt)
                     .on_press(Message::ThemeChanged(OurTheme::Dark));
                 let mut custom = Button::new(customtxt)
                     .on_press(Message::ThemeChanged(OurTheme::Custom));
-                let themelabel = Text::new(self.locale.mainpage.theme.clone());
+                let themelabel = Text::new(gettext("UI Theme for Configurator"));
                 match self.theme {
                     OurTheme::Light => {
                         light = light.style(style.secondary.mk_theme());
@@ -1037,21 +1032,21 @@ impl Application for Configurator {
                     .placeholder("choose")
                     .style(style.list.mk_theme());
                 let primarytxt;
-                let temp_primary = format!("{}{}", self.locale.global.primary, self.locale.global.primary_addendum);
+                let temp_primary = format!("{}{}", gettext("Primary Shortcut Key"), gettext("-- Control and shift not recommended"));
                 let secondarytxt;
-                let temp_secondary = format!("{}{}", self.locale.global.secondary, self.locale.global.secondary_addendum);
+                let temp_secondary = format!("{}{}", gettext("Secondary Shortcut Key"), gettext("-- used for more advanced shortcuts"));
                 if self.width == ShrinkValue::Full {
                     primarytxt = temp_primary;
                     secondarytxt = temp_secondary;
                 } else {
-                    primarytxt = self.locale.global.primary.clone();
-                    secondarytxt = self.locale.global.secondary.clone();
+                    primarytxt = gettext("Primary Shortcut Key");
+                    secondarytxt = gettext("Secondary Shortcut Key");
                 }
                 let primarylabel: Text = Text::new(primarytxt);
                 let secondarylabel: Text = Text::new(secondarytxt);
 
 
-                let exitsclabel = Text::new(self.locale.bindpage.exit.clone());
+                let exitsclabel = Text::new(gettext("Exit the Desktop Session"));
                 let exitheaderselect = pick_list(
                 &BindKey::ALL[..], 
                 self.exit_header, 
@@ -1061,7 +1056,7 @@ impl Application for Configurator {
                 .style(style.list.mk_theme());
                 let exitkey = Text::new(self.exit_key.clone());
                 let mut exitkeyselect = Button::new(exitkey).on_press(Message::Capture(CaptureInput::ExitKey)).width(50);
-                let launchsclabel: Text = Text::new(self.locale.bindpage.launch.clone());
+                let launchsclabel: Text = Text::new(gettext("Open the App Launcher"));
                 let launchheaderselect = pick_list(
                     &BindKey::ALL[..], 
                     self.launch_header, 
@@ -1071,7 +1066,7 @@ impl Application for Configurator {
                     .style(style.list.mk_theme());
                 let launchkey = Text::new(self.launch_key.clone());
                 let mut launchkeyselect = Button::new(launchkey).on_press(Message::Capture(CaptureInput::LaunchKey)).width(50);
-                let killsclabel: Text = Text::new(self.locale.bindpage.kill.clone());
+                let killsclabel: Text = Text::new(gettext("Close the Currently Focused App"));
                 let killheaderselect = pick_list(
                     &BindKey::ALL[..], 
                     self.kill_header, 
@@ -1081,7 +1076,7 @@ impl Application for Configurator {
                     .style(style.list.mk_theme());
                 let killkey = Text::new(self.kill_key.clone());
                 let mut killkeyselect = Button::new(killkey).on_press(Message::Capture(CaptureInput::KillKey)).width(50);
-                let minisclabel: Text = Text::new(self.locale.bindpage.mini.clone());
+                let minisclabel: Text = Text::new(gettext("Minimize the Focused App"));
                 let miniheaderselect = pick_list(
                  &BindKey::ALL[..], 
                  self.minimize_header, 
@@ -1091,7 +1086,7 @@ impl Application for Configurator {
                     .style(style.list.mk_theme());
                 let minikey = Text::new(self.minimize_key.clone());
                 let mut minikeyselect = Button::new(minikey).on_press(Message::Capture(CaptureInput::MiniKey)).width(50);
-                let scratchsclabel: Text = Text::new(self.locale.bindpage.scratch.clone());
+                let scratchsclabel: Text = Text::new(gettext("Retrieve App from Minimization"));
                 let scratchheaderselect = pick_list(
                     &BindKey::ALL[..], 
                     self.scratch_header, 
@@ -1304,21 +1299,21 @@ impl Application for Configurator {
                 let widthincr = Button::new("+").on_press(Message::Incr(IncrVal::WidthVal)).width(30);
                 let mut widthdecr = Button::new("-").on_press(Message::Decr(IncrVal::WidthVal)).width(30);
                 let widthvaluepeek = Text::new(format!("{}", self.border.width));
-                let widthlabel = Text::new(self.locale.animpage.width.clone());
+                let widthlabel = Text::new(gettext("The Width of The Window Borders:"));
 
                 let mut widthrow = Row::new().spacing(10);
 
                 let gapsincr = Button::new("+").on_press(Message::Incr(IncrVal::GapsVal)).width(30);
                 let mut gapsdecr = Button::new("-").on_press(Message::Decr(IncrVal::GapsVal)).width(30);
                 let gapsvaluepeek = Text::new(format!("{}", self.border.gaps));
-                let gapslabel = Text::new(self.locale.animpage.gaps.clone());
+                let gapslabel = Text::new(gettext("The Size of The Standard Window Gaps:"));
 
                 let mut gapsrow = Row::new().spacing(10);
 
                 let radincr = Button::new("+").on_press(Message::Incr(IncrVal::RadiusVal)).width(30);
                 let mut raddecr = Button::new("-").on_press(Message::Decr(IncrVal::RadiusVal)).width(30);
                 let radvaluepeek = Text::new(format!("{}", self.border.radius));
-                let radlabel = Text::new(self.locale.animpage.radius.clone());
+                let radlabel = Text::new(gettext("The roundedness of window corners:"));
 
                 let mut radrow = Row::new().spacing(10);
 
@@ -1329,7 +1324,7 @@ impl Application for Configurator {
                     )
                     .placeholder("choose")
                     .style(style.list.mk_theme());
-                let winlabel = Text::new(self.locale.animpage.winanim.clone());
+                let winlabel = Text::new(gettext("The Window Animations To Be Used:"));
 
                 let mut winrow = Row::new().spacing(10);
 
@@ -1340,15 +1335,15 @@ impl Application for Configurator {
                     )
                     .placeholder("choose")
                     .style(style.list.mk_theme());
-                let worklabel = Text::new(self.locale.animpage.workanim.clone());
+                let worklabel = Text::new(gettext("The Workspace Animations To Be Used:"));
 
                 let mut workrow = Row::new().spacing(10);
 
-                let enable = Text::new(self.locale.animpage.enableblur.clone());
-                let disable = Text::new(self.locale.animpage.disableblur.clone());
-                let enabled = Text::new(self.locale.animpage.enabledblur.clone());
-                let disabled = Text::new(self.locale.animpage.disabledblur.clone());
-                let blurlabel = Text::new(self.locale.animpage.blur.clone());
+                let enable = Text::new(gettext("Enable"));
+                let disable = Text::new(gettext("Disable"));
+                let enabled = Text::new(gettext("Enabled"));
+                let disabled = Text::new(gettext("Disabled"));
+                let blurlabel = Text::new(gettext("Whether or not to use window blur"));
                 let mut bluron = Button::new(enable).on_press(Message::BlurToggled(true));
                 let mut bluroff = Button::new(disable).on_press(Message::BlurToggled(false));
                 if self.blur {
