@@ -47,7 +47,7 @@ struct Configurator { //The basic configurator struct, contains most program sta
     bar_left: Vec<BarWidget>,
     bar_center: Vec<BarWidget>,
     bar_right: Vec<BarWidget>,
-    next_widget: BarWidget,
+    next_widget: Option<BarWidget>,
 }
 #[derive(PartialEq, Debug, Clone)]
 enum CaptureInput { //enum used to store what binding should be captured into
@@ -188,7 +188,7 @@ impl Default for Configurator {
             bar_left: vec![],
             bar_center: vec![],
             bar_right: vec![],
-            next_widget: BarWidget::None,
+            next_widget: None,
         }
     }
 }
@@ -437,18 +437,21 @@ impl Application for Configurator {
                                         }
                                         Page::Bar => {
                                             if self.index >= 5 {
-                                                if self.next_widget != BarWidget::None {
-                                                    if self.index == 5 {
-                                                        self.bar_left.push(self.next_widget);
-                                                    } else if self.index == 6 {
-                                                        self.bar_center.push(self.next_widget);
-                                                    } else if self.index == 7 {
-                                                        self.bar_right.push(self.next_widget);
+                                                match self.next_widget {
+                                                    Some(x) => {
+                                                        if self.index == 5 {
+                                                            self.bar_left.push(x);
+                                                        } else if self.index == 6 {
+                                                            self.bar_center.push(x);
+                                                        } else if self.index == 7 {
+                                                            self.bar_right.push(x);
+                                                        }
                                                     }
-                                                };
+                                                    None => {}
+                                                }
                                                 println!("{:?}", self.bar_left);
                                                 println!("{}", self.bar_center.len());
-                                                self.next_widget = BarWidget::None;
+                                                self.next_widget = None;
                                                 self.unsaved = true;
                                             }
                                         }
@@ -504,15 +507,15 @@ impl Application for Configurator {
                                         }
                                     } else if self.current_page == Page::Bar {
                                         if self.index == 0 {
-                                            self.next_widget = BarWidget::Audio;
+                                            self.next_widget = Some(BarWidget::Audio);
                                         } else if self.index == 1 {
-                                            self.next_widget = BarWidget::Bluetooth;
+                                            self.next_widget = Some(BarWidget::Bluetooth);
                                         } else if self.index == 2 {
-                                            self.next_widget = BarWidget::Disk;
+                                            self.next_widget = Some(BarWidget::Disk);
                                         } else if self.index == 3 {
-                                            self.next_widget = BarWidget::RAM;
+                                            self.next_widget = Some(BarWidget::RAM);
                                         } else if self.index == 4 {
-                                            self.next_widget = BarWidget::Tray;
+                                            self.next_widget = Some(BarWidget::Tray);
                                         }
                                     }
                                 } else if key_code == KeyCode::Key2 {
@@ -557,15 +560,15 @@ impl Application for Configurator {
                                         }
                                     } else if self.current_page == Page::Bar {
                                         if self.index == 0 {
-                                            self.next_widget = BarWidget::Backlight;
+                                            self.next_widget = Some(BarWidget::Backlight);
                                         } else if self.index == 1 {
-                                            self.next_widget = BarWidget::CPU;
+                                            self.next_widget = Some(BarWidget::CPU);
                                         } else if self.index == 2 {
-                                            self.next_widget = BarWidget::KeyboardState;
+                                            self.next_widget = Some(BarWidget::KeyboardState);
                                         } else if self.index == 3 {
-                                            self.next_widget = BarWidget::Taskbar;
+                                            self.next_widget = Some(BarWidget::Taskbar);
                                         } else if self.index == 4 {
-                                            self.next_widget = BarWidget::User;
+                                            self.next_widget = Some(BarWidget::User);
                                         }
                                     }
                                 } else if key_code == KeyCode::Key3 {
@@ -610,15 +613,15 @@ impl Application for Configurator {
                                         }
                                     } else if self.current_page == Page::Bar {
                                         if self.index == 0 {
-                                            self.next_widget = BarWidget::Battery;
+                                            self.next_widget = Some(BarWidget::Battery);
                                         } else if self.index == 1 {
-                                            self.next_widget = BarWidget::Clock;
+                                            self.next_widget = Some(BarWidget::Clock);
                                         } else if self.index == 2 {
-                                            self.next_widget = BarWidget::Network;
+                                            self.next_widget = Some(BarWidget::Network);
                                         } else if self.index == 3 {
-                                            self.next_widget = BarWidget::Temperature;
+                                            self.next_widget = Some(BarWidget::Temperature);
                                         } else if self.index == 4 {
-                                            self.next_widget = BarWidget::Workspaces;
+                                            self.next_widget = Some(BarWidget::Workspaces);
                                         }
                                     }
                                 } else if key_code == KeyCode::Key4 {
@@ -806,23 +809,26 @@ impl Application for Configurator {
                 iced::Command::none()
             }
             Message::PushWidget(bank) => {
-                if self.next_widget != BarWidget::None {
-                    match bank {
-                        WidgetBank::Left => {
-                            self.bar_left.push(self.next_widget);
+                match self.next_widget {
+                    Some(x) => {
+                        match bank {
+                            WidgetBank::Left => {
+                                self.bar_left.push(x);
+                            }
+                            WidgetBank::Center => {
+                                self.bar_center.push(x);
+                            }
+                            WidgetBank::Right => {
+                                self.bar_right.push(x);
+                            }
                         }
-                        WidgetBank::Center => {
-                            self.bar_center.push(self.next_widget);
-                        }
-                        WidgetBank::Right => {
-                            self.bar_right.push(self.next_widget);
-                        }
+                        self.unsaved = true;
                     }
-                    self.unsaved = true;
+                    None => {}
                 };
                 println!("{:?}", self.bar_left);
                 println!("{}", self.bar_center.len());
-                self.next_widget = BarWidget::None;
+                self.next_widget = None;
                 iced::Command::none()
             }
             Message::RemoveWidget(bank) => {
@@ -834,27 +840,27 @@ impl Application for Configurator {
                         let val;
                         if left > 0 {
                             val = left - 1;
-                            self.bar_left.remove(val)
+                            Some(self.bar_left.remove(val))
                         } else {
-                            BarWidget::None
+                            None
                         }
                     },
                     WidgetBank::Center => {
                         let val;
                         if center > 0 {
                             val = center - 1;
-                            self.bar_center.remove(val)
+                            Some(self.bar_center.remove(val))
                         } else {
-                            BarWidget::None
+                            None
                         }
                     },
                     WidgetBank::Right => {
                         let val;
                         if right > 0 {
                             val = right - 1;
-                            self.bar_right.remove(val)
+                            Some(self.bar_right.remove(val))
                         } else {
-                            BarWidget::None
+                            None
                         }
                     },
                 };
@@ -863,7 +869,7 @@ impl Application for Configurator {
                 iced::Command::none()
             }
             Message::AwaitDestination(x) => {
-                self.next_widget = x;
+                self.next_widget = Some(x);
                 iced::Command::none()
             }
 
@@ -1225,24 +1231,26 @@ impl Application for Configurator {
                 let labelcenter = Text::new(center_contents);
 
                 match self.next_widget {
-                    BarWidget::None => {
-
+                    Some(value) => {
+                        match value {
+                            BarWidget::Audio => audio = audio.style(style.secondary.mk_theme()),
+                            BarWidget::Backlight => backlight = backlight.style(style.secondary.mk_theme()),
+                            BarWidget::Battery => battery = battery.style(style.secondary.mk_theme()),
+                            BarWidget::Bluetooth => bluetooth = bluetooth.style(style.secondary.mk_theme()),
+                            BarWidget::Clock => clock = clock.style(style.secondary.mk_theme()),
+                            BarWidget::CPU => cpu = cpu.style(style.secondary.mk_theme()),
+                            BarWidget::Disk => disk = disk.style(style.secondary.mk_theme()),
+                            BarWidget::KeyboardState => keyboard = keyboard.style(style.secondary.mk_theme()),
+                            BarWidget::RAM => ram = ram.style(style.secondary.mk_theme()),
+                            BarWidget::Network => network = network.style(style.secondary.mk_theme()),
+                            BarWidget::Temperature => temperature = temperature.style(style.secondary.mk_theme()),
+                            BarWidget::Tray => tray = tray.style(style.secondary.mk_theme()),
+                            BarWidget::Taskbar => taskbar = taskbar.style(style.secondary.mk_theme()),
+                            BarWidget::Workspaces => workspaces = workspaces.style(style.secondary.mk_theme()),
+                            BarWidget::User => user = user.style(style.secondary.mk_theme()),
+                        }
                     },
-                    BarWidget::Audio => audio = audio.style(style.secondary.mk_theme()),
-                    BarWidget::Backlight => backlight = backlight.style(style.secondary.mk_theme()),
-                    BarWidget::Battery => battery = battery.style(style.secondary.mk_theme()),
-                    BarWidget::Bluetooth => bluetooth = bluetooth.style(style.secondary.mk_theme()),
-                    BarWidget::Clock => clock = clock.style(style.secondary.mk_theme()),
-                    BarWidget::CPU => cpu = cpu.style(style.secondary.mk_theme()),
-                    BarWidget::Disk => disk = disk.style(style.secondary.mk_theme()),
-                    BarWidget::KeyboardState => keyboard = keyboard.style(style.secondary.mk_theme()),
-                    BarWidget::RAM => ram = ram.style(style.secondary.mk_theme()),
-                    BarWidget::Network => network = network.style(style.secondary.mk_theme()),
-                    BarWidget::Temperature => temperature = temperature.style(style.secondary.mk_theme()),
-                    BarWidget::Tray => tray = tray.style(style.secondary.mk_theme()),
-                    BarWidget::Taskbar => taskbar = taskbar.style(style.secondary.mk_theme()),
-                    BarWidget::Workspaces => workspaces = workspaces.style(style.secondary.mk_theme()),
-                    BarWidget::User => user = user.style(style.secondary.mk_theme()),
+                    None => {}
                 }
                 
                 let mut left_row = Row::new();

@@ -64,7 +64,6 @@ pub enum WorkAnimation {
 
 pub enum BarWidget {
     #[default]
-    None,
     Audio,
     Backlight,
     Battery,
