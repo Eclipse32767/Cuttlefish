@@ -1,7 +1,7 @@
 use iced::theme::Theme;
 use iced::{Result, Settings, alignment, Alignment, Length, Application, Command, executor};
 use iced::widget::{Button, Row, Column, Container, Text, Scrollable};
-use iced_style::Color;
+use iced::Color;
 use libcfg::{getcfgdata, decodetheme, OurTheme};
 mod libcfg;
 use libstyle::{ButtonStyle, ThemeCustom, make_custom_theme, ThemeSet, ListStyle, MenuStyle};

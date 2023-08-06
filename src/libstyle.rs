@@ -1,5 +1,6 @@
 #![allow(dead_code)]
-use iced_style::{Color, button, pick_list, menu, Background, theme::Palette};
+use iced_style::{button, pick_list, menu, theme::Palette};
+use iced::{Color, Background};
 use iced::theme::{self, Theme};
 use serde_derive::{Deserialize, Serialize};
 use toml::{self, from_str};
@@ -21,7 +22,7 @@ impl button::StyleSheet for ButtonStyle {
     fn active(&self, _style: &Theme) -> button::Appearance {
         button::Appearance {
             shadow_offset: self.shadow_offset.clone(),
-            border_radius: self.border_radius.clone(),
+            border_radius: self.border_radius.clone().into(),
             text_color: self.txt_color.clone(),
             border_color: self.border_color.clone(),
             border_width: self.border_width.clone(),
@@ -56,7 +57,7 @@ impl pick_list::StyleSheet for ListStyle {
             placeholder_color: Color::from_rgb8(0xFF, 0x00, 0x00), 
             handle_color: self.handle_color.clone(), 
             background: Background::Color(self.bg_color.clone()),
-            border_radius: self.border_radius, 
+            border_radius: self.border_radius.into(), 
             border_width: self.border_width, 
             border_color: self.border_color.clone() 
         }
@@ -67,7 +68,7 @@ impl pick_list::StyleSheet for ListStyle {
             placeholder_color: Color::from_rgb8(0xFF, 0x00, 0x00), 
             handle_color: self.handle_color.clone(), 
             background: Background::Color(self.bg_color.clone()),
-            border_radius: self.border_radius, 
+            border_radius: self.border_radius.into(), 
             border_width: self.border_width, 
             border_color: self.border_color.clone() 
         }
@@ -200,7 +201,7 @@ impl menu::StyleSheet for MenuStyle {
             text_color: self.txt_color.clone(), 
             background: Background::Color(self.bg_color.clone()), 
             border_width: self.border_width, 
-            border_radius: self.border_radius, 
+            border_radius: self.border_radius.into(), 
             border_color: self.border_color.clone(), 
             selected_text_color: self.sel_txt_color.clone(), 
             selected_background: Background::Color(self.sel_bg_color.clone())
