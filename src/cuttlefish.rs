@@ -1,6 +1,6 @@
 use iced::theme::Theme;
 use iced::{Result, Application, Settings, Alignment, Length, executor};
-use iced::widget::{Button, Row, Column, Container, Text, Scrollable};
+use iced::widget::{Button, Row, Column, Container, Text, Scrollable, Rule};
 use iced::keyboard::KeyCode;
 use iced::Color;
 use libcfg::{getcfgdata, BindKey, ShortcutKey, OurTheme, BarWidget, WindowAnimation, WorkAnimation, Border, decodeheader, decodepri, decodetheme, mkwmcfg, mkselfcfg, decodewinanim, decodeworkanim, decodeblur};
@@ -13,6 +13,7 @@ mod cuttlefish_pages;
 
 //This is Cuttlefish, Our Configuration Tool
 
+const SIDEBAR_WIDTH: u16 = 175;
 fn main() -> Result {
     let _ = textdomain("CuttlefishCfg");
     let _ = bind_textdomain_codeset("CuttlefishCfg", "UTF-8");
@@ -103,7 +104,7 @@ impl Default for Configurator {
                     application: iced::theme::Palette {
                         background: Color::from_rgb8(0xE0, 0xF5, 0xFF),
                         text: Color::from_rgb8(0x00, 0x19, 0x36),
-                        primary: Color::from_rgb8(0x00, 0xF1, 0xD6),
+                        primary: Color::from_rgb8(0x00, 0x77, 0xFF),
                         success: Color::from_rgb8(0x00, 0xCB, 0x40),
                         danger: Color::from_rgb8(0xFF, 0x4C, 0x00),
                     },
@@ -145,7 +146,7 @@ impl Default for Configurator {
                     application: iced::theme::Palette {
                         background: Color::from_rgb8(0x00, 0x19, 0x36),
                         text: Color::from_rgb8(0xE0, 0xF5, 0xFF),
-                        primary: Color::from_rgb8(0x00, 0xCD, 0xB6),
+                        primary: Color::from_rgb8(0x00, 0xAB, 0xE1),
                         success: Color::from_rgb8(0x00, 0xA9, 0x35),
                         danger: Color::from_rgb8(0xC5, 0x3A, 0x00),
                     },
@@ -890,27 +891,34 @@ impl Application for Configurator {
         let bartxt = Text::new(Page::Bar.to_string());
         let inittxt = Text::new(Page::Init.to_string());
         let animtxt = Text::new(Page::Anim.to_string());
-        let pagemain = Button::new(maintxt)
+        let mut pagemain = Button::new(maintxt)
             .on_press(Message::PageChanged(Page::Main))
-            .width(150)
+            .width(SIDEBAR_WIDTH)
             .style(style.sidebar.mk_theme());
-        let pagebind = Button::new(bindtxt)
+        let mut pagebind = Button::new(bindtxt)
             .on_press(Message::PageChanged(Page::Bind))
-            .width(150)
+            .width(SIDEBAR_WIDTH)
             .style(style.sidebar.mk_theme());
-        let pagebar = Button::new(bartxt)
+        let mut pagebar = Button::new(bartxt)
             .on_press(Message::PageChanged(Page::Bar))
-            .width(150)
+            .width(SIDEBAR_WIDTH)
             .style(style.sidebar.mk_theme());
-        let pageinit = Button::new(inittxt)
+        let mut pageinit = Button::new(inittxt)
             .on_press(Message::PageChanged(Page::Init))
-            .width(150)
+            .width(SIDEBAR_WIDTH)
             .style(style.sidebar.mk_theme());
-        let pageanim = Button::new(animtxt)
+        let mut pageanim = Button::new(animtxt)
             .on_press(Message::PageChanged(Page::Anim))
-            .width(150)
+            .width(SIDEBAR_WIDTH)
             .style(style.sidebar.mk_theme());
         let pagelabel = Text::new(gettext("Available Pages"));
+        match self.current_page {
+            Page::Main => pagemain = pagemain.style(style.secondary.mk_theme()),
+            Page::Bind => pagebind = pagebind.style(style.secondary.mk_theme()),
+            Page::Bar => pagebar = pagebar.style(style.secondary.mk_theme()),
+            Page::Init => pageinit = pageinit.style(style.secondary.mk_theme()),
+            Page::Anim => pageanim = pageanim.style(style.secondary.mk_theme()),
+        }
         let pagecol = Column::new()
             .push(pagelabel)
             .push(pagemain)
@@ -918,7 +926,6 @@ impl Application for Configurator {
             .push(pageanim)
             .push(pagebar)
             .push(pageinit)
-            .spacing(10)
             .align_items(Alignment::Start);
 
         let save;
@@ -957,7 +964,7 @@ impl Application for Configurator {
                 settings = self.anim_page(style);
             }
         }
-
+        let testrule = Rule::vertical(1);
         let scroll = Scrollable::new(settings);
         let col = Column::new()
             .push(scroll)
@@ -967,8 +974,8 @@ impl Application for Configurator {
             .spacing(10);
         let master = Row::new()
             .push(pagecol)
-            .push(col)
-            .spacing(30);
+            .push(testrule)
+            .push(col);
         Container::new(master)
             .width(Length::Fill)
             .height(Length::Fill)
