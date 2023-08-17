@@ -671,6 +671,8 @@ impl Application for Configurator {
                                         } else if self.index == 2 {
                                             self.border.radius = self.border.radius + 1;
                                             self.unsaved = true;
+                                        } else if self.index == 5 {
+                                            self.blur = !self.blur;
                                         }
                                     }
                                 } else if key_code == KeyCode::Left { // decrement values with left presses
@@ -684,6 +686,8 @@ impl Application for Configurator {
                                         } else if self.index == 2 && self.border.radius > 0 {
                                             self.border.radius = self.border.radius - 1;
                                             self.unsaved = true;
+                                        } else if self.index == 5 {
+                                            self.blur = !self.blur;
                                         }
                                     }
                                 } else if key_code == KeyCode::Backspace {
