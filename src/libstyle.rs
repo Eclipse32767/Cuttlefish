@@ -30,6 +30,14 @@ impl button::StyleSheet for ButtonStyle {
         }
     }
 }
+pub struct TextStyle {
+    pub color: Color
+}
+impl TextStyle {
+    pub fn mk_theme(&self) -> theme::Text {
+        theme::Text::Color(self.color.clone())
+    }
+}
 impl ButtonStyle {
     pub fn mk_theme(&self) -> theme::Button {
         theme::Button::Custom(std::boxed::Box::new(self.clone()))

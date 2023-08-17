@@ -1,7 +1,7 @@
 use gettextrs::gettext;
 use iced::widget::{Column, Text, pick_list, Button, Row};
 
-use crate::{Configurator, Message, libstyle::ThemeCustom, libcfg::{ShortcutKey, OurTheme, BindKey, BarWidget, WorkAnimation, WindowAnimation}, ShrinkValue, CaptureInput, WidgetBank, IncrVal};
+use crate::{Configurator, Message, libstyle::{ThemeCustom, TextStyle}, libcfg::{ShortcutKey, OurTheme, BindKey, BarWidget, WorkAnimation, WindowAnimation}, ShrinkValue, CaptureInput, WidgetBank, IncrVal};
 
 
 
@@ -9,7 +9,8 @@ use crate::{Configurator, Message, libstyle::ThemeCustom, libcfg::{ShortcutKey, 
 impl Configurator {
     pub fn main_page(&self, style: ThemeCustom) -> Column<Message> {
         let settings = Column::new();
-        let selectionmarker: Text = Text::new("=>");
+        let seltext = TextStyle {color: style.application.success};
+        //let selectionmarker: Text = Text::new("=>");
         let primarypick = pick_list(
             &ShortcutKey::ALL[..], 
             self.primary_key, 
@@ -36,8 +37,8 @@ impl Configurator {
             secondarytxt = gettext("Secondary Shortcut Key");
         }
         
-        let primarylabel: Text = Text::new(primarytxt);
-        let secondarylabel: Text = Text::new(secondarytxt);
+        let mut primarylabel: Text = Text::new(primarytxt);
+        let mut secondarylabel: Text = Text::new(secondarytxt);
 
         let lighttxt = Text::new(gettext("Light"));
         let darktxt = Text::new(gettext("Dark"));
@@ -48,7 +49,7 @@ impl Configurator {
             .on_press(Message::ThemeChanged(OurTheme::Dark));
         let mut custom = Button::new(customtxt)
             .on_press(Message::ThemeChanged(OurTheme::Custom));
-        let themelabel = Text::new(gettext("UI Theme for Configurator"));
+        let mut themelabel = Text::new(gettext("UI Theme for Configurator"));
         match self.theme {
             OurTheme::Light => {
                 light = light.style(style.secondary.mk_theme());
@@ -65,11 +66,11 @@ impl Configurator {
         let mut secondaryrow = Row::new().spacing(10);
 
         if self.index == 0 {
-            themerow = themerow.push(selectionmarker);
+            themelabel = themelabel.style(seltext.mk_theme())
         } else if self.index == 1 {
-            primaryrow = primaryrow.push(selectionmarker);
+            primarylabel = primarylabel.style(seltext.mk_theme())
         } else if self.index == 2 {
-            secondaryrow = secondaryrow.push(selectionmarker);
+            secondarylabel = secondarylabel.style(seltext.mk_theme());
         }
         themerow = themerow
             .push(themelabel)
@@ -86,7 +87,8 @@ impl Configurator {
     }
     pub fn bind_page(&self, style: ThemeCustom) -> Column<Message> {
         let settings = Column::new();
-        let selectionmarker: Text = Text::new("=>");
+        //let selectionmarker: Text = Text::new("=>");
+        let seltext = TextStyle {color: style.application.success};
         let primarypick = pick_list(
             &ShortcutKey::ALL[..], 
             self.primary_key, 
@@ -112,11 +114,11 @@ impl Configurator {
             primarytxt = gettext("Primary Shortcut Key");
             secondarytxt = gettext("Secondary Shortcut Key");
         }
-        let primarylabel: Text = Text::new(primarytxt);
-        let secondarylabel: Text = Text::new(secondarytxt);
+        let mut primarylabel: Text = Text::new(primarytxt);
+        let mut secondarylabel: Text = Text::new(secondarytxt);
 
 
-        let exitsclabel = Text::new(gettext("Exit the Desktop Session"));
+        let mut exitsclabel = Text::new(gettext("Exit the Desktop Session"));
         let exitheaderselect = pick_list(
         &BindKey::ALL[..], 
         self.exit_header, 
@@ -126,7 +128,7 @@ impl Configurator {
         .style(style.list.mk_theme());
         let exitkey = Text::new(self.exit_key.clone());
         let mut exitkeyselect = Button::new(exitkey).on_press(Message::Capture(CaptureInput::ExitKey)).width(50);
-        let launchsclabel: Text = Text::new(gettext("Open the App Launcher"));
+        let mut launchsclabel: Text = Text::new(gettext("Open the App Launcher"));
         let launchheaderselect = pick_list(
             &BindKey::ALL[..], 
             self.launch_header, 
@@ -136,7 +138,7 @@ impl Configurator {
             .style(style.list.mk_theme());
         let launchkey = Text::new(self.launch_key.clone());
         let mut launchkeyselect = Button::new(launchkey).on_press(Message::Capture(CaptureInput::LaunchKey)).width(50);
-        let killsclabel: Text = Text::new(gettext("Close the Currently Focused App"));
+        let mut killsclabel: Text = Text::new(gettext("Close the Currently Focused App"));
         let killheaderselect = pick_list(
             &BindKey::ALL[..], 
             self.kill_header, 
@@ -146,7 +148,7 @@ impl Configurator {
             .style(style.list.mk_theme());
         let killkey = Text::new(self.kill_key.clone());
         let mut killkeyselect = Button::new(killkey).on_press(Message::Capture(CaptureInput::KillKey)).width(50);
-        let minisclabel: Text = Text::new(gettext("Minimize the Focused App"));
+        let mut minisclabel: Text = Text::new(gettext("Minimize the Focused App"));
         let miniheaderselect = pick_list(
          &BindKey::ALL[..], 
          self.minimize_header, 
@@ -156,7 +158,7 @@ impl Configurator {
             .style(style.list.mk_theme());
         let minikey = Text::new(self.minimize_key.clone());
         let mut minikeyselect = Button::new(minikey).on_press(Message::Capture(CaptureInput::MiniKey)).width(50);
-        let scratchsclabel: Text = Text::new(gettext("Retrieve App from Minimization"));
+        let mut scratchsclabel: Text = Text::new(gettext("Retrieve App from Minimization"));
         let scratchheaderselect = pick_list(
             &BindKey::ALL[..], 
             self.scratch_header, 
@@ -194,19 +196,19 @@ impl Configurator {
         let mut miniscrow = Row::new();
         let mut scratchscrow = Row::new();
         if self.index == 0 {
-            primaryrow = primaryrow.push(selectionmarker);
+            primarylabel = primarylabel.style(seltext.mk_theme());
         } else if self.index == 1 {
-            secondaryrow = secondaryrow.push(selectionmarker);
+            secondarylabel = secondarylabel.style(seltext.mk_theme());
         } else if self.index == 2 {
-            exitscrow = exitscrow.push(selectionmarker);
+            exitsclabel = exitsclabel.style(seltext.mk_theme());
         } else if self.index == 3 {
-            launchscrow = launchscrow.push(selectionmarker);
+            launchsclabel = launchsclabel.style(seltext.mk_theme());
         } else if self.index == 4 {
-            killscrow = killscrow.push(selectionmarker);
+            killsclabel = killsclabel.style(seltext.mk_theme());
         } else if self.index == 5 {
-            miniscrow = miniscrow.push(selectionmarker);
+            minisclabel = minisclabel.style(seltext.mk_theme());
         } else if self.index == 6 {
-            scratchscrow = scratchscrow.push(selectionmarker);
+            scratchsclabel = scratchsclabel.style(seltext.mk_theme());
         }
         primaryrow = primaryrow
             .push(primarylabel)
@@ -367,25 +369,26 @@ impl Configurator {
     }
     pub fn anim_page(&self, style: ThemeCustom) -> Column<Message> {
         let settings = Column::new();
-        let selectionmarker: Text = Text::new("=>");
+        //let selectionmarker: Text = Text::new("=>");
+        let seltext = TextStyle {color: style.application.success};
         let widthincr = Button::new("+").on_press(Message::Incr(IncrVal::WidthVal)).width(30);
         let mut widthdecr = Button::new("-").on_press(Message::Decr(IncrVal::WidthVal)).width(30);
         let widthvaluepeek = Text::new(format!("{}", self.border.width));
-        let widthlabel = Text::new(gettext("The Width of The Window Borders:"));
+        let mut widthlabel = Text::new(gettext("The Width of The Window Borders:"));
 
         let mut widthrow = Row::new().spacing(10);
 
         let gapsincr = Button::new("+").on_press(Message::Incr(IncrVal::GapsVal)).width(30);
         let mut gapsdecr = Button::new("-").on_press(Message::Decr(IncrVal::GapsVal)).width(30);
         let gapsvaluepeek = Text::new(format!("{}", self.border.gaps));
-        let gapslabel = Text::new(gettext("The Size of The Standard Window Gaps:"));
+        let mut gapslabel = Text::new(gettext("The Size of The Standard Window Gaps:"));
 
         let mut gapsrow = Row::new().spacing(10);
 
         let radincr = Button::new("+").on_press(Message::Incr(IncrVal::RadiusVal)).width(30);
         let mut raddecr = Button::new("-").on_press(Message::Decr(IncrVal::RadiusVal)).width(30);
         let radvaluepeek = Text::new(format!("{}", self.border.radius));
-        let radlabel = Text::new(gettext("The roundedness of window corners:"));
+        let mut radlabel = Text::new(gettext("The roundedness of window corners:"));
 
         let mut radrow = Row::new().spacing(10);
 
@@ -396,7 +399,7 @@ impl Configurator {
             )
             .placeholder("choose")
             .style(style.list.mk_theme());
-        let winlabel = Text::new(gettext("The Window Animations To Be Used:"));
+        let mut winlabel = Text::new(gettext("The Window Animations To Be Used:"));
 
         let mut winrow = Row::new().spacing(10);
 
@@ -407,7 +410,7 @@ impl Configurator {
             )
             .placeholder("choose")
             .style(style.list.mk_theme());
-        let worklabel = Text::new(gettext("The Workspace Animations To Be Used:"));
+        let mut worklabel = Text::new(gettext("The Workspace Animations To Be Used:"));
 
         let mut workrow = Row::new().spacing(10);
 
@@ -415,7 +418,7 @@ impl Configurator {
         let disable = Text::new(gettext("Disable"));
         let enabled = Text::new(gettext("Enabled"));
         let disabled = Text::new(gettext("Disabled"));
-        let blurlabel = Text::new(gettext("Whether or not to use window blur"));
+        let mut blurlabel = Text::new(gettext("Whether or not to use window blur"));
         let mut bluron = Button::new(enable).on_press(Message::BlurToggled(true));
         let mut bluroff = Button::new(disable).on_press(Message::BlurToggled(false));
         if self.blur {
@@ -436,17 +439,17 @@ impl Configurator {
         }
 
         if self.index == 0 {
-            widthrow = widthrow.push(selectionmarker);
+            widthlabel = widthlabel.style(seltext.mk_theme());
         } else if self.index == 1 {
-            gapsrow = gapsrow.push(selectionmarker);
+            gapslabel = gapslabel.style(seltext.mk_theme());
         } else if self.index == 2 {
-            radrow = radrow.push(selectionmarker);
+            radlabel = radlabel.style(seltext.mk_theme());
         } else if self.index == 3 {
-            winrow = winrow.push(selectionmarker);
+            winlabel = winlabel.style(seltext.mk_theme());
         } else if self.index == 4 {
-            workrow = workrow.push(selectionmarker);
+            worklabel = worklabel.style(seltext.mk_theme());
         } else if self.index == 5 {
-            blurrow = blurrow.push(selectionmarker);
+            blurlabel = blurlabel.style(seltext.mk_theme());
         }
 
         widthrow = widthrow
