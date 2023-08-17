@@ -3,6 +3,7 @@ use iced::{Result, Application, Settings, Alignment, Length, executor};
 use iced::widget::{Button, Row, Column, Container, Text, Scrollable, Rule};
 use iced::keyboard::KeyCode;
 use iced::Color;
+use iced_style::theme;
 use libcfg::{getcfgdata, BindKey, ShortcutKey, OurTheme, BarWidget, WindowAnimation, WorkAnimation, Border, decodeheader, decodepri, decodetheme, mkwmcfg, mkselfcfg, decodewinanim, decodeworkanim, decodeblur};
 mod libcfg;
 use libstyle::{ButtonStyle, ListStyle, MenuStyle, ThemeCustom, make_custom_theme, ThemeSet};
@@ -94,7 +95,7 @@ impl Default for Configurator {
             unsaved: false,
             capturenext: Some(CaptureInput::NoKey),
             index: 0,
-            indexmax: 2,
+            indexmax: 3,
             border: data.border.clone().unwrap(),
             window_anim: decodewinanim(&data.winanim, WindowAnimation::None),
             work_anim: decodeworkanim(&data.workanim, WorkAnimation::None),
@@ -285,19 +286,19 @@ impl Application for Configurator {
                 self.current_page = x;
                 match x {
                     Page::Main => {
-                        self.indexmax = 2;
+                        self.indexmax = 3;
                     }
                     Page::Bind => {
-                        self.indexmax = 6;
-                    }
-                    Page::Bar => {
                         self.indexmax = 7;
                     }
+                    Page::Bar => {
+                        self.indexmax = 5;
+                    }
                     Page::Init => {
-                        self.indexmax = 0;
+                        self.indexmax = 1;
                     }
                     Page::Anim => {
-                        self.indexmax = 5;
+                        self.indexmax = 8;
                     }
                 }
                 if self.index > self.indexmax {
@@ -349,23 +350,23 @@ impl Application for Configurator {
                                     if iced::keyboard::Modifiers::shift(modifiers) {//go up a page
                                         self.current_page = match self.current_page {
                                             Page::Main => {
-                                                self.indexmax = 0;
+                                                self.indexmax = 1;
                                                 Page::Init
                                             }
                                             Page::Bind => {
-                                                self.indexmax = 2;
+                                                self.indexmax = 3;
                                                 Page::Main
                                             }
                                             Page::Anim => {
-                                                self.indexmax = 6;
+                                                self.indexmax = 7;
                                                 Page::Bind
                                             }
                                             Page::Bar => {
-                                                self.indexmax = 5;
+                                                self.indexmax = 6;
                                                 Page::Anim
                                             }
                                             Page::Init => {
-                                                self.indexmax = 7;
+                                                self.indexmax = 8;
                                                 Page::Bar
                                             }
                                         };
@@ -381,26 +382,29 @@ impl Application for Configurator {
                                     if iced::keyboard::Modifiers::shift(modifiers) {//go down a page
                                         self.current_page = match self.current_page {
                                             Page::Main => {
-                                                self.indexmax = 6;
+                                                self.indexmax = 7;
                                                 Page::Bind
                                             }
                                             Page::Bind => {
-                                                self.indexmax = 5;
+                                                self.indexmax = 6;
                                                 Page::Anim
                                             }
                                             Page::Anim => {
-                                                self.indexmax = 7;
+                                                self.indexmax = 8;
                                                 Page::Bar
                                             }
                                             Page::Bar => {
-                                                self.indexmax = 0;
+                                                self.indexmax = 1;
                                                 Page::Init
                                             }
                                             Page::Init => {
-                                                self.indexmax = 2;
+                                                self.indexmax = 3;
                                                 Page::Main
                                             }
-                                       }
+                                       };
+                                       if self.index > self.indexmax {
+                                            self.index = self.indexmax;
+                                        }
                                     } else { //move the minicursor down
                                         if self.index < self.indexmax {
                                             self.index = self.index +1;
@@ -466,6 +470,13 @@ impl Application for Configurator {
                                                 self.unsaved = true;
                                             }
                                         }
+                                    }
+                                    if self.index == self.indexmax {
+                                        if self.unsaved {
+                                            mkwmcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), Some(self.border), self.window_anim, self.work_anim, self.blur);
+                                            mkselfcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), self.theme.clone(), Some(self.border), self.window_anim, self.work_anim, self.blur);
+                                        }
+                                        self.unsaved = false;
                                     }
                                 } else if key_code == KeyCode::Key1 {//dropdown management with number keys
                                     if self.current_page == Page::Main {
@@ -928,9 +939,23 @@ impl Application for Configurator {
             .push(pageinit)
             .align_items(Alignment::Start);
 
-        let save;
         let savetxt = Text::new(gettext("Save"));
         let savedtxt = Text::new(gettext("Saved!"));
+        let save = match (self.unsaved, self.index == self.indexmax) {
+            (true, true) => {
+                Button::new(savetxt).on_press(Message::Save).style(theme::Button::Positive)
+            }
+            (true, false) => {
+                Button::new(savetxt).on_press(Message::Save)
+            }
+            (false, true) => {
+                Button::new(savedtxt).on_press(Message::Save).style(theme::Button::Positive)
+            }
+            (false, false) => {
+                Button::new(savedtxt).on_press(Message::Save).style(style.secondary.mk_theme())
+            }
+        };
+        /* 
         if self.unsaved {
             save = Button::new(savetxt)
             .on_press(Message::Save);
@@ -939,10 +964,10 @@ impl Application for Configurator {
             .on_press(Message::Save)
             .style(style.secondary.mk_theme());
         }
+        */
         let saverow = Row::new()
             .push(save)
             .align_items(Alignment::Center);
-
         
         let mut settings = Column::new().spacing(10);
 
