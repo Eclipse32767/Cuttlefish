@@ -54,7 +54,7 @@ struct Configurator { //The basic configurator struct, contains most program sta
 }
 #[derive(PartialEq, Debug, Clone)]
 enum CaptureInput { //enum used to store what binding should be captured into
-    NoKey,
+    NoKey,//TODO: REMOVE THIS IT'S STUPID
     ExitKey,
     LaunchKey,
     KillKey,
