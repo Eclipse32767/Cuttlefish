@@ -5,7 +5,7 @@ use std::fs::read_to_string;
 use std::env;
 use std::process::Command;
 use std::fs;
-use gettextrs::*;
+use gettextrs::gettext as tr;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum OurTheme {
@@ -134,10 +134,10 @@ impl std::fmt::Display for ShortcutKey {
             f,
             "{}",
             match self {
-                ShortcutKey::Super => gettext("Windows/Command Key"),
-                ShortcutKey::Alt => gettext("Alt Key"),
-                ShortcutKey::Shift => gettext("Shift Key"),
-                ShortcutKey::Ctrl => gettext("Control Key"),
+                ShortcutKey::Super => tr("Windows/Command Key"),
+                ShortcutKey::Alt => tr("Alt Key"),
+                ShortcutKey::Shift => tr("Shift Key"),
+                ShortcutKey::Ctrl => tr("Control Key"),
             }
         )
     }
@@ -148,9 +148,9 @@ impl std::fmt::Display for BindKey {
             f,
             "{}",
             match self {
-                BindKey::PrimaryKey => gettext("Primary Key"),
-                BindKey::SecondaryKey => gettext("Secondary Key"),
-                BindKey::BothKey => gettext("Primary + Secondary")
+                BindKey::PrimaryKey => tr("Primary Key"),
+                BindKey::SecondaryKey => tr("Secondary Key"),
+                BindKey::BothKey => tr("Primary + Secondary")
             }
         )
     }
@@ -161,9 +161,9 @@ impl std::fmt::Display for WindowAnimation {
             f,
             "{}",
             match self {
-                WindowAnimation::None => gettext("No Animation"),
-                WindowAnimation::Popin => gettext("Pop-in"),
-                WindowAnimation::Slide => gettext("Slide In")
+                WindowAnimation::None => tr("No Animation"),
+                WindowAnimation::Popin => tr("Pop-in"),
+                WindowAnimation::Slide => tr("Slide In")
             }
         )
     }
@@ -174,10 +174,10 @@ impl std::fmt::Display for WorkAnimation {
             f,
             "{}",
             match self {
-                WorkAnimation::None => gettext("No Animation"),
-                WorkAnimation::Fade => gettext("Fade In"),
-                WorkAnimation::Slide => gettext("Slide In Horizontally"),
-                WorkAnimation::SlideVert => gettext("Slide In Vertically")
+                WorkAnimation::None => tr("No Animation"),
+                WorkAnimation::Fade => tr("Fade In"),
+                WorkAnimation::Slide => tr("Slide In Horizontally"),
+                WorkAnimation::SlideVert => tr("Slide In Vertically")
             }
         )
     }

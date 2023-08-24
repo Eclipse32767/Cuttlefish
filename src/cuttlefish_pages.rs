@@ -1,4 +1,4 @@
-use gettextrs::gettext;
+use gettextrs::gettext as tr;
 use iced::widget::{Column, Text, pick_list, Button, Row};
 
 use crate::{Configurator, Message, libstyle::{ThemeCustom, TextStyle}, libcfg::{ShortcutKey, OurTheme, BindKey, BarWidget, WorkAnimation, WindowAnimation}, ShrinkValue, CaptureInput, WidgetBank, IncrVal};
@@ -26,30 +26,30 @@ impl Configurator {
             .placeholder("choose")
             .style(style.list.mk_theme());
         let primarytxt;
-        let temp_primary = format!("{}{}", gettext("Primary Shortcut Key"), gettext("-- Control and shift not recommended"));
+        let temp_primary = format!("{}{}", tr("Primary Shortcut Key"), tr("-- Control and shift not recommended"));
         let secondarytxt;
-        let temp_secondary = format!("{}{}", gettext("Secondary Shortcut Key"), gettext("-- used for more advanced shortcuts"));
+        let temp_secondary = format!("{}{}", tr("Secondary Shortcut Key"), tr("-- used for more advanced shortcuts"));
         if self.width == ShrinkValue::Full {
             primarytxt = temp_primary;
             secondarytxt = temp_secondary;
         } else {
-            primarytxt = gettext("Primary Shortcut Key");
-            secondarytxt = gettext("Secondary Shortcut Key");
+            primarytxt = tr("Primary Shortcut Key");
+            secondarytxt = tr("Secondary Shortcut Key");
         }
         
         let mut primarylabel: Text = Text::new(primarytxt);
         let mut secondarylabel: Text = Text::new(secondarytxt);
 
-        let lighttxt = Text::new(gettext("Light"));
-        let darktxt = Text::new(gettext("Dark"));
-        let customtxt = Text::new(gettext("Custom"));
+        let lighttxt = Text::new(tr("Light"));
+        let darktxt = Text::new(tr("Dark"));
+        let customtxt = Text::new(tr("Custom"));
         let mut light = Button::new(lighttxt)
             .on_press(Message::ThemeChanged(OurTheme::Light));
         let mut dark = Button::new(darktxt)
             .on_press(Message::ThemeChanged(OurTheme::Dark));
         let mut custom = Button::new(customtxt)
             .on_press(Message::ThemeChanged(OurTheme::Custom));
-        let mut themelabel = Text::new(gettext("UI Theme for Configurator"));
+        let mut themelabel = Text::new(tr("UI Theme for Configurator"));
         match self.theme {
             OurTheme::Light => {
                 light = light.style(style.secondary.mk_theme());
@@ -104,21 +104,21 @@ impl Configurator {
             .placeholder("choose")
             .style(style.list.mk_theme());
         let primarytxt;
-        let temp_primary = format!("{}{}", gettext("Primary Shortcut Key"), gettext("-- Control and shift not recommended"));
+        let temp_primary = format!("{}{}", tr("Primary Shortcut Key"), tr("-- Control and shift not recommended"));
         let secondarytxt;
-        let temp_secondary = format!("{}{}", gettext("Secondary Shortcut Key"), gettext("-- used for more advanced shortcuts"));
+        let temp_secondary = format!("{}{}", tr("Secondary Shortcut Key"), tr("-- used for more advanced shortcuts"));
         if self.width == ShrinkValue::Full {
             primarytxt = temp_primary;
             secondarytxt = temp_secondary;
         } else {
-            primarytxt = gettext("Primary Shortcut Key");
-            secondarytxt = gettext("Secondary Shortcut Key");
+            primarytxt = tr("Primary Shortcut Key");
+            secondarytxt = tr("Secondary Shortcut Key");
         }
         let mut primarylabel: Text = Text::new(primarytxt);
         let mut secondarylabel: Text = Text::new(secondarytxt);
 
 
-        let mut exitsclabel = Text::new(gettext("Exit the Desktop Session"));
+        let mut exitsclabel = Text::new(tr("Exit the Desktop Session"));
         let exitheaderselect = pick_list(
         &BindKey::ALL[..], 
         self.exit_header, 
@@ -128,7 +128,7 @@ impl Configurator {
         .style(style.list.mk_theme());
         let exitkey = Text::new(self.exit_key.clone());
         let mut exitkeyselect = Button::new(exitkey).on_press(Message::Capture(CaptureInput::ExitKey)).width(50);
-        let mut launchsclabel: Text = Text::new(gettext("Open the App Launcher"));
+        let mut launchsclabel: Text = Text::new(tr("Open the App Launcher"));
         let launchheaderselect = pick_list(
             &BindKey::ALL[..], 
             self.launch_header, 
@@ -138,7 +138,7 @@ impl Configurator {
             .style(style.list.mk_theme());
         let launchkey = Text::new(self.launch_key.clone());
         let mut launchkeyselect = Button::new(launchkey).on_press(Message::Capture(CaptureInput::LaunchKey)).width(50);
-        let mut killsclabel: Text = Text::new(gettext("Close the Currently Focused App"));
+        let mut killsclabel: Text = Text::new(tr("Close the Currently Focused App"));
         let killheaderselect = pick_list(
             &BindKey::ALL[..], 
             self.kill_header, 
@@ -148,7 +148,7 @@ impl Configurator {
             .style(style.list.mk_theme());
         let killkey = Text::new(self.kill_key.clone());
         let mut killkeyselect = Button::new(killkey).on_press(Message::Capture(CaptureInput::KillKey)).width(50);
-        let mut minisclabel: Text = Text::new(gettext("Minimize the Focused App"));
+        let mut minisclabel: Text = Text::new(tr("Minimize the Focused App"));
         let miniheaderselect = pick_list(
          &BindKey::ALL[..], 
          self.minimize_header, 
@@ -158,7 +158,7 @@ impl Configurator {
             .style(style.list.mk_theme());
         let minikey = Text::new(self.minimize_key.clone());
         let mut minikeyselect = Button::new(minikey).on_press(Message::Capture(CaptureInput::MiniKey)).width(50);
-        let mut scratchsclabel: Text = Text::new(gettext("Retrieve App from Minimization"));
+        let mut scratchsclabel: Text = Text::new(tr("Retrieve App from Minimization"));
         let scratchheaderselect = pick_list(
             &BindKey::ALL[..], 
             self.scratch_header, 
@@ -273,27 +273,27 @@ impl Configurator {
                 center_contents = format!("{center_contents}  {:#?}", self.bar_center[i]);
             }
         }
-        let barleft = Button::new(Text::new(gettext("Left"))).on_press(Message::PushWidget(WidgetBank::Left));
-        let barcenter = Button::new(Text::new(gettext("Center"))).on_press(Message::PushWidget(WidgetBank::Center));
-        let barright = Button::new(Text::new(gettext("Right"))).on_press(Message::PushWidget(WidgetBank::Right));
-        let mut audio = Button::new(Text::new(gettext("Audio"))).on_press(Message::AwaitDestination(BarWidget::Audio));
-        let mut backlight = Button::new(Text::new(gettext("Backlight"))).on_press(Message::AwaitDestination(BarWidget::Backlight));
-        let mut battery = Button::new(Text::new(gettext("Battery"))).on_press(Message::AwaitDestination(BarWidget::Battery));
-        let mut bluetooth = Button::new(Text::new(gettext("Bluetooth"))).on_press(Message::AwaitDestination(BarWidget::Bluetooth));
-        let mut cpu = Button::new(Text::new(gettext("CPU"))).on_press(Message::AwaitDestination(BarWidget::CPU));
-        let mut clock = Button::new(Text::new(gettext("Clock"))).on_press(Message::AwaitDestination(BarWidget::Clock));
-        let mut disk = Button::new(Text::new(gettext("Disk"))).on_press(Message::AwaitDestination(BarWidget::Disk));
-        let mut keyboard = Button::new(Text::new(gettext("Keyboard State"))).on_press(Message::AwaitDestination(BarWidget::KeyboardState));
-        let mut network = Button::new(Text::new(gettext("Network"))).on_press(Message::AwaitDestination(BarWidget::Network));
-        let mut ram = Button::new(Text::new(gettext("RAM"))).on_press(Message::AwaitDestination(BarWidget::RAM));
-        let mut taskbar = Button::new(Text::new(gettext("Taskbar"))).on_press(Message::AwaitDestination(BarWidget::Taskbar));
-        let mut temperature = Button::new(Text::new(gettext("Temperature"))).on_press(Message::AwaitDestination(BarWidget::Temperature));
-        let mut tray = Button::new(Text::new(gettext("System Tray"))).on_press(Message::AwaitDestination(BarWidget::Tray));
-        let mut user = Button::new(Text::new(gettext("Current User"))).on_press(Message::AwaitDestination(BarWidget::User));
-        let mut workspaces = Button::new(Text::new(gettext("Workspaces"))).on_press(Message::AwaitDestination(BarWidget::Workspaces));
-        let removeleft = Button::new(Text::new(gettext("Remove"))).on_press(Message::RemoveWidget(WidgetBank::Left));
-        let removecenter = Button::new(Text::new(gettext("Remove"))).on_press(Message::RemoveWidget(WidgetBank::Center));
-        let removeright = Button::new(Text::new(gettext("Remove"))).on_press(Message::RemoveWidget(WidgetBank::Right));
+        let barleft = Button::new(Text::new(tr("Left"))).on_press(Message::PushWidget(WidgetBank::Left));
+        let barcenter = Button::new(Text::new(tr("Center"))).on_press(Message::PushWidget(WidgetBank::Center));
+        let barright = Button::new(Text::new(tr("Right"))).on_press(Message::PushWidget(WidgetBank::Right));
+        let mut audio = Button::new(Text::new(tr("Audio"))).on_press(Message::AwaitDestination(BarWidget::Audio));
+        let mut backlight = Button::new(Text::new(tr("Backlight"))).on_press(Message::AwaitDestination(BarWidget::Backlight));
+        let mut battery = Button::new(Text::new(tr("Battery"))).on_press(Message::AwaitDestination(BarWidget::Battery));
+        let mut bluetooth = Button::new(Text::new(tr("Bluetooth"))).on_press(Message::AwaitDestination(BarWidget::Bluetooth));
+        let mut cpu = Button::new(Text::new(tr("CPU"))).on_press(Message::AwaitDestination(BarWidget::CPU));
+        let mut clock = Button::new(Text::new(tr("Clock"))).on_press(Message::AwaitDestination(BarWidget::Clock));
+        let mut disk = Button::new(Text::new(tr("Disk"))).on_press(Message::AwaitDestination(BarWidget::Disk));
+        let mut keyboard = Button::new(Text::new(tr("Keyboard State"))).on_press(Message::AwaitDestination(BarWidget::KeyboardState));
+        let mut network = Button::new(Text::new(tr("Network"))).on_press(Message::AwaitDestination(BarWidget::Network));
+        let mut ram = Button::new(Text::new(tr("RAM"))).on_press(Message::AwaitDestination(BarWidget::RAM));
+        let mut taskbar = Button::new(Text::new(tr("Taskbar"))).on_press(Message::AwaitDestination(BarWidget::Taskbar));
+        let mut temperature = Button::new(Text::new(tr("Temperature"))).on_press(Message::AwaitDestination(BarWidget::Temperature));
+        let mut tray = Button::new(Text::new(tr("System Tray"))).on_press(Message::AwaitDestination(BarWidget::Tray));
+        let mut user = Button::new(Text::new(tr("Current User"))).on_press(Message::AwaitDestination(BarWidget::User));
+        let mut workspaces = Button::new(Text::new(tr("Workspaces"))).on_press(Message::AwaitDestination(BarWidget::Workspaces));
+        let removeleft = Button::new(Text::new(tr("Remove"))).on_press(Message::RemoveWidget(WidgetBank::Left));
+        let removecenter = Button::new(Text::new(tr("Remove"))).on_press(Message::RemoveWidget(WidgetBank::Center));
+        let removeright = Button::new(Text::new(tr("Remove"))).on_press(Message::RemoveWidget(WidgetBank::Right));
         let labelleft = Text::new(left_contents);
         let labelright = Text::new(right_contents);
         let labelcenter = Text::new(center_contents);
@@ -374,21 +374,21 @@ impl Configurator {
         let widthincr = Button::new("+").on_press(Message::Incr(IncrVal::WidthVal)).width(30);
         let mut widthdecr = Button::new("-").on_press(Message::Decr(IncrVal::WidthVal)).width(30);
         let widthvaluepeek = Text::new(format!("{}", self.border.width));
-        let mut widthlabel = Text::new(gettext("The Width of The Window Borders:"));
+        let mut widthlabel = Text::new(tr("The Width of The Window Borders:"));
 
         let mut widthrow = Row::new().spacing(10);
 
         let gapsincr = Button::new("+").on_press(Message::Incr(IncrVal::GapsVal)).width(30);
         let mut gapsdecr = Button::new("-").on_press(Message::Decr(IncrVal::GapsVal)).width(30);
         let gapsvaluepeek = Text::new(format!("{}", self.border.gaps));
-        let mut gapslabel = Text::new(gettext("The Size of The Standard Window Gaps:"));
+        let mut gapslabel = Text::new(tr("The Size of The Standard Window Gaps:"));
 
         let mut gapsrow = Row::new().spacing(10);
 
         let radincr = Button::new("+").on_press(Message::Incr(IncrVal::RadiusVal)).width(30);
         let mut raddecr = Button::new("-").on_press(Message::Decr(IncrVal::RadiusVal)).width(30);
         let radvaluepeek = Text::new(format!("{}", self.border.radius));
-        let mut radlabel = Text::new(gettext("The roundedness of window corners:"));
+        let mut radlabel = Text::new(tr("The roundedness of window corners:"));
 
         let mut radrow = Row::new().spacing(10);
 
@@ -399,7 +399,7 @@ impl Configurator {
             )
             .placeholder("choose")
             .style(style.list.mk_theme());
-        let mut winlabel = Text::new(gettext("The Window Animations To Be Used:"));
+        let mut winlabel = Text::new(tr("The Window Animations To Be Used:"));
 
         let mut winrow = Row::new().spacing(10);
 
@@ -410,15 +410,15 @@ impl Configurator {
             )
             .placeholder("choose")
             .style(style.list.mk_theme());
-        let mut worklabel = Text::new(gettext("The Workspace Animations To Be Used:"));
+        let mut worklabel = Text::new(tr("The Workspace Animations To Be Used:"));
 
         let mut workrow = Row::new().spacing(10);
 
-        let enable = Text::new(gettext("Enable"));
-        let disable = Text::new(gettext("Disable"));
-        let enabled = Text::new(gettext("Enabled"));
-        let disabled = Text::new(gettext("Disabled"));
-        let mut blurlabel = Text::new(gettext("Whether or not to use window blur"));
+        let enable = Text::new(tr("Enable"));
+        let disable = Text::new(tr("Disable"));
+        let enabled = Text::new(tr("Enabled"));
+        let disabled = Text::new(tr("Disabled"));
+        let mut blurlabel = Text::new(tr("Whether or not to use window blur"));
         let mut bluron = Button::new(enable).on_press(Message::BlurToggled(true));
         let mut bluroff = Button::new(disable).on_press(Message::BlurToggled(false));
         if self.blur {

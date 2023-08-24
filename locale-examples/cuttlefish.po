@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-03 02:22+0000\n"
+"POT-Creation-Date: 2023-08-24 00:02+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -69,206 +69,206 @@ msgstr ""
 msgid "Slide In Vertically"
 msgstr ""
 
-#: src/cuttlefish.rs:243
-msgid "Main Page"
-msgstr ""
-
-#: src/cuttlefish.rs:244
-msgid "Keybindings Page"
-msgstr ""
-
-#: src/cuttlefish.rs:245
-msgid "Status Bar Page"
-msgstr ""
-
-#: src/cuttlefish.rs:246
-msgid "Autostart Page"
-msgstr ""
-
-#: src/cuttlefish.rs:247
-msgid "Animations Page"
-msgstr ""
-
-#: src/cuttlefish.rs:265
-msgid "Cuttlefish Configurator--"
-msgstr ""
-
-#: src/cuttlefish.rs:914
-msgid "Available Pages"
-msgstr ""
-
-#: src/cuttlefish.rs:926
-msgid "Save"
-msgstr ""
-
-#: src/cuttlefish.rs:927
-msgid "Saved!"
-msgstr ""
-
-#: src/cuttlefish.rs:962 src/cuttlefish.rs:969 src/cuttlefish.rs:1041 src/cuttlefish.rs:1048
+#: src/cuttlefish_pages.rs:29 src/cuttlefish_pages.rs:36 src/cuttlefish_pages.rs:107 src/cuttlefish_pages.rs:114
 msgid "Primary Shortcut Key"
 msgstr ""
 
-#: src/cuttlefish.rs:962 src/cuttlefish.rs:1041
+#: src/cuttlefish_pages.rs:29 src/cuttlefish_pages.rs:107
 msgid "-- Control and shift not recommended"
 msgstr ""
 
-#: src/cuttlefish.rs:964 src/cuttlefish.rs:970 src/cuttlefish.rs:1043 src/cuttlefish.rs:1049
+#: src/cuttlefish_pages.rs:31 src/cuttlefish_pages.rs:37 src/cuttlefish_pages.rs:109 src/cuttlefish_pages.rs:115
 msgid "Secondary Shortcut Key"
 msgstr ""
 
-#: src/cuttlefish.rs:964 src/cuttlefish.rs:1043
+#: src/cuttlefish_pages.rs:31 src/cuttlefish_pages.rs:109
 msgid "-- used for more advanced shortcuts"
 msgstr ""
 
-#: src/cuttlefish.rs:976
+#: src/cuttlefish_pages.rs:43
 msgid "Light"
 msgstr ""
 
-#: src/cuttlefish.rs:977
+#: src/cuttlefish_pages.rs:44
 msgid "Dark"
 msgstr ""
 
-#: src/cuttlefish.rs:978
+#: src/cuttlefish_pages.rs:45
 msgid "Custom"
 msgstr ""
 
-#: src/cuttlefish.rs:985
+#: src/cuttlefish_pages.rs:52
 msgid "UI Theme for Configurator"
 msgstr ""
 
-#: src/cuttlefish.rs:1055
+#: src/cuttlefish_pages.rs:121
 msgid "Exit the Desktop Session"
 msgstr ""
 
-#: src/cuttlefish.rs:1065
+#: src/cuttlefish_pages.rs:131
 msgid "Open the App Launcher"
 msgstr ""
 
-#: src/cuttlefish.rs:1075
+#: src/cuttlefish_pages.rs:141
 msgid "Close the Currently Focused App"
 msgstr ""
 
-#: src/cuttlefish.rs:1085
+#: src/cuttlefish_pages.rs:151
 msgid "Minimize the Focused App"
 msgstr ""
 
-#: src/cuttlefish.rs:1095
+#: src/cuttlefish_pages.rs:161
 msgid "Retrieve App from Minimization"
 msgstr ""
 
-#: src/cuttlefish.rs:1208
+#: src/cuttlefish_pages.rs:276
 msgid "Left"
 msgstr ""
 
-#: src/cuttlefish.rs:1209
+#: src/cuttlefish_pages.rs:277
 msgid "Center"
 msgstr ""
 
-#: src/cuttlefish.rs:1210
+#: src/cuttlefish_pages.rs:278
 msgid "Right"
 msgstr ""
 
-#: src/cuttlefish.rs:1211
+#: src/cuttlefish_pages.rs:279
 msgid "Audio"
 msgstr ""
 
-#: src/cuttlefish.rs:1212
+#: src/cuttlefish_pages.rs:280
 msgid "Backlight"
 msgstr ""
 
-#: src/cuttlefish.rs:1213
+#: src/cuttlefish_pages.rs:281
 msgid "Battery"
 msgstr ""
 
-#: src/cuttlefish.rs:1214
+#: src/cuttlefish_pages.rs:282
 msgid "Bluetooth"
 msgstr ""
 
-#: src/cuttlefish.rs:1215
+#: src/cuttlefish_pages.rs:283
 msgid "CPU"
 msgstr ""
 
-#: src/cuttlefish.rs:1216
+#: src/cuttlefish_pages.rs:284
 msgid "Clock"
 msgstr ""
 
-#: src/cuttlefish.rs:1217
+#: src/cuttlefish_pages.rs:285
 msgid "Disk"
 msgstr ""
 
-#: src/cuttlefish.rs:1218
+#: src/cuttlefish_pages.rs:286
 msgid "Keyboard State"
 msgstr ""
 
-#: src/cuttlefish.rs:1219
+#: src/cuttlefish_pages.rs:287
 msgid "Network"
 msgstr ""
 
-#: src/cuttlefish.rs:1220
+#: src/cuttlefish_pages.rs:288
 msgid "RAM"
 msgstr ""
 
-#: src/cuttlefish.rs:1221
+#: src/cuttlefish_pages.rs:289
 msgid "Taskbar"
 msgstr ""
 
-#: src/cuttlefish.rs:1222
+#: src/cuttlefish_pages.rs:290
 msgid "Temperature"
 msgstr ""
 
-#: src/cuttlefish.rs:1223
+#: src/cuttlefish_pages.rs:291
 msgid "System Tray"
 msgstr ""
 
-#: src/cuttlefish.rs:1224
+#: src/cuttlefish_pages.rs:292
 msgid "Current User"
 msgstr ""
 
-#: src/cuttlefish.rs:1225
+#: src/cuttlefish_pages.rs:293
 msgid "Workspaces"
 msgstr ""
 
-#: src/cuttlefish.rs:1226 src/cuttlefish.rs:1227 src/cuttlefish.rs:1228
+#: src/cuttlefish_pages.rs:294 src/cuttlefish_pages.rs:295 src/cuttlefish_pages.rs:296
 msgid "Remove"
 msgstr ""
 
-#: src/cuttlefish.rs:1310
+#: src/cuttlefish_pages.rs:377
 msgid "The Width of The Window Borders:"
 msgstr ""
 
-#: src/cuttlefish.rs:1317
+#: src/cuttlefish_pages.rs:384
 msgid "The Size of The Standard Window Gaps:"
 msgstr ""
 
-#: src/cuttlefish.rs:1324
+#: src/cuttlefish_pages.rs:391
 msgid "The roundedness of window corners:"
 msgstr ""
 
-#: src/cuttlefish.rs:1335
+#: src/cuttlefish_pages.rs:402
 msgid "The Window Animations To Be Used:"
 msgstr ""
 
-#: src/cuttlefish.rs:1346
+#: src/cuttlefish_pages.rs:413
 msgid "The Workspace Animations To Be Used:"
 msgstr ""
 
-#: src/cuttlefish.rs:1350
+#: src/cuttlefish_pages.rs:417
 msgid "Enable"
 msgstr ""
 
-#: src/cuttlefish.rs:1351
+#: src/cuttlefish_pages.rs:418
 msgid "Disable"
 msgstr ""
 
-#: src/cuttlefish.rs:1352
+#: src/cuttlefish_pages.rs:419
 msgid "Enabled"
 msgstr ""
 
-#: src/cuttlefish.rs:1353
+#: src/cuttlefish_pages.rs:420
 msgid "Disabled"
 msgstr ""
 
-#: src/cuttlefish.rs:1354
+#: src/cuttlefish_pages.rs:421
 msgid "Whether or not to use window blur"
+msgstr ""
+
+#: src/cuttlefish.rs:247
+msgid "Main Page"
+msgstr ""
+
+#: src/cuttlefish.rs:248
+msgid "Keybindings Page"
+msgstr ""
+
+#: src/cuttlefish.rs:249
+msgid "Status Bar Page"
+msgstr ""
+
+#: src/cuttlefish.rs:250
+msgid "Autostart Page"
+msgstr ""
+
+#: src/cuttlefish.rs:251
+msgid "Animations Page"
+msgstr ""
+
+#: src/cuttlefish.rs:269
+msgid "Cuttlefish Configurator--"
+msgstr ""
+
+#: src/cuttlefish.rs:525
+msgid "Available Pages"
+msgstr ""
+
+#: src/cuttlefish.rs:542
+msgid "Save"
+msgstr ""
+
+#: src/cuttlefish.rs:543
+msgid "Saved!"
 msgstr ""

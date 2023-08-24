@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-27 02:17+0000\n"
+"POT-Creation-Date: 2023-08-24 00:02+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,199 +17,199 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/libcfg.rs:138
+#: src/libcfg.rs:137
 msgid "Windows/Command Key"
 msgstr ""
 
-#: src/libcfg.rs:139
+#: src/libcfg.rs:138
 msgid "Alt Key"
 msgstr ""
 
-#: src/libcfg.rs:140
+#: src/libcfg.rs:139
 msgid "Shift Key"
 msgstr ""
 
-#: src/libcfg.rs:141
+#: src/libcfg.rs:140
 msgid "Control Key"
 msgstr ""
 
-#: src/libcfg.rs:152
+#: src/libcfg.rs:151
 msgid "Primary Key"
 msgstr ""
 
-#: src/libcfg.rs:153
+#: src/libcfg.rs:152
 msgid "Secondary Key"
 msgstr ""
 
-#: src/libcfg.rs:154
+#: src/libcfg.rs:153
 msgid "Primary + Secondary"
 msgstr ""
 
-#: src/libcfg.rs:165 src/libcfg.rs:178
+#: src/libcfg.rs:164 src/libcfg.rs:177
 msgid "No Animation"
 msgstr ""
 
-#: src/libcfg.rs:166
+#: src/libcfg.rs:165
 msgid "Pop-in"
 msgstr ""
 
-#: src/libcfg.rs:167
+#: src/libcfg.rs:166
 msgid "Slide In"
 msgstr ""
 
-#: src/libcfg.rs:179
+#: src/libcfg.rs:178
 msgid "Fade In"
 msgstr ""
 
-#: src/libcfg.rs:180
+#: src/libcfg.rs:179
 msgid "Slide In Horizontally"
 msgstr ""
 
-#: src/libcfg.rs:181
+#: src/libcfg.rs:180
 msgid "Slide In Vertically"
 msgstr ""
 
-#: src/sunfish.rs:224
+#: src/sunfish.rs:225
 msgid "Back"
 msgstr ""
 
-#: src/sunfish.rs:225
+#: src/sunfish.rs:226
 msgid "Forwards"
 msgstr ""
 
-#: src/sunfish.rs:238
+#: src/sunfish.rs:239
 msgid "Basic Navigation"
 msgstr ""
 
-#: src/sunfish.rs:242
+#: src/sunfish.rs:243
 msgid "To shift focus between applications, press:\n"
 ""
 msgstr ""
 
-#: src/sunfish.rs:243 src/sunfish.rs:246
+#: src/sunfish.rs:244 src/sunfish.rs:247
 msgid "+An Arrow Key.\n"
 ""
 msgstr ""
 
-#: src/sunfish.rs:244
+#: src/sunfish.rs:245
 msgid "This will shift the interface's focus in the direction you pressed.\n"
 " \n"
 ""
 msgstr ""
 
-#: src/sunfish.rs:245
+#: src/sunfish.rs:246
 msgid "To move applications around, press:\n"
 ""
 msgstr ""
 
-#: src/sunfish.rs:247
+#: src/sunfish.rs:248
 msgid "This should swap applications in that direction.\n"
 "\n"
 ""
 msgstr ""
 
-#: src/sunfish.rs:248 src/sunfish.rs:283
+#: src/sunfish.rs:249 src/sunfish.rs:284
 msgid "As of now, these bindings are inferred and cannot be directly changed."
 msgstr ""
 
-#: src/sunfish.rs:252
+#: src/sunfish.rs:253
 msgid "Basic Navigation, Continued"
 msgstr ""
 
-#: src/sunfish.rs:260
+#: src/sunfish.rs:261
 msgid "To open the application search, press:\n"
 ""
 msgstr ""
 
-#: src/sunfish.rs:261 src/sunfish.rs:264 src/sunfish.rs:267 src/sunfish.rs:295 src/sunfish.rs:298
+#: src/sunfish.rs:262 src/sunfish.rs:265 src/sunfish.rs:268 src/sunfish.rs:296 src/sunfish.rs:299
 msgid ".\n"
 ""
 msgstr ""
 
-#: src/sunfish.rs:262
+#: src/sunfish.rs:263
 msgid "This will open a search menu that you can use to run the apps you want.\n"
 "\n"
 ""
 msgstr ""
 
-#: src/sunfish.rs:263
+#: src/sunfish.rs:264
 msgid "To close the currently focused application, press:\n"
 ""
 msgstr ""
 
-#: src/sunfish.rs:265
+#: src/sunfish.rs:266
 msgid "This will close the currently focused application, potentially destroying unsaved work. \n"
 "\n"
 ""
 msgstr ""
 
-#: src/sunfish.rs:266
+#: src/sunfish.rs:267
 msgid "To return to the login screen, press:\n"
 ""
 msgstr ""
 
-#: src/sunfish.rs:268
+#: src/sunfish.rs:269
 msgid "This will close out the desktop entirely, destroying all unsaved work."
 msgstr ""
 
-#: src/sunfish.rs:272
+#: src/sunfish.rs:273
 msgid "Workspaces"
 msgstr ""
 
-#: src/sunfish.rs:276
+#: src/sunfish.rs:277
 msgid "There are 10 workspaces in this environment-\n"
 " In effect each one is its own desktop where you can move applications to or visit the applications located there.\n"
 "\n"
 ""
 msgstr ""
 
-#: src/sunfish.rs:277
+#: src/sunfish.rs:278
 msgid "To move yourself to a workspace, press:\n"
 ""
 msgstr ""
 
-#: src/sunfish.rs:278 src/sunfish.rs:281
+#: src/sunfish.rs:279 src/sunfish.rs:282
 msgid "+A Number Key.\n"
 ""
 msgstr ""
 
-#: src/sunfish.rs:279
+#: src/sunfish.rs:280
 msgid "This will move you to the workspace corresponding to the number you pressed.\n"
 " \n"
 ""
 msgstr ""
 
-#: src/sunfish.rs:280
+#: src/sunfish.rs:281
 msgid "To move the currently focused application to a workspace, press:\n"
 ""
 msgstr ""
 
-#: src/sunfish.rs:282
+#: src/sunfish.rs:283
 msgid "This will banish the application to the corresponding workspace.\n"
 "\n"
 ""
 msgstr ""
 
-#: src/sunfish.rs:288
+#: src/sunfish.rs:289
 msgid "Minimization"
 msgstr ""
 
-#: src/sunfish.rs:294
+#: src/sunfish.rs:295
 msgid "To minimize the focused application, press:\n"
 ""
 msgstr ""
 
-#: src/sunfish.rs:296
+#: src/sunfish.rs:297
 msgid "This will minimize said application, temporarily removing it from the current workspace.\n"
 "\n"
 ""
 msgstr ""
 
-#: src/sunfish.rs:297
+#: src/sunfish.rs:298
 msgid "To show the currently minimized apps, press:\n"
 ""
 msgstr ""
 
-#: src/sunfish.rs:299
+#: src/sunfish.rs:300
 msgid "This show all of your minimized apps."
 msgstr ""

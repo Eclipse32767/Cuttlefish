@@ -8,6 +8,7 @@ mod libcfg;
 use libstyle::{ButtonStyle, ListStyle, MenuStyle, ThemeCustom, make_custom_theme, ThemeSet};
 mod libstyle;
 use gettextrs::*;
+use gettextrs::gettext as tr;
 mod cuttlefish_pages;
 mod kbparser;
 
@@ -243,11 +244,11 @@ impl std::fmt::Display for Page {
             f,
             "{}",
             match self { //respect locale preferences when prettyprinting
-                Page::Main => gettext("Main Page"),
-                Page::Bind => gettext("Keybindings Page"),
-                Page::Bar => gettext("Status Bar Page"),
-                Page::Init => gettext("Autostart Page"),
-                Page::Anim => gettext("Animations Page"),
+                Page::Main => tr("Main Page"),
+                Page::Bind => tr("Keybindings Page"),
+                Page::Bar => tr("Status Bar Page"),
+                Page::Init => tr("Autostart Page"),
+                Page::Anim => tr("Animations Page"),
             }
         )
     }
@@ -265,7 +266,7 @@ impl Application for Configurator {
         )
     }
     fn title(&self) -> String { //code that sets the app title
-        format!("{}{}", gettext("Cuttlefish Configurator--"), self.current_page.to_string())
+        format!("{}{}", tr("Cuttlefish Configurator--"), self.current_page.to_string())
     }
     fn update(&mut self, message: Self::Message) -> iced::Command<Message> { //update function, parses messages
         match message {
@@ -521,7 +522,7 @@ impl Application for Configurator {
             .on_press(Message::PageChanged(Page::Anim))
             .width(SIDEBAR_WIDTH)
             .style(style.sidebar.mk_theme());
-        let pagelabel = Text::new(gettext("Available Pages"));
+        let pagelabel = Text::new(tr("Available Pages"));
         match self.current_page {
             Page::Main => pagemain = pagemain.style(style.secondary.mk_theme()),
             Page::Bind => pagebind = pagebind.style(style.secondary.mk_theme()),
@@ -538,8 +539,8 @@ impl Application for Configurator {
             .push(pageinit)
             .align_items(Alignment::Start);
 
-        let savetxt = Text::new(gettext("Save"));
-        let savedtxt = Text::new(gettext("Saved!"));
+        let savetxt = Text::new(tr("Save"));
+        let savedtxt = Text::new(tr("Saved!"));
         let save = match (self.unsaved, self.index == self.indexmax) {
             (true, true) => {
                 Button::new(savetxt).on_press(Message::Save).style(theme::Button::Positive)
