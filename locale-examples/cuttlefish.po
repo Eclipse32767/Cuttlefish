@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-24 00:02+0000\n"
+"POT-Creation-Date: 2023-08-29 22:38+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -237,38 +237,38 @@ msgstr ""
 msgid "Whether or not to use window blur"
 msgstr ""
 
-#: src/cuttlefish.rs:247
+#: src/cuttlefish.rs:248
 msgid "Main Page"
 msgstr ""
 
-#: src/cuttlefish.rs:248
+#: src/cuttlefish.rs:249
 msgid "Keybindings Page"
 msgstr ""
 
-#: src/cuttlefish.rs:249
+#: src/cuttlefish.rs:250
 msgid "Status Bar Page"
 msgstr ""
 
-#: src/cuttlefish.rs:250
+#: src/cuttlefish.rs:251
 msgid "Autostart Page"
 msgstr ""
 
-#: src/cuttlefish.rs:251
+#: src/cuttlefish.rs:252
 msgid "Animations Page"
 msgstr ""
 
-#: src/cuttlefish.rs:269
+#: src/cuttlefish.rs:270
 msgid "Cuttlefish Configurator--"
 msgstr ""
 
-#: src/cuttlefish.rs:525
+#: src/cuttlefish.rs:529
 msgid "Available Pages"
 msgstr ""
 
-#: src/cuttlefish.rs:542
+#: src/cuttlefish.rs:547
 msgid "Save"
 msgstr ""
 
-#: src/cuttlefish.rs:543
+#: src/cuttlefish.rs:548
 msgid "Saved!"
 msgstr ""

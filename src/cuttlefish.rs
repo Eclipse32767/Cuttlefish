@@ -219,7 +219,8 @@ enum Message { // The Message enum, used to send data to the configurator's upda
     WindowUpdate(iced::window::Event),
     AwaitDestination(BarWidget),
     PushWidget(WidgetBank),
-    RemoveWidget(WidgetBank)
+    RemoveWidget(WidgetBank),
+    NoOp,
 }
 #[derive(Debug, Clone)]
 enum IncrVal {
@@ -485,7 +486,9 @@ impl Application for Configurator {
                 self.next_widget = Some(x);
                 iced::Command::none()
             }
-
+            Message::NoOp => {
+                iced::Command::none()
+            }
         }
     }
     fn view(&self) -> iced::Element<'_, Self::Message> {
@@ -522,6 +525,7 @@ impl Application for Configurator {
             .on_press(Message::PageChanged(Page::Anim))
             .width(SIDEBAR_WIDTH)
             .style(style.sidebar.mk_theme());
+        let pagecap = Button::new("").width(SIDEBAR_WIDTH).height(10000).style(style.sidebar.mk_theme()).on_press(Message::NoOp);
         let pagelabel = Text::new(tr("Available Pages"));
         match self.current_page {
             Page::Main => pagemain = pagemain.style(style.secondary.mk_theme()),
@@ -537,6 +541,7 @@ impl Application for Configurator {
             .push(pageanim)
             .push(pagebar)
             .push(pageinit)
+            .push(pagecap)
             .align_items(Alignment::Start);
 
         let savetxt = Text::new(tr("Save"));
