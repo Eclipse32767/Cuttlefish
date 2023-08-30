@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-29 22:38+0000\n"
+"POT-Creation-Date: 2023-08-30 22:58+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,55 +17,55 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/libcfg.rs:137
+#: src/libcfg.rs:136
 msgid "Windows/Command Key"
 msgstr ""
 
-#: src/libcfg.rs:138
+#: src/libcfg.rs:137
 msgid "Alt Key"
 msgstr ""
 
-#: src/libcfg.rs:139
+#: src/libcfg.rs:138
 msgid "Shift Key"
 msgstr ""
 
-#: src/libcfg.rs:140
+#: src/libcfg.rs:139
 msgid "Control Key"
 msgstr ""
 
-#: src/libcfg.rs:151
+#: src/libcfg.rs:150
 msgid "Primary Key"
 msgstr ""
 
-#: src/libcfg.rs:152
+#: src/libcfg.rs:151
 msgid "Secondary Key"
 msgstr ""
 
-#: src/libcfg.rs:153
+#: src/libcfg.rs:152
 msgid "Primary + Secondary"
 msgstr ""
 
-#: src/libcfg.rs:164 src/libcfg.rs:177
+#: src/libcfg.rs:163 src/libcfg.rs:176
 msgid "No Animation"
 msgstr ""
 
-#: src/libcfg.rs:165
+#: src/libcfg.rs:164
 msgid "Pop-in"
 msgstr ""
 
-#: src/libcfg.rs:166
+#: src/libcfg.rs:165
 msgid "Slide In"
 msgstr ""
 
-#: src/libcfg.rs:178
+#: src/libcfg.rs:177
 msgid "Fade In"
 msgstr ""
 
-#: src/libcfg.rs:179
+#: src/libcfg.rs:178
 msgid "Slide In Horizontally"
 msgstr ""
 
-#: src/libcfg.rs:180
+#: src/libcfg.rs:179
 msgid "Slide In Vertically"
 msgstr ""
 
@@ -237,27 +237,27 @@ msgstr ""
 msgid "Whether or not to use window blur"
 msgstr ""
 
-#: src/cuttlefish.rs:248
+#: src/cuttlefish.rs:249
 msgid "Main Page"
 msgstr ""
 
-#: src/cuttlefish.rs:249
+#: src/cuttlefish.rs:250
 msgid "Keybindings Page"
 msgstr ""
 
-#: src/cuttlefish.rs:250
+#: src/cuttlefish.rs:251
 msgid "Status Bar Page"
 msgstr ""
 
-#: src/cuttlefish.rs:251
+#: src/cuttlefish.rs:252
 msgid "Autostart Page"
 msgstr ""
 
-#: src/cuttlefish.rs:252
+#: src/cuttlefish.rs:253
 msgid "Animations Page"
 msgstr ""
 
-#: src/cuttlefish.rs:270
+#: src/cuttlefish.rs:271
 msgid "Cuttlefish Configurator--"
 msgstr ""
 

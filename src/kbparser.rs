@@ -1,6 +1,6 @@
 use iced::keyboard::KeyCode;
 
-use crate::{Configurator, CaptureInput, Page, libcfg::{mkwmcfg, mkselfcfg, OurTheme, ShortcutKey, BindKey, WindowAnimation, WorkAnimation, BarWidget}};
+use crate::{Configurator, CaptureInput, Page, libcfg::{ OurTheme, ShortcutKey, BindKey, WindowAnimation, WorkAnimation, BarWidget}};
 
 impl Configurator {
     pub fn kbparse(&mut self, evt: iced::keyboard::Event) {
@@ -74,8 +74,7 @@ impl Configurator {
                             }
                         } else if key_code == KeyCode::S { //save
                             if self.unsaved {
-                                mkwmcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), Some(self.border), self.window_anim, self.work_anim, self.blur);
-                                mkselfcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), self.theme.clone(), Some(self.border), self.window_anim, self.work_anim, self.blur);
+                                self.mkconfig();
                             }
                             self.unsaved = false;
                         } else if key_code == KeyCode::Enter { // if the enter key is pressed, interact with certain widgets
@@ -135,8 +134,7 @@ impl Configurator {
                             }
                             if self.index == self.indexmax {
                                 if self.unsaved {
-                                    mkwmcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), Some(self.border), self.window_anim, self.work_anim, self.blur);
-                                    mkselfcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), self.theme.clone(), Some(self.border), self.window_anim, self.work_anim, self.blur);
+                                    self.mkconfig();
                                 }
                                 self.unsaved = false;
                             }

@@ -3,7 +3,7 @@ use iced::{Result, Application, Settings, Alignment, Length, executor};
 use iced::widget::{Button, Row, Column, Container, Text, Scrollable, Rule};
 use iced::Color;
 use iced_style::theme;
-use libcfg::{getcfgdata, BindKey, ShortcutKey, OurTheme, BarWidget, WindowAnimation, WorkAnimation, Border, decodeheader, decodepri, decodetheme, mkwmcfg, mkselfcfg, decodewinanim, decodeworkanim, decodeblur};
+use libcfg::{getcfgdata, BindKey, ShortcutKey, OurTheme, BarWidget, WindowAnimation, WorkAnimation, Border, decodeheader, decodepri, decodetheme, decodewinanim, decodeworkanim, decodeblur};
 mod libcfg;
 use libstyle::{ButtonStyle, ListStyle, MenuStyle, ThemeCustom, make_custom_theme, ThemeSet};
 mod libstyle;
@@ -11,6 +11,7 @@ use gettextrs::*;
 use gettextrs::gettext as tr;
 mod cuttlefish_pages;
 mod kbparser;
+mod cuttlefish_save_helper;
 
 
 //This is Cuttlefish, Our Configuration Tool
@@ -97,7 +98,7 @@ impl Default for Configurator {
             capturenext: Some(CaptureInput::NoKey),
             index: 0,
             indexmax: 3,
-            border: data.border.clone().unwrap(),
+            border: data.border.clone(),
             window_anim: decodewinanim(&data.winanim, WindowAnimation::None),
             work_anim: decodeworkanim(&data.workanim, WorkAnimation::None),
             blur: decodeblur(&data.blur),
@@ -273,8 +274,7 @@ impl Application for Configurator {
         match message {
             Message::Save => {
                 if self.unsaved {
-                    mkwmcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), Some(self.border), self.window_anim, self.work_anim, self.blur);
-                    mkselfcfg(self.primary_key, self.secondary_key, self.exit_header, self.exit_key.clone(), self.launch_header, self.launch_key.clone(), self.kill_header, self.kill_key.clone(), self.minimize_header, self.minimize_key.clone(), self.scratch_header, self.scratch_key.clone(), self.theme.clone(), Some(self.border), self.window_anim, self.work_anim, self.blur);
+                    self.mkconfig();
                 }
                 self.unsaved = false;
                 iced::Command::none()
