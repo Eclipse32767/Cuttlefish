@@ -32,7 +32,10 @@ pub struct FileData {
     pub border: Border,
     pub winanim: String,
     pub workanim: String,
-    pub blur: String
+    pub blur: String,
+    pub widgetsleft: Vec<String>,
+    pub widgetscenter: Vec<String>,
+    pub widgetsright:  Vec<String>,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
@@ -181,6 +184,31 @@ impl std::fmt::Display for WorkAnimation {
         )
     }
 }
+impl std::fmt::Display for BarWidget {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                BarWidget::Audio => tr("Audio"),
+                BarWidget::Backlight => tr("Backlight"),
+                BarWidget::Battery => tr("Battery"),
+                BarWidget::Bluetooth => tr("Bluetooth"),
+                BarWidget::CPU => tr("CPU"),
+                BarWidget::Clock => tr("Clock"),
+                BarWidget::Disk => tr("Disk"),
+                BarWidget::KeyboardState => tr("Keyboard State"),
+                BarWidget::Network => tr("Network"),
+                BarWidget::RAM => tr("RAM"),
+                BarWidget::Taskbar => tr("Taskbar"),
+                BarWidget::Temperature => tr("Temperature"),
+                BarWidget::Tray => tr("System Tray"),
+                BarWidget::User => tr("Current User"),
+                BarWidget::Workspaces => tr("Workspaces")
+            }
+        )
+    }
+}
 
 pub fn get_home() -> String {
     match env::var("XDG_CONFIG_HOME") {
@@ -280,6 +308,26 @@ pub fn decodeheader(x: &str, default: BindKey) -> Option<BindKey> {
         &_ => default
     })
 }
+pub fn decodewidget(x: &str, default: BarWidget) -> BarWidget {
+    match x {
+        "Audio" => BarWidget::Audio,
+        "Backlight" => BarWidget::Backlight,
+        "Battery" => BarWidget::Battery,
+        "Bluetooth" => BarWidget::Bluetooth,
+        "CPU" => BarWidget::CPU,
+        "Clock" => BarWidget::Clock,
+        "Disk" => BarWidget::Disk,
+        "Keyboard State" => BarWidget::KeyboardState,
+        "Network" => BarWidget::Network,
+        "RAM" => BarWidget::RAM,
+        "Taskbar" => BarWidget::Taskbar,
+        "Temperature" => BarWidget::Temperature,
+        "System Tray" => BarWidget::Tray,
+        "Current User" => BarWidget::User,
+        "Workspaces" => BarWidget::Workspaces,
+        &_ => default,
+    }
+}
 pub fn encodetheme(x: OurTheme) -> String {
     match x {
         OurTheme::Dark => "dark".to_string(),
@@ -323,6 +371,25 @@ pub fn encodeblur(x: bool) -> String {
     } else {
         "n".to_string()
     }
+}
+pub fn encodewidget(x: BarWidget) -> String {
+    match x {
+        BarWidget::Audio => "Audio",
+        BarWidget::Backlight => "Backlight",
+        BarWidget::Battery => "Battery",
+        BarWidget::Bluetooth => "Bluetooth",
+        BarWidget::CPU => "CPU",
+        BarWidget::Clock => "Clock",
+        BarWidget::Disk => "Disk",
+        BarWidget::KeyboardState => "Keyboard State",
+        BarWidget::Network => "Network",
+        BarWidget::RAM => "RAM",
+        BarWidget::Taskbar => "Taskbar",
+        BarWidget::Temperature => "Temperature",
+        BarWidget::Tray => "System Tray",
+        BarWidget::User => "Current User",
+        BarWidget::Workspaces => "Workspaces"
+    }.to_string()
 }
 pub fn rip_shortcut(opt: Option<ShortcutKey>) -> String {
     match opt.unwrap() {

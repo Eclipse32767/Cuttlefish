@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-30 22:58+0000\n"
+"POT-Creation-Date: 2023-08-30 23:47+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,56 +17,116 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/libcfg.rs:136
+#: src/libcfg.rs:139
 msgid "Windows/Command Key"
 msgstr ""
 
-#: src/libcfg.rs:137
+#: src/libcfg.rs:140
 msgid "Alt Key"
 msgstr ""
 
-#: src/libcfg.rs:138
+#: src/libcfg.rs:141
 msgid "Shift Key"
 msgstr ""
 
-#: src/libcfg.rs:139
+#: src/libcfg.rs:142
 msgid "Control Key"
 msgstr ""
 
-#: src/libcfg.rs:150
+#: src/libcfg.rs:153
 msgid "Primary Key"
 msgstr ""
 
-#: src/libcfg.rs:151
+#: src/libcfg.rs:154
 msgid "Secondary Key"
 msgstr ""
 
-#: src/libcfg.rs:152
+#: src/libcfg.rs:155
 msgid "Primary + Secondary"
 msgstr ""
 
-#: src/libcfg.rs:163 src/libcfg.rs:176
+#: src/libcfg.rs:166 src/libcfg.rs:179
 msgid "No Animation"
 msgstr ""
 
-#: src/libcfg.rs:164
+#: src/libcfg.rs:167
 msgid "Pop-in"
 msgstr ""
 
-#: src/libcfg.rs:165
+#: src/libcfg.rs:168
 msgid "Slide In"
 msgstr ""
 
-#: src/libcfg.rs:177
+#: src/libcfg.rs:180
 msgid "Fade In"
 msgstr ""
 
-#: src/libcfg.rs:178
+#: src/libcfg.rs:181
 msgid "Slide In Horizontally"
 msgstr ""
 
-#: src/libcfg.rs:179
+#: src/libcfg.rs:182
 msgid "Slide In Vertically"
+msgstr ""
+
+#: src/libcfg.rs:193
+msgid "Audio"
+msgstr ""
+
+#: src/libcfg.rs:194
+msgid "Backlight"
+msgstr ""
+
+#: src/libcfg.rs:195
+msgid "Battery"
+msgstr ""
+
+#: src/libcfg.rs:196
+msgid "Bluetooth"
+msgstr ""
+
+#: src/libcfg.rs:197
+msgid "CPU"
+msgstr ""
+
+#: src/libcfg.rs:198
+msgid "Clock"
+msgstr ""
+
+#: src/libcfg.rs:199
+msgid "Disk"
+msgstr ""
+
+#: src/libcfg.rs:200
+msgid "Keyboard State"
+msgstr ""
+
+#: src/libcfg.rs:201
+msgid "Network"
+msgstr ""
+
+#: src/libcfg.rs:202
+msgid "RAM"
+msgstr ""
+
+#: src/libcfg.rs:203
+msgid "Taskbar"
+msgstr ""
+
+#: src/libcfg.rs:204
+msgid "Temperature"
+msgstr ""
+
+#: src/libcfg.rs:205
+msgid "System Tray"
+msgstr ""
+
+#: src/libcfg.rs:206
+msgid "Current User"
+msgstr ""
+
+#: src/libcfg.rs:207 src/sunfish.rs:273
+msgid "Workspaces"
 msgstr ""
 
 #: src/sunfish.rs:225
@@ -150,10 +210,6 @@ msgstr ""
 
 #: src/sunfish.rs:269
 msgid "This will close out the desktop entirely, destroying all unsaved work."
-msgstr ""
-
-#: src/sunfish.rs:273
-msgid "Workspaces"
 msgstr ""
 
 #: src/sunfish.rs:277

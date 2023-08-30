@@ -3,7 +3,7 @@ use iced::{Result, Application, Settings, Alignment, Length, executor};
 use iced::widget::{Button, Row, Column, Container, Text, Scrollable, Rule};
 use iced::Color;
 use iced_style::theme;
-use libcfg::{getcfgdata, BindKey, ShortcutKey, OurTheme, BarWidget, WindowAnimation, WorkAnimation, Border, decodeheader, decodepri, decodetheme, decodewinanim, decodeworkanim, decodeblur};
+use libcfg::{getcfgdata, BindKey, ShortcutKey, OurTheme, BarWidget, WindowAnimation, WorkAnimation, Border, decodeheader, decodepri, decodetheme, decodewinanim, decodeworkanim, decodeblur, decodewidget};
 mod libcfg;
 use libstyle::{ButtonStyle, ListStyle, MenuStyle, ThemeCustom, make_custom_theme, ThemeSet};
 mod libstyle;
@@ -79,6 +79,18 @@ enum ShrinkValue {
 impl Default for Configurator {
     fn default() -> Self {
         let data = getcfgdata();
+        let mut leftwidgets = vec![];
+        let mut centerwidgets = vec![];
+        let mut rightwidgets = vec![];
+        for i in 0..data.widgetsleft.len() {
+            leftwidgets.push(decodewidget(&data.widgetsleft[i], BarWidget::Clock))
+        }
+        for i in 0..data.widgetscenter.len() {
+            centerwidgets.push(decodewidget(&data.widgetscenter[i], BarWidget::Clock))
+        }
+        for i in 0..data.widgetsright.len() {
+            rightwidgets.push(decodewidget(&data.widgetsright[i], BarWidget::Clock))
+        }
         Configurator { //here we extract all of the data from the config file
             theme: decodetheme(&data.theme, OurTheme::Light),
             current_page: Page::Main,
@@ -190,9 +202,9 @@ impl Default for Configurator {
                 custom: make_custom_theme()
             },
             width: ShrinkValue::Full,
-            bar_left: vec![],
-            bar_center: vec![],
-            bar_right: vec![],
+            bar_left: leftwidgets,
+            bar_center: centerwidgets,
+            bar_right: rightwidgets,
             next_widget: None,
         }
     }

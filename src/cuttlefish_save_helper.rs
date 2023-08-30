@@ -11,8 +11,20 @@ impl Configurator {
         let home = get_home();
         let path = format!("{home}/Oceania/cfg.toml");
         let backup_path = format!("{home}/Oceania");
+        let mut leftwidgets = vec![];
+        let mut centerwidgets = vec![];
+        let mut rightwidgets = vec![];
+        for i in 0..self.bar_left.len() {
+            leftwidgets.push(encodewidget(self.bar_left[i]))
+        }
+        for i in 0..self.bar_center.len() {
+            centerwidgets.push(encodewidget(self.bar_center[i]))
+        }
+        for i in 0..self.bar_right.len() {
+            rightwidgets.push(encodewidget(self.bar_right[i]))
+        }
         std::process::Command::new("mkdir").arg("-p").arg(backup_path).output().expect("uh oh");
-        let data = FileData{
+        let data = FileData {
             theme: encodetheme(self.theme.clone()).to_string(),
             primary: encodepri(self.primary_key).to_string(),
             secondary: encodepri(self.secondary_key).to_string(),
@@ -30,6 +42,9 @@ impl Configurator {
             winanim: encodewinanim(self.window_anim).to_string(),
             workanim: encodeworkanim(self.work_anim).to_string(),
             blur: encodeblur(self.blur).to_string(),
+            widgetsleft: leftwidgets,
+            widgetscenter: centerwidgets,
+            widgetsright: rightwidgets
         };
         let toml = to_string(&data).expect("failed to generate toml");
         fs::write(path, toml).expect("failed to write cfg.toml");

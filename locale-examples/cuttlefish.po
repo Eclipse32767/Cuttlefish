@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-30 22:58+0000\n"
+"POT-Creation-Date: 2023-08-30 23:47+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,56 +17,116 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/libcfg.rs:136
+#: src/libcfg.rs:139
 msgid "Windows/Command Key"
 msgstr ""
 
-#: src/libcfg.rs:137
+#: src/libcfg.rs:140
 msgid "Alt Key"
 msgstr ""
 
-#: src/libcfg.rs:138
+#: src/libcfg.rs:141
 msgid "Shift Key"
 msgstr ""
 
-#: src/libcfg.rs:139
+#: src/libcfg.rs:142
 msgid "Control Key"
 msgstr ""
 
-#: src/libcfg.rs:150
+#: src/libcfg.rs:153
 msgid "Primary Key"
 msgstr ""
 
-#: src/libcfg.rs:151
+#: src/libcfg.rs:154
 msgid "Secondary Key"
 msgstr ""
 
-#: src/libcfg.rs:152
+#: src/libcfg.rs:155
 msgid "Primary + Secondary"
 msgstr ""
 
-#: src/libcfg.rs:163 src/libcfg.rs:176
+#: src/libcfg.rs:166 src/libcfg.rs:179
 msgid "No Animation"
 msgstr ""
 
-#: src/libcfg.rs:164
+#: src/libcfg.rs:167
 msgid "Pop-in"
 msgstr ""
 
-#: src/libcfg.rs:165
+#: src/libcfg.rs:168
 msgid "Slide In"
 msgstr ""
 
-#: src/libcfg.rs:177
+#: src/libcfg.rs:180
 msgid "Fade In"
 msgstr ""
 
-#: src/libcfg.rs:178
+#: src/libcfg.rs:181
 msgid "Slide In Horizontally"
 msgstr ""
 
-#: src/libcfg.rs:179
+#: src/libcfg.rs:182
 msgid "Slide In Vertically"
+msgstr ""
+
+#: src/libcfg.rs:193 src/cuttlefish_pages.rs:279
+msgid "Audio"
+msgstr ""
+
+#: src/libcfg.rs:194 src/cuttlefish_pages.rs:280
+msgid "Backlight"
+msgstr ""
+
+#: src/libcfg.rs:195 src/cuttlefish_pages.rs:281
+msgid "Battery"
+msgstr ""
+
+#: src/libcfg.rs:196 src/cuttlefish_pages.rs:282
+msgid "Bluetooth"
+msgstr ""
+
+#: src/libcfg.rs:197 src/cuttlefish_pages.rs:283
+msgid "CPU"
+msgstr ""
+
+#: src/libcfg.rs:198 src/cuttlefish_pages.rs:284
+msgid "Clock"
+msgstr ""
+
+#: src/libcfg.rs:199 src/cuttlefish_pages.rs:285
+msgid "Disk"
+msgstr ""
+
+#: src/libcfg.rs:200 src/cuttlefish_pages.rs:286
+msgid "Keyboard State"
+msgstr ""
+
+#: src/libcfg.rs:201 src/cuttlefish_pages.rs:287
+msgid "Network"
+msgstr ""
+
+#: src/libcfg.rs:202 src/cuttlefish_pages.rs:288
+msgid "RAM"
+msgstr ""
+
+#: src/libcfg.rs:203 src/cuttlefish_pages.rs:289
+msgid "Taskbar"
+msgstr ""
+
+#: src/libcfg.rs:204 src/cuttlefish_pages.rs:290
+msgid "Temperature"
+msgstr ""
+
+#: src/libcfg.rs:205 src/cuttlefish_pages.rs:291
+msgid "System Tray"
+msgstr ""
+
+#: src/libcfg.rs:206 src/cuttlefish_pages.rs:292
+msgid "Current User"
+msgstr ""
+
+#: src/libcfg.rs:207 src/cuttlefish_pages.rs:293
+msgid "Workspaces"
 msgstr ""
 
 #: src/cuttlefish_pages.rs:29 src/cuttlefish_pages.rs:36 src/cuttlefish_pages.rs:107 src/cuttlefish_pages.rs:114
@@ -133,66 +193,6 @@ msgstr ""
 msgid "Right"
 msgstr ""
 
-#: src/cuttlefish_pages.rs:279
-msgid "Audio"
-msgstr ""
-
-#: src/cuttlefish_pages.rs:280
-msgid "Backlight"
-msgstr ""
-
-#: src/cuttlefish_pages.rs:281
-msgid "Battery"
-msgstr ""
-
-#: src/cuttlefish_pages.rs:282
-msgid "Bluetooth"
-msgstr ""
-
-#: src/cuttlefish_pages.rs:283
-msgid "CPU"
-msgstr ""
-
-#: src/cuttlefish_pages.rs:284
-msgid "Clock"
-msgstr ""
-
-#: src/cuttlefish_pages.rs:285
-msgid "Disk"
-msgstr ""
-
-#: src/cuttlefish_pages.rs:286
-msgid "Keyboard State"
-msgstr ""
-
-#: src/cuttlefish_pages.rs:287
-msgid "Network"
-msgstr ""
-
-#: src/cuttlefish_pages.rs:288
-msgid "RAM"
-msgstr ""
-
-#: src/cuttlefish_pages.rs:289
-msgid "Taskbar"
-msgstr ""
-
-#: src/cuttlefish_pages.rs:290
-msgid "Temperature"
-msgstr ""
-
-#: src/cuttlefish_pages.rs:291
-msgid "System Tray"
-msgstr ""
-
-#: src/cuttlefish_pages.rs:292
-msgid "Current User"
-msgstr ""
-
-#: src/cuttlefish_pages.rs:293
-msgid "Workspaces"
-msgstr ""
-
 #: src/cuttlefish_pages.rs:294 src/cuttlefish_pages.rs:295 src/cuttlefish_pages.rs:296
 msgid "Remove"
 msgstr ""
@@ -237,38 +237,38 @@ msgstr ""
 msgid "Whether or not to use window blur"
 msgstr ""
 
-#: src/cuttlefish.rs:249
+#: src/cuttlefish.rs:261
 msgid "Main Page"
 msgstr ""
 
-#: src/cuttlefish.rs:250
+#: src/cuttlefish.rs:262
 msgid "Keybindings Page"
 msgstr ""
 
-#: src/cuttlefish.rs:251
+#: src/cuttlefish.rs:263
 msgid "Status Bar Page"
 msgstr ""
 
-#: src/cuttlefish.rs:252
+#: src/cuttlefish.rs:264
 msgid "Autostart Page"
 msgstr ""
 
-#: src/cuttlefish.rs:253
+#: src/cuttlefish.rs:265
 msgid "Animations Page"
 msgstr ""
 
-#: src/cuttlefish.rs:271
+#: src/cuttlefish.rs:283
 msgid "Cuttlefish Configurator--"
 msgstr ""
 
-#: src/cuttlefish.rs:529
+#: src/cuttlefish.rs:541
 msgid "Available Pages"
 msgstr ""
 
-#: src/cuttlefish.rs:547
+#: src/cuttlefish.rs:559
 msgid "Save"
 msgstr ""
 
-#: src/cuttlefish.rs:548
+#: src/cuttlefish.rs:560
 msgid "Saved!"
 msgstr ""
