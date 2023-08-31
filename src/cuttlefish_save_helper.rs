@@ -72,7 +72,7 @@ impl Configurator {
         let sector_tail = r#"}"#;
         let path = format!("{home}/hypr/hyprland.conf");
     data = format!("#AUTO-GENERATED CONFIG, DO NOT EDIT, CHANGES WILL BE OVERWRITTEN \n \
-    source {home}/hypr/usercfg.conf\n \
+    source={home}/hypr/usercfg.conf\n \
     exec_once={home}/hypr/autostart\n \
     bind={exith},{exitk},exec,killall Hyprland\n \
     bind={launchh},{launchk},exec,rofi\n \
@@ -114,10 +114,12 @@ impl Configurator {
     {sector_tail}\n \
     decoration {sector_head}\n \
     rounding = {radius}\n \
-    blur = {blur}\n \
-    blur_size = 3\n \
-    blur_passes = 3\n \
-    blur_new_optimizations = true\n \
+    blur {sector_head} \n \
+    enabled={blur} \n \
+    size=3 \n \
+    passes=3 \n \
+    new_optimizations=true \n \
+    {sector_tail}
     drop_shadow = false\n \
     shadow_ignore_window = true\n \
     shadow_offset = 0\n \
