@@ -130,6 +130,40 @@ pub fn string_to_color(x: String) -> Color {
 
     Color::from_rgb8(rednum, greennum, bluenum)
 }
+fn format_radix(mut x: u32, radix: u32) -> String {
+    let mut result = vec![];
+
+    loop {
+        let m = x % radix;
+        x = x / radix;
+
+        // will panic if you use a bad radix (< 2 or > 36).
+        result.push(std::char::from_digit(m, radix).unwrap());
+        if x == 0 {
+            break;
+        }
+    }
+    result.into_iter().rev().collect()
+}
+pub fn string_from_col(color: &Color) -> String {
+    let rgba = color.into_rgba8();
+    let prepend_0 = [rgba[0] < 16, rgba[1] < 16, rgba[2] < 16];
+    let redstr = format_radix(rgba[0].into(), 16);
+    let greenstr = format_radix(rgba[1].into(), 16);
+    let bluestr = format_radix(rgba[2].into(), 16);
+    let mut output = match prepend_0[0] {
+        true => format!("0{redstr}"),
+        false => format!("{redstr}")
+    };
+    output = match prepend_0[1] {
+        true => format!("{output}0{greenstr}"),
+        false => format!("{output}{greenstr}"),
+    };
+    match prepend_0[2] {
+        true => format!("{output}0{bluestr}"),
+        false => format!("{output}{bluestr}")
+    }
+}
 pub fn make_custom_theme() -> ThemeCustom {
     let home = get_home();
     let path = format!("{home}/Oceania/theme.toml");

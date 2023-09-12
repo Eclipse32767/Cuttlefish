@@ -2,7 +2,7 @@ use toml::to_string;
 use std::fs;
 use std::process::Command;
 use crate::libcfg::*;
-
+use crate::libstyle::*;
 
 use crate::Configurator;
 impl Configurator {
@@ -68,14 +68,19 @@ impl Configurator {
         let win_anim = rip_win_anim(self.window_anim);
         let work_anim = rip_work_anim(self.work_anim);
         let blur = self.blur;
+        let activeborder = string_from_col(match self.theme {
+            OurTheme::Light => &self.theme_set.light.application.primary,
+            OurTheme::Dark => &self.theme_set.dark.application.primary,
+            OurTheme::Custom => &self.theme_set.custom.application.primary
+        });
         let sector_head = r#"{"#;
         let sector_tail = r#"}"#;
         let path = format!("{home}/hypr/hyprland.conf");
     data = format!("#AUTO-GENERATED CONFIG, DO NOT EDIT, CHANGES WILL BE OVERWRITTEN \n \
-    source={home}/hypr/usercfg.conf\n \
-    exec_once={home}/hypr/autostart\n \
-    bind={exith},{exitk},exec,killall Hyprland\n \
-    bind={launchh},{launchk},exec,rofi\n \
+    exec-once=oceania-shell\n \
+    exec-once={home}/hypr/autostart\n \
+    bind={exith},{exitk},exec,wlogout\n \
+    bind={launchh},{launchk},exec,rofi -show drun\n \
     bind={killh},{killk},killactive\n \
     bind={minih},{minik},movetoworkspace,special\n \
     bind={scratchh},{scratchk},togglespecialworkspace\n \
@@ -111,6 +116,7 @@ impl Configurator {
     gaps_in = {gaps}\n \
     gaps_out = {gaps}\n \
     border_size = {width}\n \
+    col.active_border = rgb({activeborder})
     {sector_tail}\n \
     decoration {sector_head}\n \
     rounding = {radius}\n \
@@ -120,18 +126,13 @@ impl Configurator {
     passes=3 \n \
     new_optimizations=true \n \
     {sector_tail}
-    drop_shadow = false\n \
-    shadow_ignore_window = true\n \
-    shadow_offset = 0\n \
-    shadow_range = 0\n \
-    shadow_render_power = 0\n \
-    col.shadow = rgba(00000099)\n \
     {sector_tail}\n \
     animations {sector_head}\n \
     enabled = true\n \
     animation = windows,{win_anim}\n \
     animation = workspaces,{work_anim}\n \
     {sector_tail}\n \
+    source={home}/hypr/usercfg.conf
     ");
         fs::write(path, data).expect("failed to write file");
 

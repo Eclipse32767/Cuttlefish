@@ -421,15 +421,15 @@ pub fn rip_bind(opt: Option<BindKey>, pri: Option<ShortcutKey>, sec: Option<Shor
 pub fn rip_win_anim(opt: Option<WindowAnimation>) -> String {
     match opt.unwrap() {
         WindowAnimation::None => "0,1,default".to_string(),
-        WindowAnimation::Popin => "1,8,default,popin".to_string(),
-        WindowAnimation::Slide => "1,8,default,slide".to_string()
+        WindowAnimation::Popin => "1,3,default,popin".to_string(),
+        WindowAnimation::Slide => "1,3,default,slide".to_string()
     }
 }
 pub fn rip_work_anim(opt: Option<WorkAnimation>) -> String {
     match opt.unwrap() {
-        WorkAnimation::None => "0,8,default".to_string(),
-        WorkAnimation::Fade => "1,8,default,fade".to_string(),
-        WorkAnimation::Slide => "1,8,default,slide".to_string(),
-        WorkAnimation::SlideVert => "1,8,default,slidevert".to_string()
+        WorkAnimation::None => "0,3,default".to_string(),
+        WorkAnimation::Fade => "1,3,default,fade".to_string(),
+        WorkAnimation::Slide => "1,3,default,slide".to_string(),
+        WorkAnimation::SlideVert => "1,3,default,slidevert".to_string()
     }
 }

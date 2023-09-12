@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Sunfish Manual
+Exec=sunfish-man
+Terminal=false
+Type=Application
+Icon=office-address-book
+StartupWMClass=Sunfish-Man
+Comment=Oceania's own manual
+Categories=Settings;

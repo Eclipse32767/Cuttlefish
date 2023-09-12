@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Cuttlefish Configurator
+Exec=cuttlefish-cfg
+Terminal=false
+Type=Application
+Icon=preferences-system
+StartupWMClass=Cuttlefish-Cfg
+Comment=Oceania's own config tool
+Categories=Settings;
