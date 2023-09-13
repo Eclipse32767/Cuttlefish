@@ -240,6 +240,9 @@ pub fn getcfgdata() -> FileData {
     winanim = "popin"
     workanim = "slidev"
     blur = "y"
+    widgetsleft = ["CPU", "RAM", "Temperature", "Current User"]
+    widgetscenter = ["Workspaces", "Clock"]
+    widgetsright = ["Audio", "Backlight", "System Tray"]
     
     [border]
     width = 5
