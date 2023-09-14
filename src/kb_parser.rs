@@ -1,41 +1,41 @@
 use iced::keyboard::KeyCode;
 
-use crate::{Configurator, CaptureInput, Page, libcfg::{ OurTheme, ShortcutKey, BindKey, WindowAnimation, WorkAnimation, BarWidget}};
+use crate::{Configurator, CaptureInput, Page, lib_cfg::{OurTheme, ShortcutKey, BindKey, WindowAnimation, WorkAnimation, BarWidget}};
 
 impl Configurator {
-    pub fn kbparse(&mut self, evt: iced::keyboard::Event) {
+    pub fn kb_parse(&mut self, evt: iced::keyboard::Event) {
         match evt {
-            iced::keyboard::Event::KeyPressed { key_code, modifiers} => { // code for handling keypresses
-                match self.capturenext.as_ref().unwrap() { //check if next input should be captured
+            iced::keyboard::Event::KeyPressed { key_code, modifiers} => { // code for handling key presses
+                match self.capture_next.as_ref().unwrap() { //check if next input should be captured
                     &CaptureInput::NoKey => { // if no captures are wanted, go through this parsing block
                         if key_code == KeyCode::Up {
                             if iced::keyboard::Modifiers::shift(modifiers) {//go up a page
                                 self.current_page = match self.current_page {
                                     Page::Main => {
-                                        self.indexmax = 1;
+                                        self.index_max = 1;
                                         Page::Init
                                     }
                                     Page::Bind => {
-                                        self.indexmax = 3;
+                                        self.index_max = 3;
                                         Page::Main
                                     }
                                     Page::Anim => {
-                                        self.indexmax = 7;
+                                        self.index_max = 7;
                                         Page::Bind
                                     }
                                     Page::Bar => {
-                                        self.indexmax = 6;
+                                        self.index_max = 6;
                                         Page::Anim
                                     }
                                     Page::Init => {
-                                        self.indexmax = 8;
+                                        self.index_max = 8;
                                         Page::Bar
                                     }
                                 };
-                                if self.index > self.indexmax {
-                                    self.index = self.indexmax;
+                                if self.index > self.index_max {
+                                    self.index = self.index_max;
                                 }
-                            } else { //move the minicursor up
+                            } else { //move the mini cursor up
                                 if self.index != 0 {
                                     self.index = self.index -1;
                                 }
@@ -44,37 +44,37 @@ impl Configurator {
                             if iced::keyboard::Modifiers::shift(modifiers) {//go down a page
                                 self.current_page = match self.current_page {
                                     Page::Main => {
-                                        self.indexmax = 7;
+                                        self.index_max = 7;
                                         Page::Bind
                                     }
                                     Page::Bind => {
-                                        self.indexmax = 6;
+                                        self.index_max = 6;
                                         Page::Anim
                                     }
                                     Page::Anim => {
-                                        self.indexmax = 8;
+                                        self.index_max = 8;
                                         Page::Bar
                                     }
                                     Page::Bar => {
-                                        self.indexmax = 1;
+                                        self.index_max = 1;
                                         Page::Init
                                     }
                                     Page::Init => {
-                                        self.indexmax = 3;
+                                        self.index_max = 3;
                                         Page::Main
                                     }
                                };
-                               if self.index > self.indexmax {
-                                    self.index = self.indexmax;
+                               if self.index > self.index_max {
+                                    self.index = self.index_max;
                                 }
-                            } else { //move the minicursor down
-                                if self.index < self.indexmax {
+                            } else { //move the mini cursor down
+                                if self.index < self.index_max {
                                     self.index = self.index +1;
                                 }
                             }
                         } else if key_code == KeyCode::S { //save
                             if self.unsaved {
-                                self.mkconfig();
+                                self.mk_config();
                             }
                             self.unsaved = false;
                         } else if key_code == KeyCode::Enter { // if the enter key is pressed, interact with certain widgets
@@ -91,15 +91,15 @@ impl Configurator {
                                 }
                                 Page::Bind => { // set the captures if needed
                                     if self.index == 2 {
-                                        self.capturenext = Some(CaptureInput::ExitKey);
+                                        self.capture_next = Some(CaptureInput::ExitKey);
                                     } else if self.index == 3 {
-                                        self.capturenext = Some(CaptureInput::LaunchKey);
+                                        self.capture_next = Some(CaptureInput::LaunchKey);
                                     } else if self.index == 4 {
-                                        self.capturenext = Some(CaptureInput::KillKey);
+                                        self.capture_next = Some(CaptureInput::KillKey);
                                     } else if self.index == 5 {
-                                        self.capturenext = Some(CaptureInput::MiniKey);
+                                        self.capture_next = Some(CaptureInput::MiniKey);
                                     } else if self.index == 6 {
-                                        self.capturenext = Some(CaptureInput::ScratchKey);
+                                        self.capture_next = Some(CaptureInput::ScratchKey);
                                     }
                                 }
                                 Page::Bar => {
@@ -132,9 +132,9 @@ impl Configurator {
                                     }
                                 }
                             }
-                            if self.index == self.indexmax {
+                            if self.index == self.index_max {
                                 if self.unsaved {
-                                    self.mkconfig();
+                                    self.mk_config();
                                 }
                                 self.unsaved = false;
                             }
@@ -225,7 +225,7 @@ impl Configurator {
                                 }
                             } else if self.current_page == Page::Anim {
                                 if self.index == 3 {
-                                    self.window_anim = Some(WindowAnimation::Popin);
+                                    self.window_anim = Some(WindowAnimation::PopIn);
                                     self.unsaved = true;
                                 } else if self.index == 4 {
                                     self.work_anim = Some(WorkAnimation::Slide);
@@ -373,27 +373,27 @@ impl Configurator {
                     } 
                     &CaptureInput::ExitKey => {
                         self.exit_key = format!("{:?}", key_code);
-                        self.capturenext = Some(CaptureInput::NoKey);
+                        self.capture_next = Some(CaptureInput::NoKey);
                         self.unsaved = true;
                     }
                     &CaptureInput::LaunchKey => {
                         self.launch_key = format!("{:?}", key_code);
-                        self.capturenext = Some(CaptureInput::NoKey);
+                        self.capture_next = Some(CaptureInput::NoKey);
                         self.unsaved = true;
                     }
                     &CaptureInput::KillKey => {
                         self.kill_key = format!("{:?}", key_code);
-                        self.capturenext = Some(CaptureInput::NoKey);
+                        self.capture_next = Some(CaptureInput::NoKey);
                         self.unsaved = true;
                     }
                     &CaptureInput::MiniKey => {
                         self.minimize_key = format!("{:?}", key_code);
-                        self.capturenext = Some(CaptureInput::NoKey);
+                        self.capture_next = Some(CaptureInput::NoKey);
                         self.unsaved = true;
                     }
                     &CaptureInput::ScratchKey => {
                         self.scratch_key = format!("{:?}", key_code);
-                        self.capturenext = Some(CaptureInput::NoKey);
+                        self.capture_next = Some(CaptureInput::NoKey);
                         self.unsaved = true;
                     }
                 }

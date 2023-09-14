@@ -3,14 +3,14 @@ use iced::{Result, Application, Settings, Alignment, Length, executor};
 use iced::widget::{Button, Row, Column, Container, Text, Scrollable, Rule};
 use iced::Color;
 use iced_style::theme;
-use libcfg::{getcfgdata, BindKey, ShortcutKey, OurTheme, BarWidget, WindowAnimation, WorkAnimation, Border, decodeheader, decodepri, decodetheme, decodewinanim, decodeworkanim, decodeblur, decodewidget};
-mod libcfg;
-use libstyle::{ButtonStyle, ListStyle, MenuStyle, ThemeCustom, make_custom_theme, ThemeSet};
-mod libstyle;
+use lib_cfg::{get_cfg_data, BindKey, ShortcutKey, OurTheme, BarWidget, WindowAnimation, WorkAnimation, Border, decode_header, decode_pri, decode_theme, decode_win_anim, decode_work_anim, decode_blur, decode_widget};
+mod lib_cfg;
+use lib_style::{ButtonStyle, ListStyle, MenuStyle, ThemeCustom, make_custom_theme, ThemeSet};
+mod lib_style;
 use gettextrs::*;
 use gettextrs::gettext as tr;
 mod cuttlefish_pages;
-mod kbparser;
+mod kb_parser;
 mod cuttlefish_save_helper;
 
 
@@ -40,9 +40,9 @@ struct Configurator { //The basic configurator struct, contains most program sta
     scratch_header: Option<BindKey>,
     scratch_key: String,
     unsaved: bool,
-    capturenext: Option<CaptureInput>,
+    capture_next: Option<CaptureInput>,
     index: u8,
-    indexmax: u8,
+    index_max: u8,
     border: Border,
     window_anim: Option<WindowAnimation>,
     work_anim: Option<WorkAnimation>,
@@ -78,45 +78,45 @@ enum ShrinkValue {
 
 impl Default for Configurator {
     fn default() -> Self {
-        let data = getcfgdata();
-        let mut leftwidgets = vec![];
-        let mut centerwidgets = vec![];
-        let mut rightwidgets = vec![];
-        for i in 0..data.widgetsleft.len() {
-            leftwidgets.push(decodewidget(&data.widgetsleft[i], BarWidget::Clock))
+        let data = get_cfg_data();
+        let mut left_widgets = vec![];
+        let mut center_widgets = vec![];
+        let mut right_widgets = vec![];
+        for i in 0..data.widgets_left.len() {
+            left_widgets.push(decode_widget(&data.widgets_left[i], BarWidget::Clock))
         }
-        for i in 0..data.widgetscenter.len() {
-            centerwidgets.push(decodewidget(&data.widgetscenter[i], BarWidget::Clock))
+        for i in 0..data.widgets_center.len() {
+            center_widgets.push(decode_widget(&data.widgets_center[i], BarWidget::Clock))
         }
-        for i in 0..data.widgetsright.len() {
-            rightwidgets.push(decodewidget(&data.widgetsright[i], BarWidget::Clock))
+        for i in 0..data.widgets_right.len() {
+            right_widgets.push(decode_widget(&data.widgets_right[i], BarWidget::Clock))
         }
         Configurator { //here we extract all of the data from the config file
-            theme: decodetheme(&data.theme, OurTheme::Light),
+            theme: decode_theme(&data.theme, OurTheme::Light),
             current_page: Page::Main,
-            primary_key: decodepri(&data.primary, ShortcutKey::Super),
-            secondary_key: decodepri(&data.secondary, ShortcutKey::Shift),
-            exit_header: decodeheader(&data.exith, BindKey::BothKey),
-            exit_key: data.exitk,
-            launch_header: decodeheader(&data.launchh, BindKey::PrimaryKey),
-            launch_key: data.launchk,
-            kill_header: decodeheader(&data.killh, BindKey::BothKey),
-            kill_key: data.killk,
-            minimize_header: decodeheader(&data.minih, BindKey::BothKey),
-            minimize_key: data.minik,
-            scratch_header: decodeheader(&data.scratchh, BindKey::PrimaryKey),
-            scratch_key: data.scratchk,
+            primary_key: decode_pri(&data.primary, ShortcutKey::Super),
+            secondary_key: decode_pri(&data.secondary, ShortcutKey::Shift),
+            exit_header: decode_header(&data.exit_h, BindKey::BothKey),
+            exit_key: data.exit_k,
+            launch_header: decode_header(&data.launch_h, BindKey::PrimaryKey),
+            launch_key: data.launch_k,
+            kill_header: decode_header(&data.kill_h, BindKey::BothKey),
+            kill_key: data.kill_k,
+            minimize_header: decode_header(&data.mini_h, BindKey::BothKey),
+            minimize_key: data.mini_k,
+            scratch_header: decode_header(&data.scratch_h, BindKey::PrimaryKey),
+            scratch_key: data.scratch_k,
             unsaved: false,
-            capturenext: Some(CaptureInput::NoKey),
+            capture_next: Some(CaptureInput::NoKey),
             index: 0,
-            indexmax: 3,
+            index_max: 3,
             border: data.border.clone(),
-            window_anim: decodewinanim(&data.winanim, WindowAnimation::None),
-            work_anim: decodeworkanim(&data.workanim, WorkAnimation::None),
-            blur: decodeblur(&data.blur),
+            window_anim: decode_win_anim(&data.win_anim, WindowAnimation::None),
+            work_anim: decode_work_anim(&data.work_anim, WorkAnimation::None),
+            blur: decode_blur(&data.blur),
             theme_set: ThemeSet {
                 light: ThemeCustom {
-                    application: iced::theme::Palette {
+                    application: theme::Palette {
                         background: Color::from_rgb8(0xE0, 0xF5, 0xFF),
                         text: Color::from_rgb8(0x00, 0x19, 0x36),
                         primary: Color::from_rgb8(0x00, 0x77, 0xFF),
@@ -158,7 +158,7 @@ impl Default for Configurator {
                     }
                 },
                 dark: ThemeCustom { // TODO: set dark theme properly
-                    application: iced::theme::Palette {
+                    application: theme::Palette {
                         background: Color::from_rgb8(0x00, 0x19, 0x36),
                         text: Color::from_rgb8(0xE0, 0xF5, 0xFF),
                         primary: Color::from_rgb8(0x00, 0xAB, 0xE1),
@@ -202,9 +202,9 @@ impl Default for Configurator {
                 custom: make_custom_theme()
             },
             width: ShrinkValue::Full,
-            bar_left: leftwidgets,
-            bar_center: centerwidgets,
-            bar_right: rightwidgets,
+            bar_left: left_widgets,
+            bar_center: center_widgets,
+            bar_right: right_widgets,
             next_widget: None,
         }
     }
@@ -257,7 +257,7 @@ impl std::fmt::Display for Page {
         write!(
             f,
             "{}",
-            match self { //respect locale preferences when prettyprinting
+            match self { //respect locale preferences when pretty-printing
                 Page::Main => tr("Main Page"),
                 Page::Bind => tr("Keybindings Page"),
                 Page::Bar => tr("Status Bar Page"),
@@ -269,9 +269,9 @@ impl std::fmt::Display for Page {
 }
 
 impl Application for Configurator {
+    type Executor = executor::Default;
     type Message = Message;
     type Theme = Theme;
-    type Executor = executor::Default;
     type Flags = ();
     fn new(_flags: ()) -> (Self, iced::Command<Message>) { //code that initializes the app
         (
@@ -286,7 +286,7 @@ impl Application for Configurator {
         match message {
             Message::Save => {
                 if self.unsaved {
-                    self.mkconfig();
+                    self.mk_config();
                 }
                 self.unsaved = false;
                 iced::Command::none()
@@ -300,23 +300,23 @@ impl Application for Configurator {
                 self.current_page = x;
                 match x {
                     Page::Main => {
-                        self.indexmax = 3;
+                        self.index_max = 3;
                     }
                     Page::Bind => {
-                        self.indexmax = 7;
+                        self.index_max = 7;
                     }
                     Page::Bar => {
-                        self.indexmax = 5;
+                        self.index_max = 5;
                     }
                     Page::Init => {
-                        self.indexmax = 1;
+                        self.index_max = 1;
                     }
                     Page::Anim => {
-                        self.indexmax = 8;
+                        self.index_max = 8;
                     }
                 }
-                if self.index > self.indexmax {
-                    self.index = self.indexmax;
+                if self.index > self.index_max {
+                    self.index = self.index_max;
                 }
                 iced::Command::none()
             }
@@ -356,11 +356,11 @@ impl Application for Configurator {
                 iced::Command::none()
             }
             Message::KeyboardUpdate(x) => { //keyboard event parser
-                self.kbparse(x);
+                self.kb_parse(x);
                 iced::Command::none()
             }
             Message::Capture(x) => {
-                self.capturenext = Some(x);
+                self.capture_next = Some(x);
                 iced::Command::none()
             }
             Message::Incr(x) => {
@@ -512,77 +512,77 @@ impl Application for Configurator {
             OurTheme::Custom => self.theme_set.custom.clone(),
         };
 
-        let maintxt = Text::new(Page::Main.to_string());
-        let bindtxt = Text::new(Page::Bind.to_string());
-        let bartxt = Text::new(Page::Bar.to_string());
-        let inittxt = Text::new(Page::Init.to_string());
-        let animtxt = Text::new(Page::Anim.to_string());
-        let mut pagemain = Button::new(maintxt)
+        let main_txt = Text::new(Page::Main.to_string());
+        let bind_txt = Text::new(Page::Bind.to_string());
+        let bar_txt = Text::new(Page::Bar.to_string());
+        let init_txt = Text::new(Page::Init.to_string());
+        let anim_txt = Text::new(Page::Anim.to_string());
+        let mut page_main = Button::new(main_txt)
             .on_press(Message::PageChanged(Page::Main))
             .width(SIDEBAR_WIDTH)
             .style(style.sidebar.mk_theme());
-        let mut pagebind = Button::new(bindtxt)
+        let mut page_bind = Button::new(bind_txt)
             .on_press(Message::PageChanged(Page::Bind))
             .width(SIDEBAR_WIDTH)
             .style(style.sidebar.mk_theme());
-        let mut pagebar = Button::new(bartxt)
+        let mut page_bar = Button::new(bar_txt)
             .on_press(Message::PageChanged(Page::Bar))
             .width(SIDEBAR_WIDTH)
             .style(style.sidebar.mk_theme());
-        let mut pageinit = Button::new(inittxt)
+        let mut page_init = Button::new(init_txt)
             .on_press(Message::PageChanged(Page::Init))
             .width(SIDEBAR_WIDTH)
             .style(style.sidebar.mk_theme());
-        let mut pageanim = Button::new(animtxt)
+        let mut page_anim = Button::new(anim_txt)
             .on_press(Message::PageChanged(Page::Anim))
             .width(SIDEBAR_WIDTH)
             .style(style.sidebar.mk_theme());
-        let pagecap = Button::new("").width(SIDEBAR_WIDTH).height(10000).style(style.sidebar.mk_theme()).on_press(Message::NoOp);
-        let pagelabel = Text::new(tr("Available Pages"));
+        let page_cap = Button::new("").width(SIDEBAR_WIDTH).height(10000).style(style.sidebar.mk_theme()).on_press(Message::NoOp);
+        let page_label = Text::new(tr("Available Pages"));
         match self.current_page {
-            Page::Main => pagemain = pagemain.style(style.secondary.mk_theme()),
-            Page::Bind => pagebind = pagebind.style(style.secondary.mk_theme()),
-            Page::Bar => pagebar = pagebar.style(style.secondary.mk_theme()),
-            Page::Init => pageinit = pageinit.style(style.secondary.mk_theme()),
-            Page::Anim => pageanim = pageanim.style(style.secondary.mk_theme()),
+            Page::Main => page_main = page_main.style(style.secondary.mk_theme()),
+            Page::Bind => page_bind = page_bind.style(style.secondary.mk_theme()),
+            Page::Bar => page_bar = page_bar.style(style.secondary.mk_theme()),
+            Page::Init => page_init = page_init.style(style.secondary.mk_theme()),
+            Page::Anim => page_anim = page_anim.style(style.secondary.mk_theme()),
         }
-        let pagecol = Column::new()
-            .push(pagelabel)
-            .push(pagemain)
-            .push(pagebind)
-            .push(pageanim)
-            .push(pagebar)
-            .push(pageinit)
-            .push(pagecap)
+        let page_col = Column::new()
+            .push(page_label)
+            .push(page_main)
+            .push(page_bind)
+            .push(page_anim)
+            .push(page_bar)
+            .push(page_init)
+            .push(page_cap)
             .align_items(Alignment::Start);
 
-        let savetxt = Text::new(tr("Save"));
-        let savedtxt = Text::new(tr("Saved!"));
-        let save = match (self.unsaved, self.index == self.indexmax) {
+        let save_txt = Text::new(tr("Save"));
+        let saved_txt = Text::new(tr("Saved!"));
+        let save = match (self.unsaved, self.index == self.index_max) {
             (true, true) => {
-                Button::new(savetxt).on_press(Message::Save).style(theme::Button::Positive)
+                Button::new(save_txt).on_press(Message::Save).style(theme::Button::Positive)
             }
             (true, false) => {
-                Button::new(savetxt).on_press(Message::Save)
+                Button::new(save_txt).on_press(Message::Save)
             }
             (false, true) => {
-                Button::new(savedtxt).on_press(Message::Save).style(theme::Button::Positive)
+                Button::new(saved_txt).on_press(Message::Save).style(theme::Button::Positive)
             }
             (false, false) => {
-                Button::new(savedtxt).on_press(Message::Save).style(style.secondary.mk_theme())
+                Button::new(saved_txt).on_press(Message::Save).style(style.secondary.mk_theme())
             }
         };
         /* 
         if self.unsaved {
-            save = Button::new(savetxt)
+            save = Button::new(save_txt)
             .on_press(Message::Save);
         } else {
-            save = Button::new(savedtxt)
+            save = Button::new(saved_txt)
             .on_press(Message::Save)
             .style(style.secondary.mk_theme());
         }
         */
-        let saverow = Row::new()
+        let save_row = Row::new()
             .push(save)
             .align_items(Alignment::Center);
         
@@ -606,22 +606,31 @@ impl Application for Configurator {
                 settings = self.anim_page(style);
             }
         }
-        let testrule = Rule::vertical(1);
+        let test_rule = Rule::vertical(1);
         let scroll = Scrollable::new(settings);
         let col = Column::new()
             .push(scroll)
-            .push(saverow)
+            .push(save_row)
             .width(Length::Fill)
             .align_items(Alignment::Start)
             .spacing(10);
         let master = Row::new()
-            .push(pagecol)
-            .push(testrule)
+            .push(page_col)
+            .push(test_rule)
             .push(col);
         Container::new(master)
             .width(Length::Fill)
             .height(Length::Fill)
             .into()
+    }
+    fn theme(&self) -> Theme {
+        let colors = match self.theme {
+            OurTheme::Light => self.theme_set.light.application,
+            OurTheme::Dark => self.theme_set.dark.application,
+            OurTheme::Custom => self.theme_set.custom.application,
+        };
+        let custom = Theme::Custom(Box::new(theme::Custom::new(colors)));
+        custom
     }
     fn subscription(&self) -> iced::Subscription<Message> {
         iced::subscription::events_with(
@@ -635,14 +644,5 @@ impl Application for Configurator {
                 }
             }
         )
-    }
-    fn theme(&self) -> Theme {
-        let colors = match self.theme {
-            OurTheme::Light => self.theme_set.light.application,
-            OurTheme::Dark => self.theme_set.dark.application,
-            OurTheme::Custom => self.theme_set.custom.application,
-        };
-        let cust = Theme::Custom(std::boxed::Box::new(iced::theme::Custom::new(colors)));
-        cust
     }
 }

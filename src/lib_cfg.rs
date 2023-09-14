@@ -19,23 +19,23 @@ pub struct FileData {
     pub theme: String,
     pub primary: String,
     pub secondary: String,
-    pub exith: String,
-    pub exitk: String,
-    pub launchh: String,
-    pub launchk: String,
-    pub killh: String,
-    pub killk: String,
-    pub minih: String,
-    pub minik: String,
-    pub scratchh: String,
-    pub scratchk: String,
+    pub exit_h: String,
+    pub exit_k: String,
+    pub launch_h: String,
+    pub launch_k: String,
+    pub kill_h: String,
+    pub kill_k: String,
+    pub mini_h: String,
+    pub mini_k: String,
+    pub scratch_h: String,
+    pub scratch_k: String,
     pub border: Border,
-    pub winanim: String,
-    pub workanim: String,
+    pub win_anim: String,
+    pub work_anim: String,
     pub blur: String,
-    pub widgetsleft: Vec<String>,
-    pub widgetscenter: Vec<String>,
-    pub widgetsright:  Vec<String>,
+    pub widgets_left: Vec<String>,
+    pub widgets_center: Vec<String>,
+    pub widgets_right:  Vec<String>,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
@@ -48,7 +48,7 @@ pub struct Border {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum WindowAnimation {
     Slide,
-    Popin,
+    PopIn,
     #[default]
     None
 }
@@ -101,7 +101,7 @@ pub enum BindKey {
 }
 
 impl ShortcutKey {
-    pub(crate) const ALL: [ShortcutKey; 4] = [
+    pub const ALL: [ShortcutKey; 4] = [
         ShortcutKey::Super,
         ShortcutKey::Alt,
         ShortcutKey::Shift,
@@ -109,7 +109,7 @@ impl ShortcutKey {
     ];
 }
 impl BindKey {
-    pub(crate) const ALL: [BindKey; 3] = [
+    pub const ALL: [BindKey; 3] = [
         BindKey::PrimaryKey,
         BindKey::SecondaryKey,
         BindKey::BothKey,
@@ -118,7 +118,7 @@ impl BindKey {
 impl WindowAnimation {
     pub const ALL: [WindowAnimation; 3] = [
         WindowAnimation::None,
-        WindowAnimation::Popin,
+        WindowAnimation::PopIn,
         WindowAnimation::Slide
     ];
 }
@@ -164,7 +164,7 @@ impl std::fmt::Display for WindowAnimation {
             "{}",
             match self {
                 WindowAnimation::None => tr("No Animation"),
-                WindowAnimation::Popin => tr("Pop-in"),
+                WindowAnimation::PopIn => tr("Pop-in"),
                 WindowAnimation::Slide => tr("Slide In")
             }
         )
@@ -219,7 +219,7 @@ pub fn get_home() -> String {
         }
     }
 }
-pub fn getcfgdata() -> FileData {
+pub fn get_cfg_data() -> FileData {
     let home = get_home();
     let path = format!("{home}/Oceania/cfg.toml");
     let backup_path = format!("{home}/Oceania");
@@ -227,22 +227,22 @@ pub fn getcfgdata() -> FileData {
     theme = "light"
     primary = "super"
     secondary = "shift"
-    exith = "both"
-    exitk = "E"
-    launchh = "pri"
-    launchk = "Tab"
-    killh = "both"
-    killk = "Q"
-    minih = "both"
-    minik = "Z"
-    scratchh = "pri"
-    scratchk = "Z"
-    winanim = "popin"
-    workanim = "slidev"
+    exit_h = "both"
+    exit_k = "E"
+    launch_h = "pri"
+    launch_k = "Tab"
+    kill_h = "both"
+    kill_k = "Q"
+    mini_h = "both"
+    mini_k = "Z"
+    scratch_h = "pri"
+    scratch_k = "Z"
+    win_anim = "popin"
+    work_anim = "slidev"
     blur = "y"
-    widgetsleft = ["CPU", "RAM", "Temperature", "Current User"]
-    widgetscenter = ["Workspaces", "Clock"]
-    widgetsright = ["Audio", "Backlight", "System Tray"]
+    widgets_left = ["CPU", "RAM", "Temperature", "Current User"]
+    widgets_center = ["Workspaces", "Clock"]
+    widgets_right = ["Audio", "Backlight", "System Tray"]
     
     [border]
     width = 5
@@ -262,7 +262,7 @@ pub fn getcfgdata() -> FileData {
     let decoded: FileData = from_str(&file).unwrap();
     decoded
 }
-pub fn decodetheme(x: &str, default: OurTheme) -> OurTheme {
+pub fn decode_theme(x: &str, default: OurTheme) -> OurTheme {
     match x {
         "dark" => OurTheme::Dark,
         "light" => OurTheme::Light,
@@ -270,7 +270,7 @@ pub fn decodetheme(x: &str, default: OurTheme) -> OurTheme {
         &_ => default
     }
 }
-pub fn decodeworkanim(x: &str, default: WorkAnimation) -> Option<WorkAnimation> {
+pub fn decode_work_anim(x: &str, default: WorkAnimation) -> Option<WorkAnimation> {
     Some(match x {
         "none" => WorkAnimation::None,
         "fade" => WorkAnimation::Fade,
@@ -279,22 +279,22 @@ pub fn decodeworkanim(x: &str, default: WorkAnimation) -> Option<WorkAnimation> 
         &_ => default
     })
 }
-pub fn decodewinanim(x: &str, default: WindowAnimation) -> Option<WindowAnimation> {
+pub fn decode_win_anim(x: &str, default: WindowAnimation) -> Option<WindowAnimation> {
     Some(match x {
         "none" => WindowAnimation::None,
-        "popin" => WindowAnimation::Popin,
+        "popin" => WindowAnimation::PopIn,
         "slide" => WindowAnimation::Slide,
         &_ => default
     })
 }
-pub fn decodeblur(x: &str) -> bool{
+pub fn decode_blur(x: &str) -> bool{
     match x {
         "y" => true,
         "n" => false,
         &_ => true
     }
 }
-pub fn decodepri(x: &str, default: ShortcutKey) -> Option<ShortcutKey> {
+pub fn decode_pri(x: &str, default: ShortcutKey) -> Option<ShortcutKey> {
     Some(match x {
         "super" => ShortcutKey::Super,
         "alt" => ShortcutKey::Alt,
@@ -303,7 +303,7 @@ pub fn decodepri(x: &str, default: ShortcutKey) -> Option<ShortcutKey> {
         &_ => default
     })
 }
-pub fn decodeheader(x: &str, default: BindKey) -> Option<BindKey> {
+pub fn decode_header(x: &str, default: BindKey) -> Option<BindKey> {
     Some(match x {
         "pri" => BindKey::PrimaryKey,
         "sec" => BindKey::SecondaryKey,
@@ -311,7 +311,7 @@ pub fn decodeheader(x: &str, default: BindKey) -> Option<BindKey> {
         &_ => default
     })
 }
-pub fn decodewidget(x: &str, default: BarWidget) -> BarWidget {
+pub fn decode_widget(x: &str, default: BarWidget) -> BarWidget {
     match x {
         "Audio" => BarWidget::Audio,
         "Backlight" => BarWidget::Backlight,
@@ -331,14 +331,14 @@ pub fn decodewidget(x: &str, default: BarWidget) -> BarWidget {
         &_ => default,
     }
 }
-pub fn encodetheme(x: OurTheme) -> String {
+pub fn encode_theme(x: OurTheme) -> String {
     match x {
         OurTheme::Dark => "dark".to_string(),
         OurTheme::Light => "light".to_string(),
         OurTheme::Custom => "custom".to_string()
     }
 }
-pub fn encodepri(x: Option<ShortcutKey>) -> String {
+pub fn encode_pri(x: Option<ShortcutKey>) -> String {
     match x.unwrap() {
         ShortcutKey::Super => "super".to_string(),
         ShortcutKey::Alt => "alt".to_string(),
@@ -346,14 +346,14 @@ pub fn encodepri(x: Option<ShortcutKey>) -> String {
         ShortcutKey::Shift => "shift".to_string()
     }
 }
-pub fn encodeheader(x: Option<BindKey>) -> String {
+pub fn encode_header(x: Option<BindKey>) -> String {
     match x.unwrap() {
         BindKey::PrimaryKey => "pri".to_string(),
         BindKey::SecondaryKey => "sec".to_string(),
         BindKey::BothKey => "both".to_string()
     }
 }
-pub fn encodeworkanim(x: Option<WorkAnimation>) -> String {
+pub fn encode_work_anim(x: Option<WorkAnimation>) -> String {
     match x.unwrap() {
         WorkAnimation::None => "none".to_string(),
         WorkAnimation::Fade => "fade".to_string(),
@@ -361,21 +361,21 @@ pub fn encodeworkanim(x: Option<WorkAnimation>) -> String {
         WorkAnimation::SlideVert => "slidev".to_string(),
     }
 }
-pub fn encodewinanim(x: Option<WindowAnimation>) -> String {
+pub fn encode_win_anim(x: Option<WindowAnimation>) -> String {
     match x.unwrap() {
         WindowAnimation::None => "none".to_string(),
-        WindowAnimation::Popin => "popin".to_string(),
+        WindowAnimation::PopIn => "popin".to_string(),
         WindowAnimation::Slide => "slide".to_string()
     }
 }
-pub fn encodeblur(x: bool) -> String {
+pub fn encode_blur(x: bool) -> String {
     if x {
         "y".to_string()
     } else {
         "n".to_string()
     }
 }
-pub fn encodewidget(x: BarWidget) -> String {
+pub fn encode_widget(x: BarWidget) -> String {
     match x {
         BarWidget::Audio => "Audio",
         BarWidget::Backlight => "Backlight",
@@ -403,28 +403,28 @@ pub fn rip_shortcut(opt: Option<ShortcutKey>) -> String {
     }
 }
 pub fn rip_bind(opt: Option<BindKey>, pri: Option<ShortcutKey>, sec: Option<ShortcutKey>) -> String {
-    let pristr = match pri.unwrap() {
+    let pri_str = match pri.unwrap() {
         ShortcutKey::Super => "SUPER",
         ShortcutKey::Alt => "ALT",
         ShortcutKey::Ctrl => "CONTROL",
         ShortcutKey::Shift => "SHIFT"
     };
-    let secstr = match sec.unwrap() {
+    let sec_str = match sec.unwrap() {
         ShortcutKey::Super => "SUPER",
         ShortcutKey::Alt => "ALT",
         ShortcutKey::Ctrl => "CONTROL",
         ShortcutKey::Shift => "SHIFT"
     };
     match opt.unwrap() {
-        BindKey::PrimaryKey => pristr.to_string(),
-        BindKey::SecondaryKey => secstr.to_string(),
-        BindKey::BothKey => format!("{pristr}_{secstr}")
+        BindKey::PrimaryKey => pri_str.to_string(),
+        BindKey::SecondaryKey => sec_str.to_string(),
+        BindKey::BothKey => format!("{pri_str}_{sec_str}")
     }
 }
 pub fn rip_win_anim(opt: Option<WindowAnimation>) -> String {
     match opt.unwrap() {
         WindowAnimation::None => "0,1,default".to_string(),
-        WindowAnimation::Popin => "1,3,default,popin".to_string(),
+        WindowAnimation::PopIn => "1,3,default,popin".to_string(),
         WindowAnimation::Slide => "1,3,default,slide".to_string()
     }
 }

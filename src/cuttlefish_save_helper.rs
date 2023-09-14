@@ -1,74 +1,74 @@
 use toml::to_string;
 use std::fs;
 use std::process::Command;
-use crate::libcfg::*;
-use crate::libstyle::*;
+use crate::lib_cfg::*;
+use crate::lib_style::*;
 
 use crate::Configurator;
 impl Configurator {
-    pub fn mkconfig(&self) {
-        //selfcfg
+    pub fn mk_config(&self) {
+        //self-cfg
         let home = get_home();
         let path = format!("{home}/Oceania/cfg.toml");
         let backup_path = format!("{home}/Oceania");
-        let mut leftwidgets = vec![];
-        let mut centerwidgets = vec![];
-        let mut rightwidgets = vec![];
+        let mut left_widgets = vec![];
+        let mut center_widgets = vec![];
+        let mut right_widgets = vec![];
         for i in 0..self.bar_left.len() {
-            leftwidgets.push(encodewidget(self.bar_left[i]))
+            left_widgets.push(encode_widget(self.bar_left[i]))
         }
         for i in 0..self.bar_center.len() {
-            centerwidgets.push(encodewidget(self.bar_center[i]))
+            center_widgets.push(encode_widget(self.bar_center[i]))
         }
         for i in 0..self.bar_right.len() {
-            rightwidgets.push(encodewidget(self.bar_right[i]))
+            right_widgets.push(encode_widget(self.bar_right[i]))
         }
-        std::process::Command::new("mkdir").arg("-p").arg(backup_path).output().expect("uh oh");
+        Command::new("mkdir").arg("-p").arg(backup_path).output().expect("uh oh");
         let data = FileData {
-            theme: encodetheme(self.theme.clone()).to_string(),
-            primary: encodepri(self.primary_key).to_string(),
-            secondary: encodepri(self.secondary_key).to_string(),
-            exith: encodeheader(self.exit_header).to_string(),
-            exitk: self.exit_key.clone(),
-            launchh: encodeheader(self.launch_header).to_string(),
-            launchk: self.launch_key.clone(),
-            killh: encodeheader(self.kill_header).to_string(),
-            killk: self.kill_key.clone(),
-            minih: encodeheader(self.minimize_header).to_string(),
-            minik: self.minimize_key.clone(),
-            scratchh: encodeheader(self.scratch_header).to_string(),
-            scratchk: self.scratch_key.clone(),
+            theme: encode_theme(self.theme.clone()).to_string(),
+            primary: encode_pri(self.primary_key).to_string(),
+            secondary: encode_pri(self.secondary_key).to_string(),
+            exit_h: encode_header(self.exit_header).to_string(),
+            exit_k: self.exit_key.clone(),
+            launch_h: encode_header(self.launch_header).to_string(),
+            launch_k: self.launch_key.clone(),
+            kill_h: encode_header(self.kill_header).to_string(),
+            kill_k: self.kill_key.clone(),
+            mini_h: encode_header(self.minimize_header).to_string(),
+            mini_k: self.minimize_key.clone(),
+            scratch_h: encode_header(self.scratch_header).to_string(),
+            scratch_k: self.scratch_key.clone(),
             border: self.border.clone(),
-            winanim: encodewinanim(self.window_anim).to_string(),
-            workanim: encodeworkanim(self.work_anim).to_string(),
-            blur: encodeblur(self.blur).to_string(),
-            widgetsleft: leftwidgets,
-            widgetscenter: centerwidgets,
-            widgetsright: rightwidgets
+            win_anim: encode_win_anim(self.window_anim).to_string(),
+            work_anim: encode_work_anim(self.work_anim).to_string(),
+            blur: encode_blur(self.blur).to_string(),
+            widgets_left: left_widgets,
+            widgets_center: center_widgets,
+            widgets_right: right_widgets
         };
         let toml = to_string(&data).expect("failed to generate toml");
         fs::write(path, toml).expect("failed to write cfg.toml");
         let home = get_home();
         let data;
-        let prik = rip_shortcut(self.primary_key);
-        let seck = rip_shortcut(self.secondary_key);
-        let exith = rip_bind(self.exit_header, self.primary_key, self.secondary_key);
-        let exitk = &self.exit_key;
-        let launchh = rip_bind(self.launch_header, self.primary_key, self.secondary_key);
-        let launchk = &self.launch_key;
-        let killh = rip_bind(self.kill_header, self.primary_key, self.secondary_key);
-        let killk = &self.kill_key;
-        let minih = rip_bind(self.minimize_header, self.primary_key, self.secondary_key);
-        let minik = &self.minimize_key;
-        let scratchh = rip_bind(self.scratch_header, self.primary_key, self.secondary_key);
-        let scratchk = &self.scratch_key;
+        let pri_k = rip_shortcut(self.primary_key);
+        let sec_k = rip_shortcut(self.secondary_key);
+        let exit_h = rip_bind(self.exit_header, self.primary_key, self.secondary_key);
+        let exit_k = &self.exit_key;
+        let launch_h = rip_bind(self.launch_header, self.primary_key, self.secondary_key);
+        let launch_k = &self.launch_key;
+        let kill_h = rip_bind(self.kill_header, self.primary_key, self.secondary_key);
+        let kill_k = &self.kill_key;
+        let mini_h = rip_bind(self.minimize_header, self.primary_key, self.secondary_key);
+        let mini_k = &self.minimize_key;
+        let scratch_h = rip_bind(self.scratch_header, self.primary_key, self.secondary_key);
+        let scratch_k = &self.scratch_key;
         let gaps = self.border.gaps;
         let width = self.border.width;
         let radius = self.border.radius;
         let win_anim = rip_win_anim(self.window_anim);
         let work_anim = rip_work_anim(self.work_anim);
         let blur = self.blur;
-        let activeborder = string_from_col(match self.theme {
+        let active_border = string_from_col(match self.theme {
             OurTheme::Light => &self.theme_set.light.application.primary,
             OurTheme::Dark => &self.theme_set.dark.application.primary,
             OurTheme::Custom => &self.theme_set.custom.application.primary
@@ -79,44 +79,44 @@ impl Configurator {
     data = format!("#AUTO-GENERATED CONFIG, DO NOT EDIT, CHANGES WILL BE OVERWRITTEN \n \
     exec-once=oceania-shell\n \
     exec-once={home}/hypr/autostart\n \
-    bind={exith},{exitk},exec,wlogout\n \
-    bind={launchh},{launchk},exec,rofi -show drun\n \
-    bind={killh},{killk},killactive\n \
-    bind={minih},{minik},movetoworkspace,special\n \
-    bind={scratchh},{scratchk},togglespecialworkspace\n \
-    bind = {prik}, left, movefocus, l\n \
-    bind = {prik}, right, movefocus, r\n \
-    bind = {prik}, up, movefocus, u\n \
-    bind = {prik}, down, movefocus, d\n \
-    bind = {prik}_{seck}, left, movewindow, l\n \
-    bind = {prik}_{seck}, right, movewindow, r\n \
-    bind = {prik}_{seck}, up, movewindow, u\n \
-    bind = {prik}_{seck}, down, movewindow, d\n \
-    bind = {prik},1, workspace, 1 \n \
-    bind = {prik},2, workspace, 2 \n \
-    bind = {prik},3, workspace, 3 \n \
-    bind = {prik},4, workspace, 4 \n \
-    bind = {prik},5, workspace, 5 \n \
-    bind = {prik},6, workspace, 6 \n \
-    bind = {prik},7, workspace, 7 \n \
-    bind = {prik},8, workspace, 8 \n \
-    bind = {prik},9, workspace, 9 \n \
-    bind = {prik},0, workspace, 10 \n \
-    bind = {prik}_{seck},1,movetoworkspacesilent,1 \n \
-    bind = {prik}_{seck},2,movetoworkspacesilent,2 \n \
-    bind = {prik}_{seck},3,movetoworkspacesilent,3 \n \
-    bind = {prik}_{seck},4,movetoworkspacesilent,4 \n \
-    bind = {prik}_{seck},5,movetoworkspacesilent,5 \n \
-    bind = {prik}_{seck},6,movetoworkspacesilent,6 \n \
-    bind = {prik}_{seck},7,movetoworkspacesilent,7 \n \
-    bind = {prik}_{seck},8,movetoworkspacesilent,8 \n \
-    bind = {prik}_{seck},9,movetoworkspacesilent,9 \n \
-    bind = {prik}_{seck},0,movetoworkspacesilent,10 \n \
+    bind={exit_h},{exit_k},exec,wlogout\n \
+    bind={launch_h},{launch_k},exec,rofi -show drun\n \
+    bind={kill_h},{kill_k},killactive\n \
+    bind={mini_h},{mini_k},movetoworkspace,special\n \
+    bind={scratch_h},{scratch_k},togglespecialworkspace\n \
+    bind = {pri_k}, left, movefocus, l\n \
+    bind = {pri_k}, right, movefocus, r\n \
+    bind = {pri_k}, up, movefocus, u\n \
+    bind = {pri_k}, down, movefocus, d\n \
+    bind = {pri_k}_{sec_k}, left, movewindow, l\n \
+    bind = {pri_k}_{sec_k}, right, movewindow, r\n \
+    bind = {pri_k}_{sec_k}, up, movewindow, u\n \
+    bind = {pri_k}_{sec_k}, down, movewindow, d\n \
+    bind = {pri_k},1, workspace, 1 \n \
+    bind = {pri_k},2, workspace, 2 \n \
+    bind = {pri_k},3, workspace, 3 \n \
+    bind = {pri_k},4, workspace, 4 \n \
+    bind = {pri_k},5, workspace, 5 \n \
+    bind = {pri_k},6, workspace, 6 \n \
+    bind = {pri_k},7, workspace, 7 \n \
+    bind = {pri_k},8, workspace, 8 \n \
+    bind = {pri_k},9, workspace, 9 \n \
+    bind = {pri_k},0, workspace, 10 \n \
+    bind = {pri_k}_{sec_k},1,movetoworkspacesilent,1 \n \
+    bind = {pri_k}_{sec_k},2,movetoworkspacesilent,2 \n \
+    bind = {pri_k}_{sec_k},3,movetoworkspacesilent,3 \n \
+    bind = {pri_k}_{sec_k},4,movetoworkspacesilent,4 \n \
+    bind = {pri_k}_{sec_k},5,movetoworkspacesilent,5 \n \
+    bind = {pri_k}_{sec_k},6,movetoworkspacesilent,6 \n \
+    bind = {pri_k}_{sec_k},7,movetoworkspacesilent,7 \n \
+    bind = {pri_k}_{sec_k},8,movetoworkspacesilent,8 \n \
+    bind = {pri_k}_{sec_k},9,movetoworkspacesilent,9 \n \
+    bind = {pri_k}_{sec_k},0,movetoworkspacesilent,10 \n \
     general {sector_head}\n \
     gaps_in = {gaps}\n \
     gaps_out = {gaps}\n \
     border_size = {width}\n \
-    col.active_border = rgb({activeborder})
+    col.active_border = rgb({active_border})
     {sector_tail}\n \
     decoration {sector_head}\n \
     rounding = {radius}\n \

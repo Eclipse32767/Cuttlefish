@@ -5,8 +5,8 @@ use iced::theme::{self, Theme};
 use serde_derive::{Deserialize, Serialize};
 use toml::{self, from_str};
 use std::fs::read_to_string;
-use libcfg::get_home;
-use crate::libcfg;
+use lib_cfg::get_home;
+use crate::lib_cfg;
 
 #[derive(Clone)]
 pub struct ButtonStyle {
@@ -40,11 +40,11 @@ impl TextStyle {
 }
 impl ButtonStyle {
     pub fn mk_theme(&self) -> theme::Button {
-        theme::Button::Custom(std::boxed::Box::new(self.clone()))
+        theme::Button::Custom(Box::new(self.clone()))
     }
 }
-pub fn mk_app_theme(palette: iced::theme::Palette) -> iced::Theme {
-    Theme::Custom(std::boxed::Box::new(iced::theme::Custom::new(palette)))
+pub fn mk_app_theme(palette: Palette) -> Theme {
+    Theme::Custom(Box::new(theme::Custom::new(palette)))
 }
 
 #[derive(Clone)]
@@ -119,16 +119,16 @@ pub struct ThemeFile {
 }
 
 pub fn string_to_color(x: String) -> Color {
-    let splitstr = x.split_at(2);
-    let redstr = splitstr.0;
-    let splitstr = splitstr.1.split_at(2);
-    let greenstr = splitstr.0;
-    let bluestr = splitstr.1;
-    let rednum = u8::from_str_radix(redstr, 16).expect("failed to parse red value");
-    let greennum = u8::from_str_radix(greenstr, 16).expect("failed to parse green value");
-    let bluenum = u8::from_str_radix(bluestr, 16).expect("failed to parse blue value");
+    let mut split_str = x.split_at(2);
+    let red_str = split_str.0;
+    split_str = split_str.1.split_at(2);
+    let green_str = split_str.0;
+    let blue_str = split_str.1;
+    let red_num = u8::from_str_radix(red_str, 16).expect("failed to parse red value");
+    let green_num = u8::from_str_radix(green_str, 16).expect("failed to parse green value");
+    let blue_num = u8::from_str_radix(blue_str, 16).expect("failed to parse blue value");
 
-    Color::from_rgb8(rednum, greennum, bluenum)
+    Color::from_rgb8(red_num, green_num, blue_num)
 }
 fn format_radix(mut x: u32, radix: u32) -> String {
     let mut result = vec![];
@@ -148,20 +148,20 @@ fn format_radix(mut x: u32, radix: u32) -> String {
 pub fn string_from_col(color: &Color) -> String {
     let rgba = color.into_rgba8();
     let prepend_0 = [rgba[0] < 16, rgba[1] < 16, rgba[2] < 16];
-    let redstr = format_radix(rgba[0].into(), 16);
-    let greenstr = format_radix(rgba[1].into(), 16);
-    let bluestr = format_radix(rgba[2].into(), 16);
+    let red_str = format_radix(rgba[0].into(), 16);
+    let green_str = format_radix(rgba[1].into(), 16);
+    let blue_str = format_radix(rgba[2].into(), 16);
     let mut output = match prepend_0[0] {
-        true => format!("0{redstr}"),
-        false => format!("{redstr}")
+        true => format!("0{red_str}"),
+        false => format!("{red_str}")
     };
     output = match prepend_0[1] {
-        true => format!("{output}0{greenstr}"),
-        false => format!("{output}{greenstr}"),
+        true => format!("{output}0{green_str}"),
+        false => format!("{output}{green_str}"),
     };
     match prepend_0[2] {
-        true => format!("{output}0{bluestr}"),
-        false => format!("{output}{bluestr}")
+        true => format!("{output}0{blue_str}"),
+        false => format!("{output}{blue_str}")
     }
 }
 pub fn make_custom_theme() -> ThemeCustom {

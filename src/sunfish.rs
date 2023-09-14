@@ -2,10 +2,10 @@ use iced::theme::Theme;
 use iced::{Result, Settings, alignment, Alignment, Length, Application, Command, executor};
 use iced::widget::{Button, Row, Column, Container, Text, Scrollable};
 use iced::Color;
-use libcfg::{getcfgdata, decodetheme, OurTheme};
-mod libcfg;
-use libstyle::{ButtonStyle, ThemeCustom, make_custom_theme, ThemeSet, ListStyle, MenuStyle};
-mod libstyle;
+use lib_cfg::{get_cfg_data, decode_theme, OurTheme};
+mod lib_cfg;
+use lib_style::{ButtonStyle, ThemeCustom, make_custom_theme, ThemeSet, ListStyle, MenuStyle};
+mod lib_style;
 use gettextrs::*;
 use gettextrs::gettext as tr;
 
@@ -32,7 +32,7 @@ struct Manual {
     scratch_key: String,
     theme_set: ThemeSet,
 }
-pub fn prettypri(x: &str) -> &'static str {
+pub fn pretty_pri(x: &str) -> &'static str {
     match x {
         "super" => "Command/Win",
         "alt" => "Alt",
@@ -41,7 +41,7 @@ pub fn prettypri(x: &str) -> &'static str {
         &_ => "Error"
     }
 }
-pub fn prettyheader(x: &str, pri: &str, sec: &str) -> String {
+pub fn pretty_header(x: &str, pri: &str, sec: &str) -> String {
     let primary = pri.to_string();
     let secondary = sec.to_string();
     match x {
@@ -54,24 +54,24 @@ pub fn prettyheader(x: &str, pri: &str, sec: &str) -> String {
 
 impl Default for Manual {
     fn default() -> Self {
-        let data = getcfgdata();
-        let pri = prettypri(&data.primary);
-        let sec = prettypri(&data.secondary);
+        let data = get_cfg_data();
+        let pri = pretty_pri(&data.primary);
+        let sec = pretty_pri(&data.secondary);
         Manual {
-            theme: decodetheme(&data.theme, OurTheme::Light),
+            theme: decode_theme(&data.theme, OurTheme::Light),
             current_page: 0,
             primary_key: pri.to_string(),
             secondary_key: sec.to_string(),
-            exit_header: prettyheader(&data.exith, pri, sec).to_string(),
-            exit_key: data.exitk,
-            launch_header: prettyheader(&data.launchh, pri, sec).to_string(),
-            launch_key: data.launchk,
-            kill_header: prettyheader(&data.killh, pri, sec).to_string(),
-            kill_key: data.killk,
-            minimize_header: prettyheader(&data.minih, pri, sec).to_string(),
-            minimize_key: data.minik,
-            scratch_header: prettyheader(&data.scratchh, pri, sec).to_string(),
-            scratch_key: data.scratchk,
+            exit_header: pretty_header(&data.exit_h, pri, sec).to_string(),
+            exit_key: data.exit_k,
+            launch_header: pretty_header(&data.launch_h, pri, sec).to_string(),
+            launch_key: data.launch_k,
+            kill_header: pretty_header(&data.kill_h, pri, sec).to_string(),
+            kill_key: data.kill_k,
+            minimize_header: pretty_header(&data.mini_h, pri, sec).to_string(),
+            minimize_key: data.mini_k,
+            scratch_header: pretty_header(&data.scratch_h, pri, sec).to_string(),
+            scratch_key: data.scratch_k,
             theme_set: ThemeSet {
                 light: ThemeCustom {
                     application: iced::theme::Palette {
@@ -169,9 +169,9 @@ enum Message {
     KeyboardUpdate(iced::keyboard::Event)
 }
 impl Application for Manual {
+    type Executor = executor::Default;
     type Message = Message;
     type Theme = Theme;
-    type Executor = executor::Default;
     type Flags = ();
     fn new(_flags: ()) -> (Self, Command<Message>) {
         (
@@ -222,100 +222,109 @@ impl Application for Manual {
             OurTheme::Custom => self.theme_set.custom.clone(),
         };
         
-        let backtxt = Text::new(tr("Back"));
-        let forwardtxt = Text::new(tr("Forwards"));
-        let mut pageleft = Button::new(backtxt)
+        let back_txt = Text::new(tr("Back"));
+        let forward_txt = Text::new(tr("Forwards"));
+        let mut page_left = Button::new(back_txt)
             .on_press(Message::PageDecr);
-        let mut pageright = Button::new(forwardtxt)
+        let mut page_right = Button::new(forward_txt)
             .on_press(Message::PageIncr);
 
 
         let mut settings = Column::new().spacing(10);
-        let humanpg = self.current_page+1;
-        let pgnum = Text::new(format!("{humanpg}"));
-        let mut pgtitle = Text::new("Page Title").horizontal_alignment(alignment::Horizontal::Center);
+        let human_pg = self.current_page+1;
+        let pg_num = Text::new(format!("{human_pg}"));
+        let mut pg_title = Text::new("Page Title").horizontal_alignment(alignment::Horizontal::Center);
         if self.current_page == 0 {
-            pageleft = pageleft.style(style.secondary.mk_theme());
+            page_left = page_left.style(style.secondary.mk_theme());
             let title = tr("Basic Navigation");
-            pgtitle = Text::new(format!("{title}"));
+            pg_title = Text::new(format!("{title}"));
             let primary_key = self.primary_key.clone();
             let secondary_key = self.secondary_key.clone();
-            let prefocus = tr("To shift focus between applications, press:\n");
+            let pre_focus = tr("To shift focus between applications, press:\n");
             let focus = tr("+An Arrow Key.\n");
-            let postfocus = tr("This will shift the interface's focus in the direction you pressed.\n \n");
-            let premove = tr("To move applications around, press:\n");
-            let movestr = tr("+An Arrow Key.\n");
-            let postmove = tr("This should swap applications in that direction.\n\n");
+            let post_focus = tr("This will shift the interface's focus in the direction you pressed.\n \n");
+            let pre_move = tr("To move applications around, press:\n");
+            let move_str = tr("+An Arrow Key.\n");
+            let post_move = tr("This should swap applications in that direction.\n\n");
             let immutable = tr("As of now, these bindings are inferred and cannot be directly changed.");
-            let text = Text::new(format!("{prefocus}{primary_key}{focus}{postfocus}{premove}{primary_key}+{secondary_key}{movestr}{postmove}{immutable}")).horizontal_alignment(alignment::Horizontal::Center);
+            let text = Text::new(format!("{pre_focus}{primary_key}{focus}{post_focus}{pre_move}{primary_key}+{secondary_key}{move_str}{post_move}{immutable}")).horizontal_alignment(alignment::Horizontal::Center);
             settings = settings.push(text);
         } else if self.current_page == 1 {
             let title = tr("Basic Navigation, Continued");
-            pgtitle = Text::new(format!("{title}"));
-            let launchh = self.launch_header.clone();
-            let launchk = self.launch_key.clone();
-            let killh = self.kill_header.clone();
-            let killk = self.kill_key.clone();
-            let exith = self.exit_header.clone();
-            let exitk = self.exit_key.clone();
-            let presearch = tr("To open the application search, press:\n");
+            pg_title = Text::new(format!("{title}"));
+            let launch_h = self.launch_header.clone();
+            let launch_k = self.launch_key.clone();
+            let kill_h = self.kill_header.clone();
+            let kill_k = self.kill_key.clone();
+            let exit_h = self.exit_header.clone();
+            let exit_k = self.exit_key.clone();
+            let pre_search = tr("To open the application search, press:\n");
             let search = tr(".\n");
-            let postsearch = tr("This will open a search menu that you can use to run the apps you want.\n\n");
-            let prekill = tr("To close the currently focused application, press:\n");
+            let post_search = tr("This will open a search menu that you can use to run the apps you want.\n\n");
+            let pre_kill = tr("To close the currently focused application, press:\n");
             let kill = tr(".\n");
-            let postkill = tr("This will close the currently focused application, potentially destroying unsaved work. \n\n");
-            let preexit = tr("To return to the login screen, press:\n");
+            let post_kill = tr("This will close the currently focused application, potentially destroying unsaved work. \n\n");
+            let pre_exit = tr("To return to the login screen, press:\n");
             let exit = tr(".\n");
-            let postexit = tr("This will close out the desktop entirely, destroying all unsaved work.");
-            let text = Text::new(format!("{presearch}{launchh}+{launchk}{search}{postsearch}{prekill}{killh}+{killk}{kill}{postkill}{preexit}{exith}+{exitk}{exit}{postexit}")).horizontal_alignment(alignment::Horizontal::Center);
+            let post_exit = tr("This will close out the desktop entirely, destroying all unsaved work.");
+            let text = Text::new(format!("{pre_search}{launch_h}+{launch_k}{search}{post_search}{pre_kill}{kill_h}+{kill_k}{kill}{post_kill}{pre_exit}{exit_h}+{exit_k}{exit}{post_exit}")).horizontal_alignment(alignment::Horizontal::Center);
             settings = settings.push(text);
         } else if self.current_page == 2 {
             let title = tr("Workspaces");
-            pgtitle = Text::new(title);
+            pg_title = Text::new(title);
             let primary_key = self.primary_key.clone();
             let secondary_key = self.secondary_key.clone();
             let head = tr("There are 10 workspaces in this environment-\n In effect each one is its own desktop where you can move applications to or visit the applications located there.\n\n");
-            let prefocus = tr("To move yourself to a workspace, press:\n");
+            let pre_focus = tr("To move yourself to a workspace, press:\n");
             let focus = tr("+A Number Key.\n");
-            let postfocus = tr("This will move you to the workspace corresponding to the number you pressed.\n \n");
-            let premove = tr("To move the currently focused application to a workspace, press:\n");
-            let movetxt = tr("+A Number Key.\n");
-            let postmove = tr("This will banish the application to the corresponding workspace.\n\n");
+            let post_focus = tr("This will move you to the workspace corresponding to the number you pressed.\n \n");
+            let pre_move = tr("To move the currently focused application to a workspace, press:\n");
+            let move_txt = tr("+A Number Key.\n");
+            let post_move = tr("This will banish the application to the corresponding workspace.\n\n");
             let immutable = tr("As of now, these bindings are inferred and cannot be directly changed.");
-            let text = Text::new(format!("{head}{prefocus}{primary_key}{focus}{postfocus}{premove}{primary_key}+{secondary_key}{movetxt}{postmove}{immutable}")).horizontal_alignment(alignment::Horizontal::Center);
+            let text = Text::new(format!("{head}{pre_focus}{primary_key}{focus}{post_focus}{pre_move}{primary_key}+{secondary_key}{move_txt}{post_move}{immutable}")).horizontal_alignment(alignment::Horizontal::Center);
             settings = settings.push(text);
         } else if self.current_page == 3 {
-            pageright = pageright.style(style.secondary.mk_theme());
+            page_right = page_right.style(style.secondary.mk_theme());
             let title = tr("Minimization");
-            pgtitle = Text::new(title);
-            let minih = self.minimize_header.clone();
-            let minik = self.minimize_key.clone();
-            let scratchh = self.scratch_header.clone();
-            let scratchk = self.scratch_key.clone();
-            let premove = tr("To minimize the focused application, press:\n");
-            let movetxt = tr(".\n");
-            let postmove = tr("This will minimize said application, temporarily removing it from the current workspace.\n\n");
-            let prefocus = tr("To show the currently minimized apps, press:\n");
+            pg_title = Text::new(title);
+            let mini_h = self.minimize_header.clone();
+            let mini_k = self.minimize_key.clone();
+            let scratch_h = self.scratch_header.clone();
+            let scratch_k = self.scratch_key.clone();
+            let pre_move = tr("To minimize the focused application, press:\n");
+            let move_txt = tr(".\n");
+            let post_move = tr("This will minimize said application, temporarily removing it from the current workspace.\n\n");
+            let pre_focus = tr("To show the currently minimized apps, press:\n");
             let focus = tr(".\n");
-            let postfocus = tr("This show all of your minimized apps.");
-            let text = Text::new(format!("{premove}{minih}+{minik}{movetxt}{postmove}{prefocus}{scratchh}+{scratchk}{focus}{postfocus}")).horizontal_alignment(alignment::Horizontal::Center);
+            let post_focus = tr("This show all of your minimized apps.");
+            let text = Text::new(format!("{pre_move}{mini_h}+{mini_k}{move_txt}{post_move}{pre_focus}{scratch_h}+{scratch_k}{focus}{post_focus}")).horizontal_alignment(alignment::Horizontal::Center);
             settings = settings.push(text);
         }
-        let leftcol = Column::new().width(Length::FillPortion(2))
-            .push(pageleft);
-        let rightcol = Column::new().width(Length::FillPortion(2))
-            .push(pageright).align_items(Alignment::End);
+        let left_col = Column::new().width(Length::FillPortion(2))
+            .push(page_left);
+        let right_col = Column::new().width(Length::FillPortion(2))
+            .push(page_right).align_items(Alignment::End);
         let scroll = Scrollable::new(settings);
-        let maincol = Column::new().spacing(30).push(pgtitle).push(scroll).push(pgnum).align_items(Alignment::Center).width(Length::FillPortion(8));
+        let main_col = Column::new().spacing(30).push(pg_title).push(scroll).push(pg_num).align_items(Alignment::Center).width(Length::FillPortion(8));
         let master = Row::new()
-            .push(leftcol)
-            .push(maincol)
-            .push(rightcol)
+            .push(left_col)
+            .push(main_col)
+            .push(right_col)
             .spacing(30);
         Container::new(master)
             .width(Length::Fill)
             .height(Length::Fill)
             .into()
+    }
+    fn theme(&self) -> Theme {
+        let colors = match self.theme {
+            OurTheme::Light => self.theme_set.light.application.clone(),
+            OurTheme::Dark => self.theme_set.dark.application.clone(),
+            OurTheme::Custom => self.theme_set.custom.application.clone()
+        };
+        let custom = Theme::Custom(Box::new(iced::theme::Custom::new(colors)));
+        custom
     }
     fn subscription(&self) -> iced::Subscription<Message> {
         iced::subscription::events_with(
@@ -327,14 +336,5 @@ impl Application for Manual {
                 }
             }
         )
-    }
-    fn theme(&self) -> Theme {
-        let colors = match self.theme {
-            OurTheme::Light => self.theme_set.light.application.clone(),
-            OurTheme::Dark => self.theme_set.dark.application.clone(),
-            OurTheme::Custom => self.theme_set.custom.application.clone()
-        };
-        let cust = Theme::Custom(std::boxed::Box::new(iced::theme::Custom::new(colors)));
-        cust
     }
 }

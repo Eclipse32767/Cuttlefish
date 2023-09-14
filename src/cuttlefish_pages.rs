@@ -1,7 +1,7 @@
 use gettextrs::gettext as tr;
 use iced::widget::{Column, Text, pick_list, Button, Row};
 
-use crate::{Configurator, Message, libstyle::{ThemeCustom, TextStyle}, libcfg::{ShortcutKey, OurTheme, BindKey, BarWidget, WorkAnimation, WindowAnimation}, ShrinkValue, CaptureInput, WidgetBank, IncrVal};
+use crate::{Configurator, Message, lib_style::{ThemeCustom, TextStyle}, lib_cfg::{ShortcutKey, OurTheme, BindKey, BarWidget, WorkAnimation, WindowAnimation}, ShrinkValue, CaptureInput, WidgetBank, IncrVal};
 
 
 
@@ -9,47 +9,47 @@ use crate::{Configurator, Message, libstyle::{ThemeCustom, TextStyle}, libcfg::{
 impl Configurator {
     pub fn main_page(&self, style: ThemeCustom) -> Column<Message> {
         let settings = Column::new();
-        let seltext = TextStyle {color: style.application.success};
-        //let selectionmarker: Text = Text::new("=>");
-        let primarypick = pick_list(
+        let sel_text = TextStyle {color: style.application.success};
+        //let selection_marker: Text = Text::new("=>");
+        let primary_pick = pick_list(
             &ShortcutKey::ALL[..], 
             self.primary_key, 
             Message::PrimaryKeyChanged,
             )
             .placeholder("choose")
             .style(style.list.mk_theme());
-        let secondarypick = pick_list(
+        let secondary_pick = pick_list(
             &ShortcutKey::ALL[..], 
             self.secondary_key, 
             Message::SecondaryKeyChanged,
             )
             .placeholder("choose")
             .style(style.list.mk_theme());
-        let primarytxt;
+        let primary_txt;
         let temp_primary = format!("{}{}", tr("Primary Shortcut Key"), tr("-- Control and shift not recommended"));
-        let secondarytxt;
+        let secondary_txt;
         let temp_secondary = format!("{}{}", tr("Secondary Shortcut Key"), tr("-- used for more advanced shortcuts"));
         if self.width == ShrinkValue::Full {
-            primarytxt = temp_primary;
-            secondarytxt = temp_secondary;
+            primary_txt = temp_primary;
+            secondary_txt = temp_secondary;
         } else {
-            primarytxt = tr("Primary Shortcut Key");
-            secondarytxt = tr("Secondary Shortcut Key");
+            primary_txt = tr("Primary Shortcut Key");
+            secondary_txt = tr("Secondary Shortcut Key");
         }
         
-        let mut primarylabel: Text = Text::new(primarytxt);
-        let mut secondarylabel: Text = Text::new(secondarytxt);
+        let mut primary_label: Text = Text::new(primary_txt);
+        let mut secondary_label: Text = Text::new(secondary_txt);
 
-        let lighttxt = Text::new(tr("Light"));
-        let darktxt = Text::new(tr("Dark"));
-        let customtxt = Text::new(tr("Custom"));
-        let mut light = Button::new(lighttxt)
+        let light_txt = Text::new(tr("Light"));
+        let dark_txt = Text::new(tr("Dark"));
+        let custom_txt = Text::new(tr("Custom"));
+        let mut light = Button::new(light_txt)
             .on_press(Message::ThemeChanged(OurTheme::Light));
-        let mut dark = Button::new(darktxt)
+        let mut dark = Button::new(dark_txt)
             .on_press(Message::ThemeChanged(OurTheme::Dark));
-        let mut custom = Button::new(customtxt)
+        let mut custom = Button::new(custom_txt)
             .on_press(Message::ThemeChanged(OurTheme::Custom));
-        let mut themelabel = Text::new(tr("UI Theme for Configurator"));
+        let mut theme_label = Text::new(tr("UI Theme for Configurator"));
         match self.theme {
             OurTheme::Light => {
                 light = light.style(style.secondary.mk_theme());
@@ -61,200 +61,200 @@ impl Configurator {
                 custom = custom.style(style.secondary.mk_theme());
             }
         }
-        let mut themerow = Row::new().spacing(10);
-        let mut primaryrow = Row::new().spacing(10);
-        let mut secondaryrow = Row::new().spacing(10);
+        let mut theme_row = Row::new().spacing(10);
+        let mut primary_row = Row::new().spacing(10);
+        let mut secondary_row = Row::new().spacing(10);
 
         if self.index == 0 {
-            themelabel = themelabel.style(seltext.mk_theme())
+            theme_label = theme_label.style(sel_text.mk_theme())
         } else if self.index == 1 {
-            primarylabel = primarylabel.style(seltext.mk_theme())
+            primary_label = primary_label.style(sel_text.mk_theme())
         } else if self.index == 2 {
-            secondarylabel = secondarylabel.style(seltext.mk_theme());
+            secondary_label = secondary_label.style(sel_text.mk_theme());
         }
-        themerow = themerow
-            .push(themelabel)
+        theme_row = theme_row
+            .push(theme_label)
             .push(light)
             .push(dark)
             .push(custom);
-        primaryrow = primaryrow
-            .push(primarylabel)
-            .push(primarypick);
-        secondaryrow = secondaryrow
-            .push(secondarylabel)
-            .push(secondarypick);
-        settings.push(themerow).push(primaryrow).push(secondaryrow).spacing(10)
+        primary_row = primary_row
+            .push(primary_label)
+            .push(primary_pick);
+        secondary_row = secondary_row
+            .push(secondary_label)
+            .push(secondary_pick);
+        settings.push(theme_row).push(primary_row).push(secondary_row).spacing(10)
     }
     pub fn bind_page(&self, style: ThemeCustom) -> Column<Message> {
         let settings = Column::new();
-        //let selectionmarker: Text = Text::new("=>");
-        let seltext = TextStyle {color: style.application.success};
-        let primarypick = pick_list(
+        //let selection marker: Text = Text::new("=>");
+        let sel_text = TextStyle {color: style.application.success};
+        let primary_pick = pick_list(
             &ShortcutKey::ALL[..], 
             self.primary_key, 
             Message::PrimaryKeyChanged,
             )
             .placeholder("choose")
             .style(style.list.mk_theme());
-        let secondarypick = pick_list(
+        let secondary_pick = pick_list(
             &ShortcutKey::ALL[..], 
             self.secondary_key, 
             Message::SecondaryKeyChanged,
             )
             .placeholder("choose")
             .style(style.list.mk_theme());
-        let primarytxt;
+        let primary_txt;
         let temp_primary = format!("{}{}", tr("Primary Shortcut Key"), tr("-- Control and shift not recommended"));
-        let secondarytxt;
+        let secondary_txt;
         let temp_secondary = format!("{}{}", tr("Secondary Shortcut Key"), tr("-- used for more advanced shortcuts"));
         if self.width == ShrinkValue::Full {
-            primarytxt = temp_primary;
-            secondarytxt = temp_secondary;
+            primary_txt = temp_primary;
+            secondary_txt = temp_secondary;
         } else {
-            primarytxt = tr("Primary Shortcut Key");
-            secondarytxt = tr("Secondary Shortcut Key");
+            primary_txt = tr("Primary Shortcut Key");
+            secondary_txt = tr("Secondary Shortcut Key");
         }
-        let mut primarylabel: Text = Text::new(primarytxt);
-        let mut secondarylabel: Text = Text::new(secondarytxt);
+        let mut primary_label: Text = Text::new(primary_txt);
+        let mut secondary_label: Text = Text::new(secondary_txt);
 
 
-        let mut exitsclabel = Text::new(tr("Exit the Desktop Session"));
-        let exitheaderselect = pick_list(
+        let mut exit_sc_label = Text::new(tr("Exit the Desktop Session"));
+        let exit_header_select = pick_list(
         &BindKey::ALL[..], 
         self.exit_header, 
         Message::ExitHeaderChanged,
         )
         .placeholder("choose")
         .style(style.list.mk_theme());
-        let exitkey = Text::new(self.exit_key.clone());
-        let mut exitkeyselect = Button::new(exitkey).on_press(Message::Capture(CaptureInput::ExitKey)).width(50);
-        let mut launchsclabel: Text = Text::new(tr("Open the App Launcher"));
-        let launchheaderselect = pick_list(
+        let exit_key = Text::new(self.exit_key.clone());
+        let mut exit_key_select = Button::new(exit_key).on_press(Message::Capture(CaptureInput::ExitKey)).width(50);
+        let mut launch_sc_label: Text = Text::new(tr("Open the App Launcher"));
+        let launch_header_select = pick_list(
             &BindKey::ALL[..], 
             self.launch_header, 
             Message::LaunchHeaderChanged,
             )
             .placeholder("choose")
             .style(style.list.mk_theme());
-        let launchkey = Text::new(self.launch_key.clone());
-        let mut launchkeyselect = Button::new(launchkey).on_press(Message::Capture(CaptureInput::LaunchKey)).width(50);
-        let mut killsclabel: Text = Text::new(tr("Close the Currently Focused App"));
-        let killheaderselect = pick_list(
+        let launch_key = Text::new(self.launch_key.clone());
+        let mut launch_key_select = Button::new(launch_key).on_press(Message::Capture(CaptureInput::LaunchKey)).width(50);
+        let mut kill_sc_label: Text = Text::new(tr("Close the Currently Focused App"));
+        let kill_header_select = pick_list(
             &BindKey::ALL[..], 
             self.kill_header, 
             Message::KillHeaderChanged,
             )
             .placeholder("choose")
             .style(style.list.mk_theme());
-        let killkey = Text::new(self.kill_key.clone());
-        let mut killkeyselect = Button::new(killkey).on_press(Message::Capture(CaptureInput::KillKey)).width(50);
-        let mut minisclabel: Text = Text::new(tr("Minimize the Focused App"));
-        let miniheaderselect = pick_list(
+        let kill_key = Text::new(self.kill_key.clone());
+        let mut kill_key_select = Button::new(kill_key).on_press(Message::Capture(CaptureInput::KillKey)).width(50);
+        let mut mini_sc_label: Text = Text::new(tr("Minimize the Focused App"));
+        let mini_header_select = pick_list(
          &BindKey::ALL[..], 
          self.minimize_header, 
          Message::MiniHeaderChanged,
          )
             .placeholder("choose")
             .style(style.list.mk_theme());
-        let minikey = Text::new(self.minimize_key.clone());
-        let mut minikeyselect = Button::new(minikey).on_press(Message::Capture(CaptureInput::MiniKey)).width(50);
-        let mut scratchsclabel: Text = Text::new(tr("Retrieve App from Minimization"));
-        let scratchheaderselect = pick_list(
+        let mini_key = Text::new(self.minimize_key.clone());
+        let mut mini_key_select = Button::new(mini_key).on_press(Message::Capture(CaptureInput::MiniKey)).width(50);
+        let mut scratch_sc_label: Text = Text::new(tr("Retrieve App from Minimization"));
+        let scratch_header_select = pick_list(
             &BindKey::ALL[..], 
             self.scratch_header, 
             Message::ScratchHeaderChanged,
             )
             .placeholder("choose")
             .style(style.list.mk_theme());
-        let scratchkey = Text::new(self.scratch_key.clone());
-        let mut scratchkeyselect = Button::new(scratchkey).on_press(Message::Capture(CaptureInput::ScratchKey)).width(50);
+        let scratch_key = Text::new(self.scratch_key.clone());
+        let mut scratch_key_select = Button::new(scratch_key).on_press(Message::Capture(CaptureInput::ScratchKey)).width(50);
         
-        match self.capturenext.as_ref().unwrap() {
+        match self.capture_next.as_ref().unwrap() {
             CaptureInput::NoKey => {
             }
             CaptureInput::ExitKey => {
-                exitkeyselect = exitkeyselect.style(style.secondary.mk_theme());
+                exit_key_select = exit_key_select.style(style.secondary.mk_theme());
             }
             CaptureInput::KillKey => {
-                killkeyselect = killkeyselect.style(style.secondary.mk_theme());
+                kill_key_select = kill_key_select.style(style.secondary.mk_theme());
             }
             CaptureInput::LaunchKey => {
-                launchkeyselect = launchkeyselect.style(style.secondary.mk_theme());
+                launch_key_select = launch_key_select.style(style.secondary.mk_theme());
             }
             CaptureInput::MiniKey => {
-                minikeyselect = minikeyselect.style(style.secondary.mk_theme());
+                mini_key_select = mini_key_select.style(style.secondary.mk_theme());
             }
             CaptureInput::ScratchKey => {
-                scratchkeyselect = scratchkeyselect.style(style.secondary.mk_theme());
+                scratch_key_select = scratch_key_select.style(style.secondary.mk_theme());
             }
         }
-        let mut primaryrow = Row::new();
-        let mut secondaryrow = Row::new();
-        let mut exitscrow = Row::new();
-        let mut launchscrow = Row::new();
-        let mut killscrow = Row::new();
-        let mut miniscrow = Row::new();
-        let mut scratchscrow = Row::new();
+        let mut primary_row = Row::new();
+        let mut secondary_row = Row::new();
+        let mut exit_sc_row = Row::new();
+        let mut launch_sc_row = Row::new();
+        let mut kill_sc_row = Row::new();
+        let mut mini_sc_row = Row::new();
+        let mut scratch_sc_row = Row::new();
         if self.index == 0 {
-            primarylabel = primarylabel.style(seltext.mk_theme());
+            primary_label = primary_label.style(sel_text.mk_theme());
         } else if self.index == 1 {
-            secondarylabel = secondarylabel.style(seltext.mk_theme());
+            secondary_label = secondary_label.style(sel_text.mk_theme());
         } else if self.index == 2 {
-            exitsclabel = exitsclabel.style(seltext.mk_theme());
+            exit_sc_label = exit_sc_label.style(sel_text.mk_theme());
         } else if self.index == 3 {
-            launchsclabel = launchsclabel.style(seltext.mk_theme());
+            launch_sc_label = launch_sc_label.style(sel_text.mk_theme());
         } else if self.index == 4 {
-            killsclabel = killsclabel.style(seltext.mk_theme());
+            kill_sc_label = kill_sc_label.style(sel_text.mk_theme());
         } else if self.index == 5 {
-            minisclabel = minisclabel.style(seltext.mk_theme());
+            mini_sc_label = mini_sc_label.style(sel_text.mk_theme());
         } else if self.index == 6 {
-            scratchsclabel = scratchsclabel.style(seltext.mk_theme());
+            scratch_sc_label = scratch_sc_label.style(sel_text.mk_theme());
         }
-        primaryrow = primaryrow
-            .push(primarylabel)
-            .push(primarypick)
+        primary_row = primary_row
+            .push(primary_label)
+            .push(primary_pick)
             .spacing(10);
-        secondaryrow = secondaryrow
-            .push(secondarylabel)
-            .push(secondarypick)
+        secondary_row = secondary_row
+            .push(secondary_label)
+            .push(secondary_pick)
             .spacing(10);
-        exitscrow = exitscrow
-            .push(exitsclabel)
-            .push(exitheaderselect)
-            .push(exitkeyselect)
+        exit_sc_row = exit_sc_row
+            .push(exit_sc_label)
+            .push(exit_header_select)
+            .push(exit_key_select)
             .spacing(10);
-        launchscrow = launchscrow
-            .push(launchsclabel)
-            .push(launchheaderselect)
-            .push(launchkeyselect)
+        launch_sc_row = launch_sc_row
+            .push(launch_sc_label)
+            .push(launch_header_select)
+            .push(launch_key_select)
             .spacing(10);
-        killscrow = killscrow
-            .push(killsclabel)
-            .push(killheaderselect)
-            .push(killkeyselect)
+        kill_sc_row = kill_sc_row
+            .push(kill_sc_label)
+            .push(kill_header_select)
+            .push(kill_key_select)
             .spacing(10);
-        miniscrow = miniscrow
-            .push(minisclabel)
-            .push(miniheaderselect)
-            .push(minikeyselect)
+        mini_sc_row = mini_sc_row
+            .push(mini_sc_label)
+            .push(mini_header_select)
+            .push(mini_key_select)
             .spacing(10);
-        scratchscrow = scratchscrow
-            .push(scratchsclabel)
-            .push(scratchheaderselect)
-            .push(scratchkeyselect)
+        scratch_sc_row = scratch_sc_row
+            .push(scratch_sc_label)
+            .push(scratch_header_select)
+            .push(scratch_key_select)
             .spacing(10);
         settings
-            .push(primaryrow)
-            .push(secondaryrow)
-            .push(exitscrow)
-            .push(launchscrow)
-            .push(killscrow)
-            .push(miniscrow)
-            .push(scratchscrow).spacing(10)
+            .push(primary_row)
+            .push(secondary_row)
+            .push(exit_sc_row)
+            .push(launch_sc_row)
+            .push(kill_sc_row)
+            .push(mini_sc_row)
+            .push(scratch_sc_row).spacing(10)
     }
     pub fn bar_page(&self, style: ThemeCustom) -> Column<Message> {
         let settings = Column::new();
-        let selectionmarker: Text = Text::new("=>");
+        let selection_marker: Text = Text::new("=>");
         let mut left_contents = String::from("");
         if self.bar_left.len() > 0 {
             for i in 0..self.bar_left.len() {
@@ -273,9 +273,9 @@ impl Configurator {
                 center_contents = format!("{center_contents}  {:#?}", self.bar_center[i]);
             }
         }
-        let barleft = Button::new(Text::new(tr("Left"))).on_press(Message::PushWidget(WidgetBank::Left));
-        let barcenter = Button::new(Text::new(tr("Center"))).on_press(Message::PushWidget(WidgetBank::Center));
-        let barright = Button::new(Text::new(tr("Right"))).on_press(Message::PushWidget(WidgetBank::Right));
+        let bar_left = Button::new(Text::new(tr("Left"))).on_press(Message::PushWidget(WidgetBank::Left));
+        let bar_center = Button::new(Text::new(tr("Center"))).on_press(Message::PushWidget(WidgetBank::Center));
+        let bar_right = Button::new(Text::new(tr("Right"))).on_press(Message::PushWidget(WidgetBank::Right));
         let mut audio = Button::new(Text::new(tr("Audio"))).on_press(Message::AwaitDestination(BarWidget::Audio));
         let mut backlight = Button::new(Text::new(tr("Backlight"))).on_press(Message::AwaitDestination(BarWidget::Backlight));
         let mut battery = Button::new(Text::new(tr("Battery"))).on_press(Message::AwaitDestination(BarWidget::Battery));
@@ -291,12 +291,12 @@ impl Configurator {
         let mut tray = Button::new(Text::new(tr("System Tray"))).on_press(Message::AwaitDestination(BarWidget::Tray));
         let mut user = Button::new(Text::new(tr("Current User"))).on_press(Message::AwaitDestination(BarWidget::User));
         let mut workspaces = Button::new(Text::new(tr("Workspaces"))).on_press(Message::AwaitDestination(BarWidget::Workspaces));
-        let removeleft = Button::new(Text::new(tr("Remove"))).on_press(Message::RemoveWidget(WidgetBank::Left));
-        let removecenter = Button::new(Text::new(tr("Remove"))).on_press(Message::RemoveWidget(WidgetBank::Center));
-        let removeright = Button::new(Text::new(tr("Remove"))).on_press(Message::RemoveWidget(WidgetBank::Right));
-        let labelleft = Text::new(left_contents);
-        let labelright = Text::new(right_contents);
-        let labelcenter = Text::new(center_contents);
+        let remove_left = Button::new(Text::new(tr("Remove"))).on_press(Message::RemoveWidget(WidgetBank::Left));
+        let remove_center = Button::new(Text::new(tr("Remove"))).on_press(Message::RemoveWidget(WidgetBank::Center));
+        let remove_right = Button::new(Text::new(tr("Remove"))).on_press(Message::RemoveWidget(WidgetBank::Right));
+        let label_left = Text::new(left_contents);
+        let label_right = Text::new(right_contents);
+        let label_center = Text::new(center_contents);
 
         match self.next_widget {
             Some(value) => {
@@ -331,26 +331,26 @@ impl Configurator {
         let mut widget_row_v = Row::new();
 
         if self.index == 0 {
-            widget_row_i = widget_row_i.push(selectionmarker)
+            widget_row_i = widget_row_i.push(selection_marker)
         } else if self.index == 1 {
-            widget_row_ii = widget_row_ii.push(selectionmarker)
+            widget_row_ii = widget_row_ii.push(selection_marker)
         } else if self.index == 2 {
-            widget_row_iii = widget_row_iii.push(selectionmarker)
+            widget_row_iii = widget_row_iii.push(selection_marker)
         } else if self.index == 3 {
-            widget_row_iv = widget_row_iv.push(selectionmarker)
+            widget_row_iv = widget_row_iv.push(selection_marker)
         } else if self.index == 4 {
-            widget_row_v = widget_row_v.push(selectionmarker)
+            widget_row_v = widget_row_v.push(selection_marker)
         } else if self.index == 5 {
-            left_row = left_row.push(selectionmarker) 
+            left_row = left_row.push(selection_marker)
         } else if self.index == 6 {
-            center_row = center_row.push(selectionmarker)
+            center_row = center_row.push(selection_marker)
         } else if self.index == 7 {
-            right_row = right_row.push(selectionmarker)
+            right_row = right_row.push(selection_marker)
         }
         
-        left_row = left_row.push(barleft).push(labelleft).push(removeleft).spacing(10);
-        center_row = center_row.push(barcenter).push(labelcenter).push(removecenter).spacing(10);
-        right_row = right_row.push(barright).push(labelright).push(removeright).spacing(10);
+        left_row = left_row.push(bar_left).push(label_left).push(remove_left).spacing(10);
+        center_row = center_row.push(bar_center).push(label_center).push(remove_center).spacing(10);
+        right_row = right_row.push(bar_right).push(label_right).push(remove_right).spacing(10);
         widget_row_i = widget_row_i.push(audio).push(backlight).push(battery).spacing(10);
         widget_row_ii = widget_row_ii.push(bluetooth).push(cpu).push(clock).spacing(10);
         widget_row_iii = widget_row_iii.push(disk).push(keyboard).push(network).spacing(10);
@@ -369,120 +369,120 @@ impl Configurator {
     }
     pub fn anim_page(&self, style: ThemeCustom) -> Column<Message> {
         let settings = Column::new();
-        //let selectionmarker: Text = Text::new("=>");
-        let seltext = TextStyle {color: style.application.success};
-        let widthincr = Button::new("+").on_press(Message::Incr(IncrVal::WidthVal)).width(30);
-        let mut widthdecr = Button::new("-").on_press(Message::Decr(IncrVal::WidthVal)).width(30);
-        let widthvaluepeek = Text::new(format!("{}", self.border.width));
-        let mut widthlabel = Text::new(tr("The Width of The Window Borders:"));
+        //let selection_marker: Text = Text::new("=>");
+        let sel_text = TextStyle {color: style.application.success};
+        let width_incr = Button::new("+").on_press(Message::Incr(IncrVal::WidthVal)).width(30);
+        let mut width_decr = Button::new("-").on_press(Message::Decr(IncrVal::WidthVal)).width(30);
+        let width_value_peek = Text::new(format!("{}", self.border.width));
+        let mut width_label = Text::new(tr("The Width of The Window Borders:"));
 
-        let mut widthrow = Row::new().spacing(10);
+        let mut width_row = Row::new().spacing(10);
 
-        let gapsincr = Button::new("+").on_press(Message::Incr(IncrVal::GapsVal)).width(30);
-        let mut gapsdecr = Button::new("-").on_press(Message::Decr(IncrVal::GapsVal)).width(30);
-        let gapsvaluepeek = Text::new(format!("{}", self.border.gaps));
-        let mut gapslabel = Text::new(tr("The Size of The Standard Window Gaps:"));
+        let gaps_incr = Button::new("+").on_press(Message::Incr(IncrVal::GapsVal)).width(30);
+        let mut gaps_decr = Button::new("-").on_press(Message::Decr(IncrVal::GapsVal)).width(30);
+        let gaps_value_peek = Text::new(format!("{}", self.border.gaps));
+        let mut gaps_label = Text::new(tr("The Size of The Standard Window Gaps:"));
 
-        let mut gapsrow = Row::new().spacing(10);
+        let mut gaps_row = Row::new().spacing(10);
 
-        let radincr = Button::new("+").on_press(Message::Incr(IncrVal::RadiusVal)).width(30);
-        let mut raddecr = Button::new("-").on_press(Message::Decr(IncrVal::RadiusVal)).width(30);
-        let radvaluepeek = Text::new(format!("{}", self.border.radius));
-        let mut radlabel = Text::new(tr("The roundedness of window corners:"));
+        let rad_incr = Button::new("+").on_press(Message::Incr(IncrVal::RadiusVal)).width(30);
+        let mut rad_decr = Button::new("-").on_press(Message::Decr(IncrVal::RadiusVal)).width(30);
+        let rad_value_peek = Text::new(format!("{}", self.border.radius));
+        let mut rad_label = Text::new(tr("The roundedness of window corners:"));
 
-        let mut radrow = Row::new().spacing(10);
+        let mut rad_row = Row::new().spacing(10);
 
-        let winpick = pick_list(
+        let win_pick = pick_list(
             &WindowAnimation::ALL[..], 
             self.window_anim, 
             Message::ChangeWindowAnim,
             )
             .placeholder("choose")
             .style(style.list.mk_theme());
-        let mut winlabel = Text::new(tr("The Window Animations To Be Used:"));
+        let mut win_label = Text::new(tr("The Window Animations To Be Used:"));
 
-        let mut winrow = Row::new().spacing(10);
+        let mut win_row = Row::new().spacing(10);
 
-        let workpick = pick_list(
+        let work_pick = pick_list(
             &WorkAnimation::ALL[..],
             self.work_anim,
             Message::ChangeWorkAnim,
             )
             .placeholder("choose")
             .style(style.list.mk_theme());
-        let mut worklabel = Text::new(tr("The Workspace Animations To Be Used:"));
+        let mut work_label = Text::new(tr("The Workspace Animations To Be Used:"));
 
-        let mut workrow = Row::new().spacing(10);
+        let mut work_row = Row::new().spacing(10);
 
         let enable = Text::new(tr("Enable"));
         let disable = Text::new(tr("Disable"));
         let enabled = Text::new(tr("Enabled"));
         let disabled = Text::new(tr("Disabled"));
-        let mut blurlabel = Text::new(tr("Whether or not to use window blur"));
-        let mut bluron = Button::new(enable).on_press(Message::BlurToggled(true));
-        let mut bluroff = Button::new(disable).on_press(Message::BlurToggled(false));
+        let mut blur_label = Text::new(tr("Whether or not to use window blur"));
+        let mut blur_on = Button::new(enable).on_press(Message::BlurToggled(true));
+        let mut blur_off = Button::new(disable).on_press(Message::BlurToggled(false));
         if self.blur {
-            bluron = Button::new(enabled).on_press(Message::BlurToggled(true)).style(style.secondary.mk_theme());
+            blur_on = Button::new(enabled).on_press(Message::BlurToggled(true)).style(style.secondary.mk_theme());
         } else {
-            bluroff = Button::new(disabled).on_press(Message::BlurToggled(false)).style(style.secondary.mk_theme());
+            blur_off = Button::new(disabled).on_press(Message::BlurToggled(false)).style(style.secondary.mk_theme());
         }
-        let mut blurrow = Row::new().spacing(10);
+        let mut blur_row = Row::new().spacing(10);
 
         if self.border.width == 0 {
-            widthdecr = widthdecr.style(style.secondary.mk_theme());
+            width_decr = width_decr.style(style.secondary.mk_theme());
         }
         if self.border.gaps == 0 {
-            gapsdecr = gapsdecr.style(style.secondary.mk_theme());
+            gaps_decr = gaps_decr.style(style.secondary.mk_theme());
         }
         if self.border.radius == 0 {
-            raddecr = raddecr.style(style.secondary.mk_theme());
+            rad_decr = rad_decr.style(style.secondary.mk_theme());
         }
 
         if self.index == 0 {
-            widthlabel = widthlabel.style(seltext.mk_theme());
+            width_label = width_label.style(sel_text.mk_theme());
         } else if self.index == 1 {
-            gapslabel = gapslabel.style(seltext.mk_theme());
+            gaps_label = gaps_label.style(sel_text.mk_theme());
         } else if self.index == 2 {
-            radlabel = radlabel.style(seltext.mk_theme());
+            rad_label = rad_label.style(sel_text.mk_theme());
         } else if self.index == 3 {
-            winlabel = winlabel.style(seltext.mk_theme());
+            win_label = win_label.style(sel_text.mk_theme());
         } else if self.index == 4 {
-            worklabel = worklabel.style(seltext.mk_theme());
+            work_label = work_label.style(sel_text.mk_theme());
         } else if self.index == 5 {
-            blurlabel = blurlabel.style(seltext.mk_theme());
+            blur_label = blur_label.style(sel_text.mk_theme());
         }
 
-        widthrow = widthrow
-            .push(widthlabel)
-            .push(widthdecr)
-            .push(widthvaluepeek)
-            .push(widthincr);
-        gapsrow = gapsrow
-            .push(gapslabel)
-            .push(gapsdecr)
-            .push(gapsvaluepeek)
-            .push(gapsincr);
-        radrow = radrow
-            .push(radlabel)
-            .push(raddecr)
-            .push(radvaluepeek)
-            .push(radincr);
-        winrow = winrow
-            .push(winlabel)
-            .push(winpick);
-        workrow = workrow
-            .push(worklabel)
-            .push(workpick);
-        blurrow = blurrow
-            .push(blurlabel)
-            .push(bluroff)
-            .push(bluron);
+        width_row = width_row
+            .push(width_label)
+            .push(width_decr)
+            .push(width_value_peek)
+            .push(width_incr);
+        gaps_row = gaps_row
+            .push(gaps_label)
+            .push(gaps_decr)
+            .push(gaps_value_peek)
+            .push(gaps_incr);
+        rad_row = rad_row
+            .push(rad_label)
+            .push(rad_decr)
+            .push(rad_value_peek)
+            .push(rad_incr);
+        win_row = win_row
+            .push(win_label)
+            .push(win_pick);
+        work_row = work_row
+            .push(work_label)
+            .push(work_pick);
+        blur_row = blur_row
+            .push(blur_label)
+            .push(blur_off)
+            .push(blur_on);
         settings
-            .push(widthrow)
-            .push(gapsrow)
-            .push(radrow)
-            .push(winrow)
-            .push(workrow)
-            .push(blurrow).spacing(10)
+            .push(width_row)
+            .push(gaps_row)
+            .push(rad_row)
+            .push(win_row)
+            .push(work_row)
+            .push(blur_row).spacing(10)
     }
 }
