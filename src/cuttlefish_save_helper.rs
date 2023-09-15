@@ -8,6 +8,7 @@ use crate::Configurator;
 impl Configurator {
     pub fn mk_config(&self) {
         //self-cfg
+        {
         let home = get_home();
         let path = format!("{home}/Oceania/cfg.toml");
         let backup_path = format!("{home}/Oceania");
@@ -48,35 +49,38 @@ impl Configurator {
         };
         let toml = to_string(&data).expect("failed to generate toml");
         fs::write(path, toml).expect("failed to write cfg.toml");
-        let home = get_home();
-        let data;
-        let pri_k = rip_shortcut(self.primary_key);
-        let sec_k = rip_shortcut(self.secondary_key);
-        let exit_h = rip_bind(self.exit_header, self.primary_key, self.secondary_key);
-        let exit_k = &self.exit_key;
-        let launch_h = rip_bind(self.launch_header, self.primary_key, self.secondary_key);
-        let launch_k = &self.launch_key;
-        let kill_h = rip_bind(self.kill_header, self.primary_key, self.secondary_key);
-        let kill_k = &self.kill_key;
-        let mini_h = rip_bind(self.minimize_header, self.primary_key, self.secondary_key);
-        let mini_k = &self.minimize_key;
-        let scratch_h = rip_bind(self.scratch_header, self.primary_key, self.secondary_key);
-        let scratch_k = &self.scratch_key;
-        let gaps = self.border.gaps;
-        let width = self.border.width;
-        let radius = self.border.radius;
-        let win_anim = rip_win_anim(self.window_anim);
-        let work_anim = rip_work_anim(self.work_anim);
-        let blur = self.blur;
-        let active_border = string_from_col(match self.theme {
-            OurTheme::Light => &self.theme_set.light.application.primary,
-            OurTheme::Dark => &self.theme_set.dark.application.primary,
-            OurTheme::Custom => &self.theme_set.custom.application.primary
-        });
-        let sector_head = r#"{"#;
-        let sector_tail = r#"}"#;
-        let path = format!("{home}/hypr/hyprland.conf");
-    data = format!("#AUTO-GENERATED CONFIG, DO NOT EDIT, CHANGES WILL BE OVERWRITTEN \n \
+        }
+        //hyprland cfg
+        {
+            let home = get_home();
+            let data;
+            let pri_k = rip_shortcut(self.primary_key);
+            let sec_k = rip_shortcut(self.secondary_key);
+            let exit_h = rip_bind(self.exit_header, self.primary_key, self.secondary_key);
+            let exit_k = &self.exit_key;
+            let launch_h = rip_bind(self.launch_header, self.primary_key, self.secondary_key);
+            let launch_k = &self.launch_key;
+            let kill_h = rip_bind(self.kill_header, self.primary_key, self.secondary_key);
+            let kill_k = &self.kill_key;
+            let mini_h = rip_bind(self.minimize_header, self.primary_key, self.secondary_key);
+            let mini_k = &self.minimize_key;
+            let scratch_h = rip_bind(self.scratch_header, self.primary_key, self.secondary_key);
+            let scratch_k = &self.scratch_key;
+            let gaps = self.border.gaps;
+            let width = self.border.width;
+            let radius = self.border.radius;
+            let win_anim = rip_win_anim(self.window_anim);
+            let work_anim = rip_work_anim(self.work_anim);
+            let blur = self.blur;
+            let active_border = string_from_col(match self.theme {
+                OurTheme::Light => &self.theme_set.light.application.primary,
+                OurTheme::Dark => &self.theme_set.dark.application.primary,
+                OurTheme::Custom => &self.theme_set.custom.application.primary
+            });
+            let sector_head = r#"{"#;
+            let sector_tail = r#"}"#;
+            let path = format!("{home}/hypr/hyprland.conf");
+            data = format!("#AUTO-GENERATED CONFIG, DO NOT EDIT, CHANGES WILL BE OVERWRITTEN \n \
     exec-once=oceania-shell\n \
     exec-once={home}/hypr/autostart\n \
     bind={exit_h},{exit_k},exec,wlogout\n \
@@ -134,11 +138,19 @@ impl Configurator {
     {sector_tail}\n \
     source={home}/hypr/usercfg.conf
     ");
-        fs::write(path, data).expect("failed to write file");
+            fs::write(path, data).expect("failed to write file");
 
-        Command::new("hyprctl")
-            .arg("reload")
-            .spawn()
-            .expect("oops, hyprctl failed, do you have Hyprland installed?");
+            Command::new("hyprctl")
+                .arg("reload")
+                .spawn()
+                .expect("oops, hyprctl failed, do you have Hyprland installed?");
+        }
+        //waybar cfg
+        {
+            let left_widgets = rip_widget_vec(self.bar_left.clone());
+            let center_widgets = rip_widget_vec(self.bar_center.clone());
+            let right_widgets = rip_widget_vec(self.bar_right.clone());
+            println!("{left_widgets}\n{center_widgets}\n{right_widgets}")
+        }
     }
 }

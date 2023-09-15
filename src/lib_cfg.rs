@@ -436,3 +436,33 @@ pub fn rip_work_anim(opt: Option<WorkAnimation>) -> String {
         WorkAnimation::SlideVert => "1,3,default,slidevert".to_string()
     }
 }
+pub fn rip_widget_vec(input_widgets: Vec<BarWidget> ) -> String {
+    let mut output = format!("[");
+    let quote = r#"""#;
+    for i in 0..input_widgets.len() {
+        let mut widget_str = match input_widgets[i] {
+            BarWidget::Audio => { "pulseaudio" }
+            BarWidget::Backlight => { "backlight" }
+            BarWidget::Battery => { "battery" }
+            BarWidget::Bluetooth => { "bluetooth" }
+            BarWidget::Clock => { "clock" }
+            BarWidget::CPU => { "cpu" }
+            BarWidget::Disk => { "disk" }
+            BarWidget::KeyboardState => { "keyboard-state" }
+            BarWidget::RAM => { "memory" }
+            BarWidget::Network => { "network" }
+            BarWidget::Temperature => { "temperature" }
+            BarWidget::Tray => { "tray" }
+            BarWidget::Taskbar => { "wlr/taskbar" }
+            BarWidget::Workspaces => { "hyprland/workspaces" }
+            BarWidget::User => { "custom/user" }
+        }.to_string();
+        widget_str = format!("{quote}{widget_str}{quote}");
+        if i == input_widgets.len() - 1 {
+            output = format!("{output}{widget_str}]");
+        } else {
+            output = format!("{output}{widget_str}, ");
+        }
+    }
+    output
+}
