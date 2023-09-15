@@ -138,6 +138,16 @@ impl Configurator {
     {sector_tail}\n \
     source={home}/hypr/usercfg.conf
     ");
+            let user_cfg_path = format!("{home}/hypr/usercfg.conf");
+            let autostart_path = format!("{home}/hypr/autostart");
+            Command::new("touch")
+                .arg(user_cfg_path)
+                .arg(autostart_path.clone())
+                .output().expect("uh oh");
+            Command::new("chmod")
+                .arg("a+x")
+                .arg(autostart_path)
+                .output().expect("uh oh");
             fs::write(path, data).expect("failed to write file");
 
             Command::new("hyprctl")
