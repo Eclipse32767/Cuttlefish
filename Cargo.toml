@@ -9,12 +9,12 @@ edition = "2021"
 env_logger = "0.10.0"
 gettext-rs = {version = "0.7.0", features = ["gettext-system"]}
 iced = "0.10.0"
-iced_aw = "0.6.0"
+iced_aw = "0.7.0"
 iced_style = "0.9.0"
-rfd = "0.12.0"
+rfd = {version = "0.12.0", default-features = false, features = ["xdg-portal"]}
 serde = "1.0.159"
 serde_derive = "1.0.159"
-toml = "0.7.3"
+toml = "0.8.0"
 whoami = "1.4.0"
 
 [[bin]]
