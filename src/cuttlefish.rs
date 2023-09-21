@@ -9,6 +9,8 @@ use lib_style::{ButtonStyle, ListStyle, MenuStyle, ThemeCustom, make_custom_them
 mod lib_style;
 use gettextrs::*;
 use gettextrs::gettext as tr;
+use rfd::FileDialog;
+
 mod cuttlefish_pages;
 mod kb_parser;
 mod cuttlefish_save_helper;
@@ -27,6 +29,7 @@ fn main() -> Result {
 struct Configurator { //The basic configurator struct, contains most program state
     theme: OurTheme,
     current_page: Page,
+    wallpaper: String,
     primary_key: Option<ShortcutKey>,
     secondary_key: Option<ShortcutKey>,
     exit_header: Option<BindKey>,
@@ -94,6 +97,7 @@ impl Default for Configurator {
         Configurator { //here we extract all of the data from the config file
             theme: decode_theme(&data.theme, OurTheme::Light),
             current_page: Page::Main,
+            wallpaper: data.wallpaper,
             primary_key: decode_pri(&data.primary, ShortcutKey::Super),
             secondary_key: decode_pri(&data.secondary, ShortcutKey::Shift),
             exit_header: decode_header(&data.exit_h, BindKey::BothKey),
@@ -109,7 +113,7 @@ impl Default for Configurator {
             unsaved: false,
             capture_next: Some(CaptureInput::NoKey),
             index: 0,
-            index_max: 3,
+            index_max: 4,
             border: data.border.clone(),
             window_anim: decode_win_anim(&data.win_anim, WindowAnimation::None),
             work_anim: decode_work_anim(&data.work_anim, WorkAnimation::None),
@@ -233,6 +237,7 @@ enum Message { // The Message enum, used to send data to the configurator's upda
     AwaitDestination(BarWidget),
     PushWidget(WidgetBank),
     RemoveWidget(WidgetBank),
+    WallpaperPrompt,
     NoOp,
 }
 #[derive(Debug, Clone)]
@@ -300,7 +305,7 @@ impl Application for Configurator {
                 self.current_page = x;
                 match x {
                     Page::Main => {
-                        self.index_max = 3;
+                        self.index_max = 4;
                     }
                     Page::Bind => {
                         self.index_max = 7;
@@ -496,6 +501,16 @@ impl Application for Configurator {
             }
             Message::AwaitDestination(x) => {
                 self.next_widget = Some(x);
+                iced::Command::none()
+            }
+            Message::WallpaperPrompt => {
+                match FileDialog::new().set_directory(self.wallpaper.clone()).pick_file() {
+                    Some(path) => {
+                        self.wallpaper = path.to_string_lossy().to_string();
+                        self.unsaved = true;
+                    },
+                    None => {}
+                };
                 iced::Command::none()
             }
             Message::NoOp => {

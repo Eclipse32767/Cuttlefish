@@ -29,6 +29,7 @@ impl Configurator {
             theme: encode_theme(self.theme.clone()).to_string(),
             primary: encode_pri(self.primary_key).to_string(),
             secondary: encode_pri(self.secondary_key).to_string(),
+            wallpaper: self.wallpaper.clone(),
             exit_h: encode_header(self.exit_header).to_string(),
             exit_k: self.exit_key.clone(),
             launch_h: encode_header(self.launch_header).to_string(),
@@ -161,6 +162,21 @@ impl Configurator {
             let center_widgets = rip_widget_vec(self.bar_center.clone());
             let right_widgets = rip_widget_vec(self.bar_right.clone());
             println!("{left_widgets}\n{center_widgets}\n{right_widgets}")
+        }
+        //wallpaper set
+        {
+            let home = get_home();
+            Command::new("ln")
+                .arg("-sf")
+                .arg(self.wallpaper.clone())
+                .arg(format!("{home}/Oceania/wallpaper"))
+                .output()
+                .expect("oops!");
+            Command::new("swww")
+                .arg("img")
+                .arg(format!("{home}/Oceania/wallpaper"))
+                .spawn()
+                .expect("oops someone forgot to install swww");
         }
     }
 }

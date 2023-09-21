@@ -61,9 +61,14 @@ impl Configurator {
                 custom = custom.style(style.secondary.mk_theme());
             }
         }
+        let mut wallpaper_label = Text::new(tr("The Wallpaper to use"));
+        let wallpaper_select = Button::new(Text::new(self.wallpaper.clone())).on_press(Message::WallpaperPrompt);
+
+
         let mut theme_row = Row::new().spacing(10);
         let mut primary_row = Row::new().spacing(10);
         let mut secondary_row = Row::new().spacing(10);
+        let mut wallpaper_row = Row::new().spacing(10);
 
         if self.index == 0 {
             theme_label = theme_label.style(sel_text.mk_theme())
@@ -71,6 +76,8 @@ impl Configurator {
             primary_label = primary_label.style(sel_text.mk_theme())
         } else if self.index == 2 {
             secondary_label = secondary_label.style(sel_text.mk_theme());
+        } else if self.index == 3 {
+            wallpaper_label = wallpaper_label.style(sel_text.mk_theme());
         }
         theme_row = theme_row
             .push(theme_label)
@@ -83,7 +90,10 @@ impl Configurator {
         secondary_row = secondary_row
             .push(secondary_label)
             .push(secondary_pick);
-        settings.push(theme_row).push(primary_row).push(secondary_row).spacing(10)
+        wallpaper_row = wallpaper_row
+            .push(wallpaper_label)
+            .push(wallpaper_select);
+        settings.push(theme_row).push(primary_row).push(secondary_row).push(wallpaper_row).spacing(10)
     }
     pub fn bind_page(&self, style: ThemeCustom) -> Column<Message> {
         let settings = Column::new();

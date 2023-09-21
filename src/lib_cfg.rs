@@ -18,6 +18,7 @@ pub enum OurTheme {
 pub struct FileData {
     pub theme: String,
     pub primary: String,
+    pub wallpaper: String,
     pub secondary: String,
     pub exit_h: String,
     pub exit_k: String,

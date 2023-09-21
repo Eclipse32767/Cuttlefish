@@ -16,7 +16,7 @@ impl Configurator {
                                         Page::Init
                                     }
                                     Page::Bind => {
-                                        self.index_max = 3;
+                                        self.index_max = 4;
                                         Page::Main
                                     }
                                     Page::Anim => {
@@ -60,7 +60,7 @@ impl Configurator {
                                         Page::Init
                                     }
                                     Page::Init => {
-                                        self.index_max = 3;
+                                        self.index_max = 4;
                                         Page::Main
                                     }
                                };
@@ -356,7 +356,7 @@ impl Configurator {
                                     let left = self.bar_left.len();
                                     let right = self.bar_right.len();
                                     let center = self.bar_center.len();
-                                    if self.index == 5 && left > 0{
+                                    if self.index == 5 && left > 0 {
                                         let val = left - 1;
                                         self.bar_left.remove(val);
                                     } else if self.index == 6 && center > 0 {
