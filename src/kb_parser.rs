@@ -1,6 +1,7 @@
 use iced::keyboard::KeyCode;
+use oceania_style::SelectedTheme;
 
-use crate::{Configurator, CaptureInput, Page, lib_cfg::{OurTheme, ShortcutKey, BindKey, WindowAnimation, WorkAnimation, BarWidget}};
+use crate::{Configurator, CaptureInput, Page, lib_cfg::{ShortcutKey, BindKey, WindowAnimation, WorkAnimation, BarWidget}};
 
 impl Configurator {
     pub fn kb_parse(&mut self, evt: iced::keyboard::Event) {
@@ -82,9 +83,9 @@ impl Configurator {
                                 Page::Main => {
                                     if self.index == 0 { // if theme selector block is marked
                                         self.theme = match self.theme {
-                                            OurTheme::Light => OurTheme::Dark,
-                                            OurTheme::Dark => OurTheme::Custom,
-                                            OurTheme::Custom => OurTheme::Light,
+                                            SelectedTheme::Light => SelectedTheme::Dark,
+                                            SelectedTheme::Dark => SelectedTheme::Custom,
+                                            SelectedTheme::Custom => SelectedTheme::Light,
                                         };
                                         self.unsaved = true;
                                     }

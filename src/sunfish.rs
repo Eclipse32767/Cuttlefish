@@ -2,12 +2,12 @@ use iced::theme::Theme;
 use iced::{Result, Settings, alignment, Alignment, Length, Application, Command, executor};
 use iced::widget::{Button, Row, Column, Container, Text, Scrollable};
 use iced::Color;
-use lib_cfg::{get_cfg_data, decode_theme, OurTheme};
+use lib_cfg::{get_cfg_data, decode_theme};
 mod lib_cfg;
-use lib_style::{ButtonStyle, ThemeCustom, make_custom_theme, ThemeSet, ListStyle, MenuStyle};
-mod lib_style;
+
 use gettextrs::*;
 use gettextrs::gettext as tr;
+use oceania_style::{ButtonStyle, ListStyle, make_custom_theme, MenuStyle, SelectedTheme, ThemeCustom, ThemeSet};
 
 fn main() -> Result {
     let _ = textdomain("SunfishMan");
@@ -16,7 +16,7 @@ fn main() -> Result {
 }
 
 struct Manual {
-    theme:OurTheme,
+    theme:SelectedTheme,
     current_page:u8,
     primary_key: String,
     secondary_key: String,
@@ -58,7 +58,7 @@ impl Default for Manual {
         let pri = pretty_pri(&data.primary);
         let sec = pretty_pri(&data.secondary);
         Manual {
-            theme: decode_theme(&data.theme, OurTheme::Light),
+            theme: decode_theme(&data.theme, SelectedTheme::Light),
             current_page: 0,
             primary_key: pri.to_string(),
             secondary_key: sec.to_string(),
@@ -217,9 +217,9 @@ impl Application for Manual {
     }
     fn view(&self) -> iced::Element<'_, Self::Message> {
         let style = match self.theme {
-            OurTheme::Light => self.theme_set.light.clone(),
-            OurTheme::Dark => self.theme_set.dark.clone(),
-            OurTheme::Custom => self.theme_set.custom.clone(),
+            SelectedTheme::Light => self.theme_set.light.clone(),
+            SelectedTheme::Dark => self.theme_set.dark.clone(),
+            SelectedTheme::Custom => self.theme_set.custom.clone(),
         };
         
         let back_txt = Text::new(tr("Back"));
@@ -319,9 +319,9 @@ impl Application for Manual {
     }
     fn theme(&self) -> Theme {
         let colors = match self.theme {
-            OurTheme::Light => self.theme_set.light.application.clone(),
-            OurTheme::Dark => self.theme_set.dark.application.clone(),
-            OurTheme::Custom => self.theme_set.custom.application.clone()
+            SelectedTheme::Light => self.theme_set.light.application.clone(),
+            SelectedTheme::Dark => self.theme_set.dark.application.clone(),
+            SelectedTheme::Custom => self.theme_set.custom.application.clone()
         };
         let custom = Theme::Custom(Box::new(iced::theme::Custom::new(colors)));
         custom

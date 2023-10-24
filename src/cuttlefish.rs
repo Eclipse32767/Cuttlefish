@@ -3,12 +3,11 @@ use iced::{Result, Application, Settings, Alignment, Length, executor};
 use iced::widget::{Button, Row, Column, Container, Text, Scrollable, Rule};
 use iced::Color;
 use iced_style::theme;
-use lib_cfg::{get_cfg_data, BindKey, ShortcutKey, OurTheme, BarWidget, WindowAnimation, WorkAnimation, Border, decode_header, decode_pri, decode_theme, decode_win_anim, decode_work_anim, decode_blur, decode_widget};
+use lib_cfg::{get_cfg_data, BindKey, ShortcutKey, BarWidget, WindowAnimation, WorkAnimation, Border, decode_header, decode_pri, decode_theme, decode_win_anim, decode_work_anim, decode_blur, decode_widget};
 mod lib_cfg;
-use lib_style::{ButtonStyle, ListStyle, MenuStyle, ThemeCustom, make_custom_theme, ThemeSet};
-mod lib_style;
 use gettextrs::*;
 use gettextrs::gettext as tr;
+use oceania_style::{ButtonStyle, ListStyle, make_custom_theme, MenuStyle, SelectedTheme, ThemeCustom, ThemeSet};
 use rfd::FileDialog;
 
 mod cuttlefish_pages;
@@ -27,7 +26,7 @@ fn main() -> Result {
 
 
 struct Configurator { //The basic configurator struct, contains most program state
-    theme: OurTheme,
+    theme: SelectedTheme,
     current_page: Page,
     wallpaper: String,
     primary_key: Option<ShortcutKey>,
@@ -95,7 +94,7 @@ impl Default for Configurator {
             right_widgets.push(decode_widget(&data.widgets_right[i], BarWidget::Clock))
         }
         Configurator { //here we extract all of the data from the config file
-            theme: decode_theme(&data.theme, OurTheme::Light),
+            theme: decode_theme(&data.theme, SelectedTheme::Light),
             current_page: Page::Main,
             wallpaper: data.wallpaper,
             primary_key: decode_pri(&data.primary, ShortcutKey::Super),
@@ -217,7 +216,7 @@ impl Default for Configurator {
 #[derive(Debug, Clone)]
 enum Message { // The Message enum, used to send data to the configurator's update function
     Save,
-    ThemeChanged(OurTheme),
+    ThemeChanged(SelectedTheme),
     PageChanged(Page),
     PrimaryKeyChanged(ShortcutKey),
     SecondaryKeyChanged(ShortcutKey),
@@ -522,9 +521,9 @@ impl Application for Configurator {
 
         //define button styles
         let style = match self.theme {
-            OurTheme::Light => self.theme_set.light.clone(),
-            OurTheme::Dark => self.theme_set.dark.clone(),
-            OurTheme::Custom => self.theme_set.custom.clone(),
+            SelectedTheme::Light => self.theme_set.light.clone(),
+            SelectedTheme::Dark => self.theme_set.dark.clone(),
+            SelectedTheme::Custom => self.theme_set.custom.clone(),
         };
 
         let main_txt = Text::new(Page::Main.to_string());
@@ -640,9 +639,9 @@ impl Application for Configurator {
     }
     fn theme(&self) -> Theme {
         let colors = match self.theme {
-            OurTheme::Light => self.theme_set.light.application,
-            OurTheme::Dark => self.theme_set.dark.application,
-            OurTheme::Custom => self.theme_set.custom.application,
+            SelectedTheme::Light => self.theme_set.light.application,
+            SelectedTheme::Dark => self.theme_set.dark.application,
+            SelectedTheme::Custom => self.theme_set.custom.application,
         };
         let custom = Theme::Custom(Box::new(theme::Custom::new(colors)));
         custom

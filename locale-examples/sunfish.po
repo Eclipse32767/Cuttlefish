@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-21 22:07+0000\n"
+"POT-Creation-Date: 2023-10-24 23:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,115 +17,115 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/lib_cfg.rs:140
+#: src/lib_cfg.rs:134
 msgid "Windows/Command Key"
 msgstr ""
 
-#: src/lib_cfg.rs:141
+#: src/lib_cfg.rs:135
 msgid "Alt Key"
 msgstr ""
 
-#: src/lib_cfg.rs:142
+#: src/lib_cfg.rs:136
 msgid "Shift Key"
 msgstr ""
 
-#: src/lib_cfg.rs:143
+#: src/lib_cfg.rs:137
 msgid "Control Key"
 msgstr ""
 
-#: src/lib_cfg.rs:154
+#: src/lib_cfg.rs:148
 msgid "Primary Key"
 msgstr ""
 
-#: src/lib_cfg.rs:155
+#: src/lib_cfg.rs:149
 msgid "Secondary Key"
 msgstr ""
 
-#: src/lib_cfg.rs:156
+#: src/lib_cfg.rs:150
 msgid "Primary + Secondary"
 msgstr ""
 
-#: src/lib_cfg.rs:167 src/lib_cfg.rs:180
+#: src/lib_cfg.rs:161 src/lib_cfg.rs:174
 msgid "No Animation"
 msgstr ""
 
-#: src/lib_cfg.rs:168
+#: src/lib_cfg.rs:162
 msgid "Pop-in"
 msgstr ""
 
-#: src/lib_cfg.rs:169
+#: src/lib_cfg.rs:163
 msgid "Slide In"
 msgstr ""
 
-#: src/lib_cfg.rs:181
+#: src/lib_cfg.rs:175
 msgid "Fade In"
 msgstr ""
 
-#: src/lib_cfg.rs:182
+#: src/lib_cfg.rs:176
 msgid "Slide In Horizontally"
 msgstr ""
 
-#: src/lib_cfg.rs:183
+#: src/lib_cfg.rs:177
 msgid "Slide In Vertically"
 msgstr ""
 
-#: src/lib_cfg.rs:194
+#: src/lib_cfg.rs:188
 msgid "Audio"
 msgstr ""
 
-#: src/lib_cfg.rs:195
+#: src/lib_cfg.rs:189
 msgid "Backlight"
 msgstr ""
 
-#: src/lib_cfg.rs:196
+#: src/lib_cfg.rs:190
 msgid "Battery"
 msgstr ""
 
-#: src/lib_cfg.rs:197
+#: src/lib_cfg.rs:191
 msgid "Bluetooth"
 msgstr ""
 
-#: src/lib_cfg.rs:198
+#: src/lib_cfg.rs:192
 msgid "CPU"
 msgstr ""
 
-#: src/lib_cfg.rs:199
+#: src/lib_cfg.rs:193
 msgid "Clock"
 msgstr ""
 
-#: src/lib_cfg.rs:200
+#: src/lib_cfg.rs:194
 msgid "Disk"
 msgstr ""
 
-#: src/lib_cfg.rs:201
+#: src/lib_cfg.rs:195
 msgid "Keyboard State"
 msgstr ""
 
-#: src/lib_cfg.rs:202
+#: src/lib_cfg.rs:196
 msgid "Network"
 msgstr ""
 
-#: src/lib_cfg.rs:203
+#: src/lib_cfg.rs:197
 msgid "RAM"
 msgstr ""
 
-#: src/lib_cfg.rs:204
+#: src/lib_cfg.rs:198
 msgid "Taskbar"
 msgstr ""
 
-#: src/lib_cfg.rs:205
+#: src/lib_cfg.rs:199
 msgid "Temperature"
 msgstr ""
 
-#: src/lib_cfg.rs:206
+#: src/lib_cfg.rs:200
 msgid "System Tray"
 msgstr ""
 
-#: src/lib_cfg.rs:207
+#: src/lib_cfg.rs:201
 msgid "Current User"
 msgstr ""
 
-#: src/lib_cfg.rs:208 src/sunfish.rs:273
+#: src/lib_cfg.rs:202 src/sunfish.rs:273
 msgid "Workspaces"
 msgstr ""
 

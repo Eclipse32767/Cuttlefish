@@ -1,7 +1,8 @@
 use gettextrs::gettext as tr;
 use iced::widget::{Column, Text, pick_list, Button, Row};
+use oceania_style::{SelectedTheme, TextStyle, ThemeCustom};
 
-use crate::{Configurator, Message, lib_style::{ThemeCustom, TextStyle}, lib_cfg::{ShortcutKey, OurTheme, BindKey, BarWidget, WorkAnimation, WindowAnimation}, ShrinkValue, CaptureInput, WidgetBank, IncrVal};
+use crate::{Configurator, Message, lib_cfg::{ShortcutKey, BindKey, BarWidget, WorkAnimation, WindowAnimation}, ShrinkValue, CaptureInput, WidgetBank, IncrVal};
 
 
 
@@ -44,20 +45,20 @@ impl Configurator {
         let dark_txt = Text::new(tr("Dark"));
         let custom_txt = Text::new(tr("Custom"));
         let mut light = Button::new(light_txt)
-            .on_press(Message::ThemeChanged(OurTheme::Light));
+            .on_press(Message::ThemeChanged(SelectedTheme::Light));
         let mut dark = Button::new(dark_txt)
-            .on_press(Message::ThemeChanged(OurTheme::Dark));
+            .on_press(Message::ThemeChanged(SelectedTheme::Dark));
         let mut custom = Button::new(custom_txt)
-            .on_press(Message::ThemeChanged(OurTheme::Custom));
+            .on_press(Message::ThemeChanged(SelectedTheme::Custom));
         let mut theme_label = Text::new(tr("UI Theme for Configurator"));
         match self.theme {
-            OurTheme::Light => {
+            SelectedTheme::Light => {
                 light = light.style(style.secondary.mk_theme());
             }
-            OurTheme::Dark => {
+            SelectedTheme::Dark => {
                 dark = dark.style(style.secondary.mk_theme());
             }
-            OurTheme::Custom => {
+            SelectedTheme::Custom => {
                 custom = custom.style(style.secondary.mk_theme());
             }
         }

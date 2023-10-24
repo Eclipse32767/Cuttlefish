@@ -1,8 +1,9 @@
 use toml::to_string;
 use std::fs;
 use std::process::Command;
+use oceania_style::{SelectedTheme, string_from_col};
 use crate::lib_cfg::*;
-use crate::lib_style::*;
+
 
 use crate::Configurator;
 impl Configurator {
@@ -74,9 +75,9 @@ impl Configurator {
             let work_anim = rip_work_anim(self.work_anim);
             let blur = self.blur;
             let active_border = string_from_col(match self.theme {
-                OurTheme::Light => &self.theme_set.light.application.primary,
-                OurTheme::Dark => &self.theme_set.dark.application.primary,
-                OurTheme::Custom => &self.theme_set.custom.application.primary
+                SelectedTheme::Light => &self.theme_set.light.application.primary,
+                SelectedTheme::Dark => &self.theme_set.dark.application.primary,
+                SelectedTheme::Custom => &self.theme_set.custom.application.primary
             });
             let sector_head = r#"{"#;
             let sector_tail = r#"}"#;

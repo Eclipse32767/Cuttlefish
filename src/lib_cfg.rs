@@ -5,14 +5,8 @@ use std::fs::read_to_string;
 use std::env;
 use std::fs;
 use gettextrs::gettext as tr;
+use oceania_style::SelectedTheme;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum OurTheme {
-    Light,
-    #[default]
-    Dark,
-    Custom
-}
 
 #[derive(Deserialize, Debug, Serialize)]
 pub struct FileData {
@@ -263,11 +257,11 @@ pub fn get_cfg_data() -> FileData {
     let decoded: FileData = from_str(&file).unwrap();
     decoded
 }
-pub fn decode_theme(x: &str, default: OurTheme) -> OurTheme {
+pub fn decode_theme(x: &str, default: SelectedTheme) -> SelectedTheme {
     match x {
-        "dark" => OurTheme::Dark,
-        "light" => OurTheme::Light,
-        "custom" => OurTheme::Custom,
+        "dark" => SelectedTheme::Dark,
+        "light" => SelectedTheme::Light,
+        "custom" => SelectedTheme::Custom,
         &_ => default
     }
 }
@@ -332,11 +326,11 @@ pub fn decode_widget(x: &str, default: BarWidget) -> BarWidget {
         &_ => default,
     }
 }
-pub fn encode_theme(x: OurTheme) -> String {
+pub fn encode_theme(x: SelectedTheme) -> String {
     match x {
-        OurTheme::Dark => "dark".to_string(),
-        OurTheme::Light => "light".to_string(),
-        OurTheme::Custom => "custom".to_string()
+        SelectedTheme::Dark => "dark".to_string(),
+        SelectedTheme::Light => "light".to_string(),
+        SelectedTheme::Custom => "custom".to_string()
     }
 }
 pub fn encode_pri(x: Option<ShortcutKey>) -> String {
